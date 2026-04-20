@@ -291,7 +291,7 @@ export default async function DashboardPage({
                   Dashboard
                 </h1>
                 <p className="mt-2 text-lg text-slate-500">
-                  Bienvenue {user.email}
+                  Bienvenue {profile.first_name || user.email || "à toi"} 👋
                 </p>
               </div>
             </section>

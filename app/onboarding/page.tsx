@@ -8,29 +8,45 @@ export default function OnboardingPage() {
   const supabase = createClient()
   const router = useRouter()
 
+  const [firstName, setFirstName] = useState("")
   const [activityType, setActivityType] = useState("service")
   const [acre, setAcre] = useState(false)
   const [versement, setVersement] = useState(false)
   const [declarationFrequency, setDeclarationFrequency] = useState<
     "monthly" | "quarterly"
   >("monthly")
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit() {
+    setLoading(true)
+
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) return
+    if (!user) {
+      setLoading(false)
+      return
+    }
 
-    await supabase.from("profiles").upsert({
+    const { error } = await supabase.from("profiles").upsert({
       id: user.id,
+      first_name: firstName.trim(),
       activity_type: activityType,
       acre,
       versement_liberatoire: versement,
       declaration_frequency: declarationFrequency,
     })
 
+    if (error) {
+      console.error("Erreur onboarding :", error.message)
+      setLoading(false)
+      return
+    }
+
+    setLoading(false)
     router.push("/dashboard")
+    router.refresh()
   }
 
   return (
@@ -41,10 +57,24 @@ export default function OnboardingPage() {
             Configure ton profil
           </h1>
           <p className="mt-3 text-slate-500">
-            Ces informations serviront à calculer tes charges, ton impôt et ta période de déclaration.
+            Ces informations servent à personnaliser ton dashboard et calculer
+            tes estimations.
           </p>
 
           <div className="mt-8 space-y-6">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-600">
+                Prénom
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Ton prénom"
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+              />
+            </div>
+
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Type d’activité
@@ -104,10 +134,11 @@ export default function OnboardingPage() {
 
             <button
               onClick={handleSubmit}
+              disabled={loading}
               style={{ cursor: "pointer" }}
-              className="rounded-2xl bg-[#4f7df3] px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(79,125,243,0.25)] transition hover:bg-[#3e6eea]"
+              className="rounded-2xl bg-[#4f7df3] px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(79,125,243,0.25)] transition hover:bg-[#3e6eea] disabled:opacity-50"
             >
-              Continuer
+              {loading ? "Enregistrement..." : "Continuer"}
             </button>
           </div>
         </div>
