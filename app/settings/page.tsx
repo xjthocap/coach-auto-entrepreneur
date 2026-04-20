@@ -45,13 +45,16 @@ export default async function SettingsPage() {
               </div>
             </div>
 
+            <div className="flex items-center gap-3">
             <Link
-              href="/dashboard"
-              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                href="/dashboard"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
-              Retour au dashboard
+                Retour
             </Link>
+
             <LogoutButton />
+            </div>
           </div>
         </header>
 
@@ -77,6 +80,14 @@ export default async function SettingsPage() {
 
             <div className="mt-6 space-y-5">
               <div className="rounded-2xl bg-[#f8f9fd] p-5">
+                <p className="font-medium text-slate-900">Prénom</p>
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  Il personnalise ton espace et rend l’expérience plus claire
+                  et plus agréable au quotidien.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#f8f9fd] p-5">
                 <p className="font-medium text-slate-900">Type d’activité</p>
                 <p className="mt-2 text-sm leading-7 text-slate-500">
                   Les taux de charges changent selon que tu sois en vente,
@@ -100,7 +111,6 @@ export default async function SettingsPage() {
                   Cette option impacte l’estimation de l’impôt affichée dans ton
                   dashboard.
                 </p>
-                
               </div>
             </div>
           </div>

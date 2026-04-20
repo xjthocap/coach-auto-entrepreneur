@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 
 type Profile = {
   id: string
+  first_name: string | null
   activity_type: "vente" | "service" | "liberal"
   acre: boolean
   versement_liberatoire: boolean
@@ -16,12 +17,15 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const supabase = createClient()
   const router = useRouter()
 
-  const [activityType, setActivityType] = useState(profile.activity_type)
-  const [acre, setAcre] = useState(profile.acre)
-  const [versement, setVersement] = useState(profile.versement_liberatoire)
-  const [declarationFrequency, setDeclarationFrequency] = useState(
-    profile.declaration_frequency || "monthly"
+  const [firstName, setFirstName] = useState(profile?.first_name || "")
+  const [activityType, setActivityType] = useState(profile?.activity_type || "service")
+  const [acre, setAcre] = useState(profile?.acre || false)
+  const [versement, setVersement] = useState(
+    profile?.versement_liberatoire || false
   )
+  const [declarationFrequency, setDeclarationFrequency] = useState<
+    "monthly" | "quarterly"
+  >(profile?.declaration_frequency || "monthly")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
 
@@ -32,6 +36,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
     const { error } = await supabase
       .from("profiles")
       .update({
+        first_name: firstName.trim(),
         activity_type: activityType,
         acre,
         versement_liberatoire: versement,
@@ -40,18 +45,32 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       .eq("id", profile.id)
 
     if (error) {
+      console.error("Erreur settings :", error.message)
       setMessage("Erreur lors de la sauvegarde")
       setLoading(false)
       return
     }
 
-    setMessage("Profil mis à jour")
+    setMessage("Profil mis à jour ✅")
     setLoading(false)
     router.refresh()
   }
 
   return (
     <div className="space-y-6">
+      <div className="w-full">
+        <label className="mb-2 block text-sm font-medium text-slate-600">
+          Prénom
+        </label>
+        <input
+          type="text"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="Ton prénom"
+          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        />
+      </div>
+
       <div className="w-full">
         <label className="mb-2 block text-sm font-medium text-slate-600">
           Type d’activité
@@ -62,7 +81,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           onChange={(e) =>
             setActivityType(e.target.value as "vente" | "service" | "liberal")
           }
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
         >
           <option value="vente">Vente</option>
           <option value="service">Service</option>
@@ -82,7 +101,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
               e.target.value as "monthly" | "quarterly"
             )
           }
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
         >
           <option value="monthly">Mensuelle</option>
           <option value="quarterly">Trimestrielle</option>
@@ -113,8 +132,9 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
 
       <button
         onClick={handleSave}
+        disabled={loading}
         style={{ cursor: "pointer" }}
-        className="w-full rounded-2xl bg-[#4f7df3] px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(79,125,243,0.25)] transition hover:bg-[#3e6eea]"
+        className="w-full rounded-2xl bg-[#4f7df3] px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(79,125,243,0.25)] transition hover:bg-[#3e6eea] disabled:opacity-50"
       >
         {loading ? "Sauvegarde..." : "Enregistrer"}
       </button>
