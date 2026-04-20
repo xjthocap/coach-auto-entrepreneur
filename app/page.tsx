@@ -1,6 +1,26 @@
+import Link from "next/link"
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
+        <nav className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <h1 className="font-bold">Coach AE</h1>
+
+          <div className="flex gap-4">
+          <Link 
+            href="/login" 
+            className="text-sm text-gray-300 hover:text-white">
+             Login
+          </Link>
+
+           <Link 
+            href="/dashboard" 
+            className="text-sm text-gray-300 hover:text-white">
+             Dashboard
+            </Link>
+          </div>
+        </nav>
+        
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
         <span className="mb-6 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300">
           Coach pour auto-entrepreneurs
@@ -16,13 +36,17 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row">
-          <button className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-200">
+          <Link
+            href="/login"
+            className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-200">
             Commencer
-          </button>
+          </Link>
 
-          <button className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-white transition hover:bg-white/5">
-            Voir la démo
-          </button>
+          <Link 
+            href="/dashboard"
+            className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-white transition hover:bg-white/5">
+            Voir le dashboard
+          </Link>
         </div>
 
         <div className="mt-20 grid w-full max-w-5xl gap-6 md:grid-cols-3">
