@@ -18,7 +18,19 @@ function getErrorMessage(error: string) {
     return "Mot de passe trop faible"
   }
 
-  return "Une erreur est survenue"
+  if (error.includes("Email rate limit exceeded")) {
+    return "Trop de tentatives. Réessaie dans quelques minutes."
+  }
+
+  if (error.includes("Signup is disabled")) {
+    return "La création de compte est désactivée."
+  }
+
+  if (error.includes("Email not confirmed")) {
+    return "Ton email n’est pas encore confirmé."
+  }
+
+  return error || "Une erreur est survenue"
 }
 
 export default function LoginPage() {
@@ -30,44 +42,79 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
 
-  async function handleSignUp(e: React.FormEvent) {
+  async function handleSignUp(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
+    if (loading) return
+
     setLoading(true)
     setMessage("")
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
+    try {
+      const emailRedirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/dashboard`
+          : undefined
 
-    if (error) {
-      setMessage(getErrorMessage(error.message))
-    } else {
-      setMessage("Compte créé. Vérifie tes emails si une confirmation est demandée.")
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo,
+        },
+      })
+
+      if (error) {
+        console.error("Erreur signup :", error.message)
+        setMessage(getErrorMessage(error.message))
+        return
+      }
+
+      if (data.user && data.session) {
+        setMessage("Compte créé avec succès.")
+        router.push("/dashboard")
+        router.refresh()
+        return
+      }
+
+      setMessage(
+        "Compte créé. Vérifie tes emails si une confirmation est demandée."
+      )
+    } catch (err) {
+      console.error("Erreur inattendue signup :", err)
+      setMessage("Une erreur est survenue lors de la création du compte.")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
-  async function handleSignIn(e: React.FormEvent) {
+  async function handleSignIn(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
+    if (loading) return
+
     setLoading(true)
     setMessage("")
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setMessage(getErrorMessage(error.message))
-    } else {
+      if (error) {
+        console.error("Erreur signin :", error.message)
+        setMessage(getErrorMessage(error.message))
+        return
+      }
+
       setMessage("Connexion réussie.")
       router.push("/dashboard")
       router.refresh()
+    } catch (err) {
+      console.error("Erreur inattendue signin :", err)
+      setMessage("Une erreur est survenue lors de la connexion.")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
@@ -114,6 +161,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
                   placeholder="ton@email.com"
+                  autoComplete="email"
                 />
               </div>
 
@@ -127,6 +175,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                 />
               </div>
 
@@ -134,6 +183,7 @@ export default function LoginPage() {
                 <button
                   onClick={handleSignIn}
                   disabled={loading}
+                  type="button"
                   className="rounded-2xl bg-[#4f7df3] px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(79,125,243,0.25)] transition hover:bg-[#3e6eea] disabled:opacity-50"
                 >
                   {loading ? "Chargement..." : "Se connecter"}

@@ -15,8 +15,25 @@ import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
 
-export default async function DashboardPage() {
+function parseLocalDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number)
+  return new Date(year, month - 1, day)
+}
+
+function formatLocalDate(date: Date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>
+}) {
   const supabase = await createClient()
+  const resolvedSearchParams = await searchParams
 
   const {
     data: { user },
@@ -41,7 +58,19 @@ export default async function DashboardPage() {
       ? "quarterly"
       : "monthly"
 
-  const period = getPeriodRange(frequency)
+  const dateParam = resolvedSearchParams?.date ?? null
+
+  const baseDate = dateParam ? parseLocalDate(dateParam) : new Date()
+
+  const period = getPeriodRange(frequency, baseDate)
+
+  const step = frequency === "quarterly" ? 3 : 1
+
+  const prevDate = new Date(baseDate)
+  prevDate.setMonth(prevDate.getMonth() - step)
+
+  const nextDate = new Date(baseDate)
+  nextDate.setMonth(nextDate.getMonth() + step)
 
   // ===== REVENUS DE LA PÉRIODE ACTUELLE =====
   const { data: revenues } = await supabase
@@ -55,10 +84,10 @@ export default async function DashboardPage() {
   const totalRevenue =
     revenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
 
-  // ===== REVENUS DE L'ANNÉE CIVILE (POUR LE SEUIL) =====
-  const currentYear = new Date().getFullYear()
-  const yearStart = `${currentYear}-01-01`
-  const yearEnd = `${currentYear}-12-31`
+  // ===== REVENUS DE L'ANNÉE DE LA PÉRIODE AFFICHÉE (POUR LE SEUIL + CHART) =====
+  const selectedYear = baseDate.getFullYear()
+  const yearStart = `${selectedYear}-01-01`
+  const yearEnd = `${selectedYear}-12-31`
 
   const { data: yearRevenues } = await supabase
     .from("revenues")
@@ -121,6 +150,7 @@ export default async function DashboardPage() {
     }) || []
 
   const realNet = result.net - totalExpenses
+  const reserveAmount = result.charges + result.tax
 
   // ===== PROJECTION FIN DE PÉRIODE =====
   const projection = calculateProjection({
@@ -160,7 +190,7 @@ export default async function DashboardPage() {
             </Link>
 
             <Link
-              href="/Expenses"
+              href="/expenses"
               className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:bg-slate-50"
             >
               <span className="text-lg">💸</span>
@@ -198,9 +228,25 @@ export default async function DashboardPage() {
                         {frequency === "monthly" ? "Mensuelle" : "Trimestrielle"}
                       </span>
 
-                      <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-                        {period.label}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/dashboard?date=${formatLocalDate(prevDate)}`}
+                          className="rounded-lg px-2 py-1 text-slate-600 hover:bg-slate-100"
+                        >
+                          ←
+                        </Link>
+
+                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
+                          {period.label}
+                        </span>
+
+                        <Link
+                          href={`/dashboard?date=${formatLocalDate(nextDate)}`}
+                          className="rounded-lg px-2 py-1 text-slate-600 hover:bg-slate-100"
+                        >
+                          →
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -214,7 +260,7 @@ export default async function DashboardPage() {
                   </Link>
 
                   <Link
-                    href="/Expenses"
+                    href="/expenses"
                     className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                   >
                     Dépenses
@@ -227,7 +273,14 @@ export default async function DashboardPage() {
                     Paramètres
                   </Link>
 
-                  <LogoutButton />
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSdE6QdvRJIyqqxMTRM3wFCofOSAU-LaH6VVARF9Q_cmcF9sZA/viewform?usp=publish-editor"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-2xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                  >
+                    Donner un avis
+                  </a>
                 </div>
               </div>
             </header>
@@ -291,28 +344,41 @@ export default async function DashboardPage() {
             <section className="space-y-4">
               <div>
                 <h2 className="text-xl font-semibold text-slate-800">
-                  Ce qu’il te reste vraiment
+                  Pilotage de ta trésorerie
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Après charges, impôts et dépenses de la période.
+                  Ce que tu dois sécuriser, ce que tu dépenses, et ce qu’il te reste vraiment.
                 </p>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-3">
                 <StatCard
                   title="Dépenses période"
                   value={`${totalExpenses.toFixed(2)} €`}
+                  accent="red"
                 />
 
-                <div className="rounded-[26px] bg-[#4f7df3] p-6 shadow-[0_12px_30px_rgba(79,125,243,0.20)]">
+                <div className="rounded-[26px] border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-6 shadow-[0_12px_30px_rgba(249,115,22,0.10)]">
+                  <p className="text-sm font-medium text-orange-700">
+                    À mettre de côté
+                  </p>
+                  <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-900">
+                    {reserveAmount.toFixed(2)} €
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Pour couvrir tes charges et ton impôt.
+                  </p>
+                </div>
+
+                <div className="rounded-[26px] bg-gradient-to-br from-[#4f7df3] to-[#3e6eea] p-6 shadow-[0_12px_30px_rgba(79,125,243,0.20)]">
                   <p className="text-sm font-medium text-blue-100">
-                    Reste disponible
+                    Disponible maintenant
                   </p>
                   <p className="mt-3 text-4xl font-semibold tracking-tight text-white">
                     {realNet.toFixed(2)} €
                   </p>
                   <p className="mt-2 text-sm text-blue-100">
-                    Ce que tu peux réellement te verser ou garder disponible.
+                    Après charges, impôt et dépenses.
                   </p>
                 </div>
               </div>

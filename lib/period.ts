@@ -1,9 +1,13 @@
-export function getPeriodRange(frequency: "monthly" | "quarterly") {
-  const now = new Date()
+export function getPeriodRange(
+  frequency: "monthly" | "quarterly",
+  baseDate: Date = new Date()
+) {
+  const year = baseDate.getFullYear()
+  const month = baseDate.getMonth()
 
   if (frequency === "monthly") {
-    const start = new Date(now.getFullYear(), now.getMonth(), 1)
-    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    const start = new Date(year, month, 1)
+    const end = new Date(year, month + 1, 0)
 
     return {
       start: formatDate(start),
@@ -15,17 +19,20 @@ export function getPeriodRange(frequency: "monthly" | "quarterly") {
     }
   }
 
-  const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3
-  const start = new Date(now.getFullYear(), quarterStartMonth, 1)
-  const end = new Date(now.getFullYear(), quarterStartMonth + 3, 0)
+  const quarter = Math.floor(month / 3)
+  const start = new Date(year, quarter * 3, 1)
+  const end = new Date(year, quarter * 3 + 3, 0)
 
   return {
     start: formatDate(start),
     end: formatDate(end),
-    label: `T${Math.floor(now.getMonth() / 3) + 1} ${now.getFullYear()}`,
+    label: `T${quarter + 1} ${year}`,
   }
 }
 
 function formatDate(date: Date) {
-  return date.toISOString().split("T")[0]
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
 }
