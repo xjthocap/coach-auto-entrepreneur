@@ -29,7 +29,7 @@ export default function DeleteRevenueButton({ revenueId }: Props) {
     <button
       onClick={handleDelete}
       style={{ cursor: "pointer" }}
-      className="rounded-lg border border-red-500/30 px-3 py-1 text-sm text-red-400 transition hover:bg-red-500/10"
+      className="rounded-2xl border border-blue-200 bg-[#edf3ff] px-4 py-2 font-medium text-[#3f6fe9] transition hover:bg-[#e3ecff]"
     >
       Supprimer
     </button>

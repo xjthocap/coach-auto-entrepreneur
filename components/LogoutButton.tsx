@@ -16,8 +16,8 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      style={{ cursor: "pointer"}}
-      className="rounded-xl bg-white px-4 py-2 font-semibold text-black transition hover:bg-gray-200"
+      style={{ cursor: "pointer" }}
+      className="rounded-2xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
     >
       Se déconnecter
     </button>
