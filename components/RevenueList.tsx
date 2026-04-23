@@ -13,7 +13,7 @@ export default function RevenueList({ revenues }: { revenues: Revenue[] }) {
       <h2 className="mb-6 text-3xl font-semibold tracking-tight text-slate-900">
   Mes revenus
   <p className="mt-2 text-sm text-slate-500">
-    Cette liste affiche uniquement les revenus pris en compte dans la période actuelle ba.
+    Cette liste affiche uniquement les revenus pris en compte dans la période actuelle.
   </p>
 </h2>
 

@@ -188,124 +188,178 @@ export default async function DashboardPage({
   const isPremium = profile.plan === "premium"
 
   return (
-    <main className="min-h-screen bg-[#f5f6fb] text-slate-800">
+    <main className="min-h-screen bg-[#f7f8f4] text-[#0f172a]">
       <div className="flex min-h-screen">
-        <aside className="hidden w-20 flex-col justify-between border-r border-slate-200 bg-[#eef1f8] px-3 py-6 md:flex">
-          <div className="space-y-4 fixed">
-            <Link
-              href="/dashboard"
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#dfe7ff] shadow-sm"
-            >
-              <span className="text-lg">🏠</span>
-            </Link>
-
-            <Link
-              href="/revenues"
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:bg-slate-50"
-            >
-              <span className="text-lg">💰</span>
-            </Link>
-
-            <Link
-              href="/Expenses"
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:bg-slate-50"
-            >
-              <span className="text-lg">💸</span>
-            </Link>
-
-            <Link
-              href="/settings"
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:bg-slate-50"
-            >
-              <span className="text-lg">⚙️</span>
-            </Link>
-          </div>
-        </aside>
-
-        <div className="flex-1 px-4 py-6 md:px-8 md:py-8">
-          <div className="mx-auto max-w-7xl space-y-8">
-            <header className="rounded-[28px] border border-white/70 bg-white/70 px-6 py-5 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4f7df3] text-2xl font-bold text-white shadow-md">
-                    PY
-                  </div>
-
-                  <div>
-                    <p className="text-3xl font-semibold tracking-tight">
-                      Pylot <PlanBadge plan={profile.plan} />
-                    </p>
-
-                    <div className="mt-2 flex flex-wrap items-center gap-3">
-                      <p className="text-sm text-slate-500">
-                        Ton copilote simple pour piloter tes revenus et tes dépenses
-                      </p>
-
-                      <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                        {frequency === "monthly" ? "Mensuelle" : "Trimestrielle"}
-                      </span>
-
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/dashboard?date=${formatLocalDate(prevDate)}`}
-                          className="rounded-lg px-2 py-1 text-slate-600 hover:bg-slate-100"
-                        >
-                          ←
-                        </Link>
-
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
-                          {period.label}
-                        </span>
-
-                        <Link
-                          href={`/dashboard?date=${formatLocalDate(nextDate)}`}
-                          className="rounded-lg px-2 py-1 text-slate-600 hover:bg-slate-100"
-                        >
-                          →
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+        {/* SIDEBAR DESKTOP */}
+        <aside className="hidden w-[280px] shrink-0 border-r border-black/5 bg-white/70 px-5 py-6 backdrop-blur lg:block">
+          <div className="sticky top-6 flex h-[calc(100vh-3rem)] flex-col">
+            <div>
+              <Link href="/dashboard" className="inline-block">
+                <div className="text-3xl font-extrabold tracking-tight text-slate-950">
+                  KeskiReste<span className="text-[#22c55e]">.</span>
                 </div>
+              </Link>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                Ton vrai solde, sans prise de tête.
+              </p>
+            </div>
 
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/revenues"
-                    className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    Revenus
-                  </Link>
+            <nav className="mt-8 space-y-2">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 rounded-2xl bg-[#0f172a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+              >
+                <span className="text-base">🏠</span>
+                <span>Tableau de bord</span>
+              </Link>
 
-                  <Link
-                    href="/Expenses"
-                    className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    Dépenses
-                  </Link>
+              <Link
+                href="/revenues"
+                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+              >
+                <span className="text-base">💰</span>
+                <span>Revenus</span>
+              </Link>
 
-                  <Link
-                    href="/settings"
-                    className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    Paramètres
-                  </Link>
+              <Link
+                href="/Expenses"
+                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+              >
+                <span className="text-base">💸</span>
+                <span>Dépenses</span>
+              </Link>
 
+              <Link
+                href="/settings"
+                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+              >
+                <span className="text-base">⚙️</span>
+                <span>Paramètres</span>
+              </Link>
+            </nav>
+
+            <div className="mt-8 rounded-[28px] border border-[#dcfce7] bg-[#f0fdf4] p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-slate-900">Ton plan</p>
+                <PlanBadge plan={profile.plan} />
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                {isPremium
+                  ? "Tu as accès aux outils avancés de pilotage et aux insights IA."
+                  : "Passe en premium pour débloquer les projections et les insights IA."}
+              </p>
+
+              {!isPremium && (
+                <Link
+                  href="/settings"
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#22c55e] px-4 py-3 text-sm font-bold text-[#0f172a] transition hover:opacity-90"
+                >
+                  Passer en premium
+                </Link>
+              )}
+            </div>
+
+            <div className="mt-auto pt-6">
+              <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
+                <p className="text-sm font-semibold text-slate-900">
+                  Session active
+                </p>
+                <p className="mt-2 truncate text-sm text-slate-500">
+                  {profile.first_name || user.email}
+                </p>
+                <div className="mt-4">
                   <LogoutButton />
                 </div>
               </div>
-            </header>
+            </div>
+          </div>
+        </aside>
 
-            <section>
-              <div>
-                <h1 className="text-5xl font-semibold tracking-tight text-slate-900">
-                  Bonjour {profile.first_name || user.email || "à toi"} 👋 
+        {/* CONTENT */}
+        <section className="min-w-0 flex-1">
+          {/* TOPBAR */}
+          <header className="sticky top-0 z-20 border-b border-black/5 bg-[#f7f8f4]/80 backdrop-blur">
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+              <div className="min-w-0">
+                <p className="text-sm text-slate-500">Dashboard</p>
+                <h1 className="truncate text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
+                  Bonjour {profile.first_name || user.email || "à toi"} 👋
                 </h1>
-                <p className="mt-2 text-lg text-slate-500">
-                  Voici le résumé de ta période actuelle.
-                </p>
+              </div>
+
+              <div className="hidden items-center gap-3 md:flex">
+                <Link
+                  href="/revenues"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Revenus
+                </Link>
+
+                <Link
+                  href="/Expenses"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Dépenses
+                </Link>
+
+                <Link
+                  href="/settings"
+                  className="rounded-xl bg-[#0f172a] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                  Paramètres
+                </Link>
+              </div>
+            </div>
+          </header>
+
+          <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 md:px-8 md:py-8">
+            {/* HERO RESUME */}
+            <section className="rounded-[32px] border border-[#dcfce7] bg-gradient-to-r from-[#f0fdf4] to-white p-6 shadow-sm md:p-8">
+              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                <div className="max-w-3xl">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#15803d]">
+                      Période active
+                    </span>
+                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+                      {period.label}
+                    </span>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                      {frequency === "monthly" ? "Déclaration mensuelle" : "Déclaration trimestrielle"}
+                    </span>
+                  </div>
+
+                  <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
+                    Voici ce qu’il te reste vraiment sur la période.
+                  </h2>
+
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
+                    Tu visualises ici ton chiffre d’affaires, tes charges estimées,
+                    tes dépenses et ton disponible réel, pour piloter ton activité
+                    sans te perdre dans les calculs.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href={`/dashboard?date=${formatLocalDate(prevDate)}`}
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    ← Période précédente
+                  </Link>
+
+                  <Link
+                    href={`/dashboard?date=${formatLocalDate(nextDate)}`}
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Période suivante →
+                  </Link>
+                </div>
               </div>
             </section>
 
+            {/* THRESHOLD ALERT */}
             <section>
               <ThresholdAlert
                 totalRevenue={yearRevenue}
@@ -316,45 +370,92 @@ export default async function DashboardPage({
               />
             </section>
 
-            <DashboardPremiumShell
-              isPremium={isPremium}
-              ai={
-                isPremium ? (
-                  <AIInsightsCard
-                    totalRevenue={totalRevenue}
-                    charges={result.charges}
-                    tax={result.tax}
-                    expenses={totalExpenses}
-                    realNet={realNet}
-                    reserveAmount={reserveAmount}
-                    thresholdRatio={ratio}
-                    periodLabel={period.label}
-                    activityType={profile.activity_type}
-                    daysRemaining={daysRemainingInPeriod}
-                  />
-                ) : null
-              }
-              projection={
-                isPremium ? (
-                  <ProjectionCard
-                    periodLabel={period.label}
-                    projectedRevenue={projection.projectedRevenue}
-                    projectedCharges={projectedResult.charges}
-                    projectedTax={projectedResult.tax}
-                    projectedExpenses={projection.projectedExpenses}
-                    projectedRealNet={projectedRealNet}
-                  />
-                ) : null
-              }
-            />
+            {/* QUICK KPIS */}
+            <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-sm text-slate-500">Chiffre d’affaires</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                  {totalRevenue.toFixed(2)} €
+                </p>
+                <p className="mt-2 text-sm text-slate-500">
+                  Période {period.label.toLowerCase()}
+                </p>
+              </div>
 
-            <section className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-800">
-                  À déclarer cette période
+              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-sm text-slate-500">Charges + impôt</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                  {reserveAmount.toFixed(2)} €
+                </p>
+                <p className="mt-2 text-sm text-slate-500">
+                  À mettre de côté
+                </p>
+              </div>
+
+              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-sm text-slate-500">Dépenses période</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                  {totalExpenses.toFixed(2)} €
+                </p>
+                <p className="mt-2 text-sm text-slate-500">
+                  Fixes + ponctuelles
+                </p>
+              </div>
+
+              <div className="rounded-[28px] bg-[#0f172a] p-6 shadow-[0_20px_50px_rgba(15,23,42,0.15)]">
+                <p className="text-sm text-slate-300">Disponible réel</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-[#4ade80]">
+                  {realNet.toFixed(2)} €
+                </p>
+                <p className="mt-2 text-sm text-slate-300">
+                  Après charges, impôt et dépenses
+                </p>
+              </div>
+            </section>
+
+            {/* PREMIUM BLOCK */}
+            <section>
+              <DashboardPremiumShell
+                isPremium={isPremium}
+                ai={
+                  isPremium ? (
+                    <AIInsightsCard
+                      totalRevenue={totalRevenue}
+                      charges={result.charges}
+                      tax={result.tax}
+                      expenses={totalExpenses}
+                      realNet={realNet}
+                      reserveAmount={reserveAmount}
+                      thresholdRatio={ratio}
+                      periodLabel={period.label}
+                      activityType={profile.activity_type}
+                      daysRemaining={daysRemainingInPeriod}
+                    />
+                  ) : null
+                }
+                projection={
+                  isPremium ? (
+                    <ProjectionCard
+                      periodLabel={period.label}
+                      projectedRevenue={projection.projectedRevenue}
+                      projectedCharges={projectedResult.charges}
+                      projectedTax={projectedResult.tax}
+                      projectedExpenses={projection.projectedExpenses}
+                      projectedRealNet={projectedRealNet}
+                    />
+                  ) : null
+                }
+              />
+            </section>
+
+            {/* DECLARATION STATS */}
+            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-black tracking-tight text-slate-950">
+                  À déclarer sur cette période
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Le chiffre d’affaires et les montants estimés pour ta déclaration actuelle.
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  Les montants estimés pour t’aider à anticiper simplement ta déclaration actuelle.
                 </p>
               </div>
 
@@ -383,82 +484,97 @@ export default async function DashboardPage({
               </div>
             </section>
 
-            <section className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-800">
+            {/* CASH PILOTING */}
+            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-black tracking-tight text-slate-950">
                   Pilotage de ta trésorerie
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Ce que tu dois sécuriser, ce que tu dépenses, et ce qu’il te reste vraiment.
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  Ce que tu dois sécuriser, ce que tu dépenses et ce qu’il te reste réellement.
                 </p>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-3">
+              <div className="grid gap-5 lg:grid-cols-3">
                 <StatCard
                   title="Dépenses période"
                   value={`${totalExpenses.toFixed(2)} €`}
                   accent="red"
                 />
 
-                <div className="rounded-[26px] border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-6 shadow-[0_12px_30px_rgba(249,115,22,0.10)]">
-                  <p className="text-sm font-medium text-orange-700">
+                <div className="rounded-[28px] border border-[#fed7aa] bg-gradient-to-br from-orange-50 to-white p-6 shadow-[0_12px_30px_rgba(249,115,22,0.08)]">
+                  <p className="text-sm font-semibold text-orange-700">
                     À mettre de côté
                   </p>
-                  <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-900">
+                  <p className="mt-3 text-4xl font-black tracking-tight text-slate-950">
                     {reserveAmount.toFixed(2)} €
                   </p>
-                  <p className="mt-2 text-sm text-slate-600">
-                    Pour couvrir tes charges et ton impôt.
+                  <p className="mt-2 text-sm leading-7 text-slate-600">
+                    Pour couvrir tes charges sociales et ton impôt.
                   </p>
                 </div>
 
-                <div className="rounded-[26px] bg-gradient-to-br from-[#4f7df3] to-[#3e6eea] p-6 shadow-[0_12px_30px_rgba(79,125,243,0.20)]">
-                  <p className="text-sm font-medium text-blue-100">
+                <div className="rounded-[28px] bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 shadow-[0_20px_40px_rgba(15,23,42,0.18)]">
+                  <p className="text-sm font-semibold text-slate-300">
                     Disponible maintenant
                   </p>
-                  <p className="mt-3 text-4xl font-semibold tracking-tight text-white">
+                  <p className="mt-3 text-4xl font-black tracking-tight text-[#4ade80]">
                     {realNet.toFixed(2)} €
                   </p>
-                  <p className="mt-2 text-sm text-blue-100">
-                    Après charges, impôt et dépenses.
+                  <p className="mt-2 text-sm leading-7 text-slate-300">
+                    Ce que tu peux considérer comme réellement disponible.
                   </p>
                 </div>
               </div>
             </section>
 
-            <section className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-800">
+            {/* QUICK ACTIONS */}
+            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-black tracking-tight text-slate-950">
                   Actions rapides
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Ajoute rapidement une entrée ou une sortie.
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  Ajoute rapidement une entrée ou une sortie pour garder tes chiffres à jour.
                 </p>
               </div>
 
               <div className="grid gap-6 xl:grid-cols-2">
-                <AddRevenue />
-                <AddExpense />
+                <div className="rounded-[28px] bg-[#f8fafc] p-2">
+                  <AddRevenue />
+                </div>
+
+                <div className="rounded-[28px] bg-[#f8fafc] p-2">
+                  <AddExpense />
+                </div>
               </div>
             </section>
 
+            {/* LISTS */}
             <section className="grid gap-6 xl:grid-cols-2">
-              <RevenueList revenues={revenues || []} />
-              <ExpenseList expenses={expensesWithPeriodInfo} showPeriodInfo />
+              <div className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
+                <RevenueList revenues={revenues || []} />
+              </div>
+
+              <div className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
+                <ExpenseList expenses={expensesWithPeriodInfo} showPeriodInfo />
+              </div>
             </section>
 
-            <section>
+            {/* CHART */}
+            <section className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
               <RevenueChart revenues={yearRevenues || []} />
             </section>
 
-            <section>
+            {/* DEV SWITCHER */}
+            <section className="rounded-[32px] border border-dashed border-slate-300 bg-white/70 p-4">
               <DevPlanSwitcher
                 currentPlan={profile.plan}
                 profileId={profile.id}
               />
             </section>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   )
