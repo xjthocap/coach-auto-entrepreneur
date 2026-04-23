@@ -10,6 +10,10 @@ import RevenueChart from "@/components/RevenueChart"
 import StatCard from "@/components/StatCard"
 import ProjectionCard from "@/components/ProjectionCard"
 import ThresholdAlert from "@/components/ThresholdAlert"
+import AIInsightsCard from "@/components/AIInsightsCard"
+import DashboardPremiumShell from "@/components/DashboardPremiumShell"
+import PlanBadge from "@/components/PlanBadge"
+import DevPlanSwitcher from "@/components/DevPlanSwitcher"
 import { calculateMicro } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
@@ -25,6 +29,11 @@ function formatLocalDate(date: Date) {
   const m = String(date.getMonth() + 1).padStart(2, "0")
   const d = String(date.getDate()).padStart(2, "0")
   return `${y}-${m}-${d}`
+}
+
+function parsePeriodDate(dateStr: string) {
+  const [y, m, d] = dateStr.split("-").map(Number)
+  return new Date(y, m - 1, d)
 }
 
 export default async function DashboardPage({
@@ -59,7 +68,6 @@ export default async function DashboardPage({
       : "monthly"
 
   const dateParam = resolvedSearchParams?.date ?? null
-
   const baseDate = dateParam ? parseLocalDate(dateParam) : new Date()
 
   const period = getPeriodRange(frequency, baseDate)
@@ -72,7 +80,15 @@ export default async function DashboardPage({
   const nextDate = new Date(baseDate)
   nextDate.setMonth(nextDate.getMonth() + step)
 
-  // ===== REVENUS DE LA PÉRIODE ACTUELLE =====
+  const today = new Date()
+  const endDate = parsePeriodDate(period.end)
+  const diffTime = endDate.getTime() - today.getTime()
+  const daysRemainingInPeriod = Math.max(
+    0,
+    Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  )
+
+  // ===== REVENUS DE LA PÉRIODE =====
   const { data: revenues } = await supabase
     .from("revenues")
     .select("*")
@@ -84,7 +100,7 @@ export default async function DashboardPage({
   const totalRevenue =
     revenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
 
-  // ===== REVENUS DE L'ANNÉE DE LA PÉRIODE AFFICHÉE (POUR LE SEUIL + CHART) =====
+  // ===== REVENUS DE L'ANNÉE DE LA PÉRIODE AFFICHÉE =====
   const selectedYear = baseDate.getFullYear()
   const yearStart = `${selectedYear}-01-01`
   const yearEnd = `${selectedYear}-12-31`
@@ -99,12 +115,12 @@ export default async function DashboardPage({
   const yearRevenue =
     yearRevenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
 
-  // ===== SEUIL ANNUEL =====
+  // ===== SEUIL =====
   const threshold = getThreshold(profile.activity_type)
   const thresholdInfo = getThresholdStatus(yearRevenue, threshold)
   const ratio = yearRevenue / threshold
 
-  // ===== CALCULS DE LA PÉRIODE =====
+  // ===== CALCULS MICRO =====
   const result = calculateMicro({
     revenue: totalRevenue,
     activityType: profile.activity_type,
@@ -112,14 +128,13 @@ export default async function DashboardPage({
     versementLiberatoire: profile.versement_liberatoire,
   })
 
-  // ===== DÉPENSES (LISTE COMPLÈTE POUR AFFICHAGE) =====
+  // ===== DÉPENSES =====
   const { data: expenses } = await supabase
     .from("expenses")
     .select("*")
     .eq("user_id", user.id)
     .order("date", { ascending: false })
 
-  // ===== DÉPENSES COMPTÉES DANS LA PÉRIODE =====
   const totalExpenses =
     expenses?.reduce((sum, exp) => {
       if (exp.type === "one_time") {
@@ -152,7 +167,7 @@ export default async function DashboardPage({
   const realNet = result.net - totalExpenses
   const reserveAmount = result.charges + result.tax
 
-  // ===== PROJECTION FIN DE PÉRIODE =====
+  // ===== PROJECTION =====
   const projection = calculateProjection({
     currentRevenue: totalRevenue,
     currentExpenses: totalExpenses,
@@ -169,6 +184,8 @@ export default async function DashboardPage({
 
   const projectedRealNet =
     projectedResult.net - projection.projectedExpenses
+
+  const isPremium = profile.plan === "premium"
 
   return (
     <main className="min-h-screen bg-[#f5f6fb] text-slate-800">
@@ -190,7 +207,7 @@ export default async function DashboardPage({
             </Link>
 
             <Link
-              href="/Expenses"
+              href="/expenses"
               className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:bg-slate-50"
             >
               <span className="text-lg">💸</span>
@@ -211,12 +228,12 @@ export default async function DashboardPage({
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4f7df3] text-2xl font-bold text-white shadow-md">
-                    AE
+                    PY
                   </div>
 
                   <div>
                     <p className="text-3xl font-semibold tracking-tight">
-                      Coach Auto-Entrepreneur
+                      Pylot <PlanBadge plan={profile.plan} />
                     </p>
 
                     <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -260,7 +277,7 @@ export default async function DashboardPage({
                   </Link>
 
                   <Link
-                    href="/Expenses"
+                    href="/expenses"
                     className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                   >
                     Dépenses
@@ -273,14 +290,7 @@ export default async function DashboardPage({
                     Paramètres
                   </Link>
 
-                  <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSdE6QdvRJIyqqxMTRM3wFCofOSAU-LaH6VVARF9Q_cmcF9sZA/viewform?usp=publish-editor"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-2xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
-                  >
-                    Donner un avis
-                  </a>
+                  <LogoutButton />
                 </div>
               </div>
             </header>
@@ -288,10 +298,10 @@ export default async function DashboardPage({
             <section>
               <div>
                 <h1 className="text-5xl font-semibold tracking-tight text-slate-900">
-                  Dashboard
+                  Bonjour {profile.first_name || user.email || "à toi"} 👋 
                 </h1>
                 <p className="mt-2 text-lg text-slate-500">
-                  Bienvenue {profile.first_name || user.email || "à toi"} 👋
+                  Voici le résumé de ta période actuelle.
                 </p>
               </div>
             </section>
@@ -305,6 +315,38 @@ export default async function DashboardPage({
                 message={thresholdInfo.message}
               />
             </section>
+
+            <DashboardPremiumShell
+              isPremium={isPremium}
+              ai={
+                isPremium ? (
+                  <AIInsightsCard
+                    totalRevenue={totalRevenue}
+                    charges={result.charges}
+                    tax={result.tax}
+                    expenses={totalExpenses}
+                    realNet={realNet}
+                    reserveAmount={reserveAmount}
+                    thresholdRatio={ratio}
+                    periodLabel={period.label}
+                    activityType={profile.activity_type}
+                    daysRemaining={daysRemainingInPeriod}
+                  />
+                ) : null
+              }
+              projection={
+                isPremium ? (
+                  <ProjectionCard
+                    periodLabel={period.label}
+                    projectedRevenue={projection.projectedRevenue}
+                    projectedCharges={projectedResult.charges}
+                    projectedTax={projectedResult.tax}
+                    projectedExpenses={projection.projectedExpenses}
+                    projectedRealNet={projectedRealNet}
+                  />
+                ) : null
+              }
+            />
 
             <section className="space-y-4">
               <div>
@@ -384,17 +426,6 @@ export default async function DashboardPage({
               </div>
             </section>
 
-            <section hidden>
-              <ProjectionCard
-                periodLabel={period.label}
-                projectedRevenue={projection.projectedRevenue}
-                projectedCharges={projectedResult.charges}
-                projectedTax={projectedResult.tax}
-                projectedExpenses={projection.projectedExpenses}
-                projectedRealNet={projectedRealNet}
-              />
-            </section>
-
             <section className="space-y-4">
               <div>
                 <h2 className="text-xl font-semibold text-slate-800">
@@ -418,6 +449,13 @@ export default async function DashboardPage({
 
             <section>
               <RevenueChart revenues={yearRevenues || []} />
+            </section>
+
+            <section>
+              <DevPlanSwitcher
+                currentPlan={profile.plan}
+                profileId={profile.id}
+              />
             </section>
           </div>
         </div>
