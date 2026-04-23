@@ -207,7 +207,7 @@ export default async function DashboardPage({
             </Link>
 
             <Link
-              href="/expenses"
+              href="/Expenses"
               className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:bg-slate-50"
             >
               <span className="text-lg">💸</span>
@@ -277,7 +277,7 @@ export default async function DashboardPage({
                   </Link>
 
                   <Link
-                    href="/expenses"
+                    href="/Expenses"
                     className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                   >
                     Dépenses
