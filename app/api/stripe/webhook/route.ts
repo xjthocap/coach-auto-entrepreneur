@@ -28,8 +28,6 @@ export async function POST(req: Request) {
       const session = event.data.object as any
       const userId = session.metadata?.supabase_user_id
 
-      console.log("Checkout completed userId:", userId)
-
       if (userId) {
         const { error } = await supabaseAdmin
           .from("profiles")
@@ -41,7 +39,7 @@ export async function POST(req: Request) {
           .eq("id", userId)
 
         if (error) {
-          console.error("Supabase update error:", error.message)
+          console.error("Erreur passage premium :", error.message)
         }
       }
     }
@@ -51,6 +49,7 @@ export async function POST(req: Request) {
       event.type === "customer.subscription.updated"
     ) {
       const subscription = event.data.object as any
+
       const customerId =
         typeof subscription.customer === "string"
           ? subscription.customer
@@ -61,17 +60,20 @@ export async function POST(req: Request) {
 
         const { error } = await supabaseAdmin
           .from("profiles")
-          .update({ plan: isActive ? "premium" : "free" })
+          .update({
+            plan: isActive ? "premium" : "free",
+          })
           .eq("stripe_customer_id", customerId)
 
         if (error) {
-          console.error("Subscription update error:", error.message)
+          console.error("Erreur update abonnement :", error.message)
         }
       }
     }
 
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as any
+
       const customerId =
         typeof subscription.customer === "string"
           ? subscription.customer
@@ -80,11 +82,33 @@ export async function POST(req: Request) {
       if (customerId) {
         const { error } = await supabaseAdmin
           .from("profiles")
-          .update({ plan: "free" })
+          .update({
+            plan: "free",
+          })
           .eq("stripe_customer_id", customerId)
 
         if (error) {
-          console.error("Subscription delete error:", error.message)
+          console.error("Erreur downgrade abonnement supprimé :", error.message)
+        }
+      }
+    }
+
+    if (event.type === "invoice.payment_failed") {
+      const invoice = event.data.object as any
+
+      const customerId =
+        typeof invoice.customer === "string" ? invoice.customer : null
+
+      if (customerId) {
+        const { error } = await supabaseAdmin
+          .from("profiles")
+          .update({
+            plan: "free",
+          })
+          .eq("stripe_customer_id", customerId)
+
+        if (error) {
+          console.error("Erreur downgrade paiement échoué :", error.message)
         }
       }
     }

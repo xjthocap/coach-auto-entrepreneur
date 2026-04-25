@@ -11,6 +11,14 @@ type Profile = {
   acre: boolean
   versement_liberatoire: boolean
   declaration_frequency: "monthly" | "quarterly"
+  company_name?: string | null
+  address?: string | null
+  postal_city?: string | null
+  phone?: string | null
+  siret?: string | null
+  bank_holder?: string | null
+  iban?: string | null
+  bic?: string | null
 }
 
 export default function SettingsForm({ profile }: { profile: Profile }) {
@@ -20,12 +28,20 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const [firstName, setFirstName] = useState(profile?.first_name || "")
   const [activityType, setActivityType] = useState(profile?.activity_type || "service")
   const [acre, setAcre] = useState(profile?.acre || false)
-  const [versement, setVersement] = useState(
-    profile?.versement_liberatoire || false
+  const [versement, setVersement] = useState(profile?.versement_liberatoire || false)
+  const [declarationFrequency, setDeclarationFrequency] = useState<"monthly" | "quarterly">(
+    profile?.declaration_frequency || "monthly"
   )
-  const [declarationFrequency, setDeclarationFrequency] = useState<
-    "monthly" | "quarterly"
-  >(profile?.declaration_frequency || "monthly")
+
+  const [companyName, setCompanyName] = useState(profile?.company_name || "")
+  const [address, setAddress] = useState(profile?.address || "")
+  const [postalCity, setPostalCity] = useState(profile?.postal_city || "")
+  const [phone, setPhone] = useState(profile?.phone || "")
+  const [siret, setSiret] = useState(profile?.siret || "")
+  const [bankHolder, setBankHolder] = useState(profile?.bank_holder || "")
+  const [iban, setIban] = useState(profile?.iban || "")
+  const [bic, setBic] = useState(profile?.bic || "")
+
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
 
@@ -41,6 +57,14 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         acre,
         versement_liberatoire: versement,
         declaration_frequency: declarationFrequency,
+        company_name: companyName.trim(),
+        address: address.trim(),
+        postal_city: postalCity.trim(),
+        phone: phone.trim(),
+        siret: siret.trim(),
+        bank_holder: bankHolder.trim(),
+        iban: iban.trim(),
+        bic: bic.trim(),
       })
       .eq("id", profile.id)
 
@@ -58,24 +82,24 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
 
   return (
     <div className="space-y-6">
-      <div className="w-full">
-        <label className="mb-2 block text-sm font-medium text-slate-600">
-          Prénom
-        </label>
-        <input
-          type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          placeholder="Ton prénom"
-          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
-        />
+      <div>
+        <h3 className="text-lg font-semibold text-slate-900">
+          Informations principales
+        </h3>
+        <p className="mt-1 text-sm text-slate-500">
+          Ces informations servent au dashboard et aux calculs.
+        </p>
       </div>
 
-      <div className="w-full">
-        <label className="mb-2 block text-sm font-medium text-slate-600">
-          Type d’activité
-        </label>
+      <input
+        type="text"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        placeholder="Prénom"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
 
+      <div className="grid gap-4 md:grid-cols-2">
         <select
           value={activityType}
           onChange={(e) =>
@@ -87,19 +111,11 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           <option value="service">Service</option>
           <option value="liberal">Libéral</option>
         </select>
-      </div>
-
-      <div className="w-full">
-        <label className="mb-2 block text-sm font-medium text-slate-600">
-          Périodicité de déclaration
-        </label>
 
         <select
           value={declarationFrequency}
           onChange={(e) =>
-            setDeclarationFrequency(
-              e.target.value as "monthly" | "quarterly"
-            )
+            setDeclarationFrequency(e.target.value as "monthly" | "quarterly")
           }
           className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
         >
@@ -125,10 +141,89 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           onChange={() => setVersement(!versement)}
           className="h-4 w-4 accent-blue-500"
         />
-        <span className="font-medium text-slate-700">
-          Versement libératoire
-        </span>
+        <span className="font-medium text-slate-700">Versement libératoire</span>
       </label>
+
+      <div className="border-t border-slate-200 pt-6">
+        <h3 className="text-lg font-semibold text-slate-900">
+          Informations de facturation
+        </h3>
+        <p className="mt-1 text-sm text-slate-500">
+          Ces informations apparaîtront sur tes factures PDF.
+        </p>
+      </div>
+
+      <input
+        type="text"
+        value={companyName}
+        onChange={(e) => setCompanyName(e.target.value)}
+        placeholder="Nom entreprise"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
+
+      <input
+        type="text"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        placeholder="Adresse"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <input
+          type="text"
+          value={postalCity}
+          onChange={(e) => setPostalCity(e.target.value)}
+          placeholder="Code postal + ville"
+          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        />
+
+        <input
+          type="text"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Téléphone"
+          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        />
+      </div>
+
+      <input
+        type="text"
+        value={siret}
+        onChange={(e) => setSiret(e.target.value)}
+        placeholder="SIRET"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
+
+      <div className="border-t border-slate-200 pt-6">
+        <h3 className="text-lg font-semibold text-slate-900">
+          Informations bancaires
+        </h3>
+      </div>
+
+      <input
+        type="text"
+        value={bankHolder}
+        onChange={(e) => setBankHolder(e.target.value)}
+        placeholder="Titulaire du compte"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
+
+      <input
+        type="text"
+        value={iban}
+        onChange={(e) => setIban(e.target.value)}
+        placeholder="IBAN"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
+
+      <input
+        type="text"
+        value={bic}
+        onChange={(e) => setBic(e.target.value)}
+        placeholder="BIC"
+        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+      />
 
       <button
         onClick={handleSave}

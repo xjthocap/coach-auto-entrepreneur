@@ -19,6 +19,7 @@ import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
+import UpgradeButton from "@/components/UpgradeButton"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)

@@ -16,6 +16,16 @@ export default function OnboardingPage() {
   const [declarationFrequency, setDeclarationFrequency] = useState<
     "monthly" | "quarterly"
   >("monthly")
+
+  const [companyName, setCompanyName] = useState("")
+  const [address, setAddress] = useState("")
+  const [postalCity, setPostalCity] = useState("")
+  const [phone, setPhone] = useState("")
+  const [siret, setSiret] = useState("")
+  const [bankHolder, setBankHolder] = useState("")
+  const [iban, setIban] = useState("")
+  const [bic, setBic] = useState("")
+
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit() {
@@ -37,6 +47,14 @@ export default function OnboardingPage() {
       acre,
       versement_liberatoire: versement,
       declaration_frequency: declarationFrequency,
+      company_name: companyName.trim(),
+      address: address.trim(),
+      postal_city: postalCity.trim(),
+      phone: phone.trim(),
+      siret: siret.trim(),
+      bank_holder: bankHolder.trim(),
+      iban: iban.trim(),
+      bic: bic.trim(),
     })
 
     if (error) {
@@ -53,7 +71,6 @@ export default function OnboardingPage() {
   return (
     <main className="min-h-screen bg-[#f7f8f4] text-[#0f172a]">
       <div className="mx-auto grid min-h-screen max-w-7xl grid-cols-1 lg:grid-cols-2">
-        {/* LEFT SIDE */}
         <section className="flex flex-col justify-between px-6 py-8 md:px-10 lg:px-12 lg:py-10">
           <div>
             <Link href="/" className="inline-block">
@@ -77,41 +94,20 @@ export default function OnboardingPage() {
 
               <p className="mt-6 text-lg leading-8 text-slate-600">
                 Ces informations nous permettent d’adapter ton dashboard, tes
-                calculs et tes estimations à ton activité d’auto-entrepreneur.
+                calculs, tes factures et tes estimations à ton activité.
               </p>
-            </div>
-
-            <div className="mt-10 grid max-w-xl gap-4 sm:grid-cols-3">
-              <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">Setup</p>
-                <p className="mt-2 text-xl font-black text-slate-950">Rapide</p>
-              </div>
-
-              <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">Calculs</p>
-                <p className="mt-2 text-xl font-black text-slate-950">Adaptés</p>
-              </div>
-
-              <div className="rounded-[24px] border border-slate-200 bg-[#0f172a] p-5 shadow-sm">
-                <p className="text-sm text-slate-300">Objectif</p>
-                <p className="mt-2 text-xl font-black text-[#4ade80]">
-                  Clarté
-                </p>
-              </div>
             </div>
           </div>
 
           <div className="mt-10 hidden rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm lg:block">
             <p className="text-sm text-slate-500">Pourquoi ces infos ?</p>
             <p className="mt-3 text-base leading-7 text-slate-700">
-              Ton type d’activité, ton ACRE, ton versement libératoire et ta
-              périodicité de déclaration influencent directement le calcul de tes
-              charges et de ton disponible réel.
+              Ton type d’activité influence tes estimations. Tes informations
+              d’entreprise servent à générer des factures propres et complètes.
             </p>
           </div>
         </section>
 
-        {/* RIGHT SIDE */}
         <section className="flex items-center justify-center px-6 py-8 md:px-10 lg:px-12">
           <div className="w-full max-w-xl rounded-[36px] border border-slate-200 bg-white p-8 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:p-10">
             <div className="mb-8">
@@ -122,94 +118,149 @@ export default function OnboardingPage() {
                 Ton profil
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                Renseigne quelques informations pour personnaliser ton tableau de
-                bord et tes estimations.
+                Renseigne quelques informations pour personnaliser ton tableau
+                de bord et tes factures.
               </p>
             </div>
 
             <div className="space-y-5">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Prénom
-                </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Prénom"
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+              />
+
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Nom entreprise"
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+              />
+
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Adresse"
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+              />
+
+              <input
+                type="text"
+                value={postalCity}
+                onChange={(e) => setPostalCity(e.target.value)}
+                placeholder="Code postal + ville"
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+              />
+
+              <div className="grid gap-3 md:grid-cols-2">
                 <input
                   type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Ton prénom"
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Téléphone"
+                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+                />
+
+                <input
+                  type="text"
+                  value={siret}
+                  onChange={(e) => setSiret(e.target.value)}
+                  placeholder="SIRET"
+                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
                 />
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Type d’activité
-                </label>
+              <div className="rounded-2xl border border-slate-200 bg-[#f8fafc] p-4">
+                <p className="mb-3 text-sm font-semibold text-slate-700">
+                  Informations bancaires pour les factures
+                </p>
 
-                <select
-                  value={activityType}
-                  onChange={(e) => setActivityType(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
-                >
-                  <option value="service">Service</option>
-                  <option value="vente">Vente</option>
-                  <option value="liberal">Libéral</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Périodicité de déclaration
-                </label>
-
-                <select
-                  value={declarationFrequency}
-                  onChange={(e) =>
-                    setDeclarationFrequency(
-                      e.target.value as "monthly" | "quarterly"
-                    )
-                  }
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
-                >
-                  <option value="monthly">Mensuelle</option>
-                  <option value="quarterly">Trimestrielle</option>
-                </select>
-              </div>
-
-              <div className="grid gap-4 pt-2">
-                <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-4 transition hover:bg-white">
+                <div className="space-y-3">
                   <input
-                    type="checkbox"
-                    checked={acre}
-                    onChange={() => setAcre(!acre)}
-                    className="mt-1 h-4 w-4"
+                    type="text"
+                    value={bankHolder}
+                    onChange={(e) => setBankHolder(e.target.value)}
+                    placeholder="Titulaire du compte"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5"
                   />
-                  <div>
-                    <p className="font-semibold text-slate-900">ACRE</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-500">
-                      Active cette option si tu bénéficies de l’ACRE.
-                    </p>
-                  </div>
-                </label>
 
-                <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-4 transition hover:bg-white">
                   <input
-                    type="checkbox"
-                    checked={versement}
-                    onChange={() => setVersement(!versement)}
-                    className="mt-1 h-4 w-4"
+                    type="text"
+                    value={iban}
+                    onChange={(e) => setIban(e.target.value)}
+                    placeholder="IBAN"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5"
                   />
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      Versement libératoire
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-500">
-                      Active cette option si tu as choisi ce mode de paiement de
-                      l’impôt.
-                    </p>
-                  </div>
-                </label>
+
+                  <input
+                    type="text"
+                    value={bic}
+                    onChange={(e) => setBic(e.target.value)}
+                    placeholder="BIC"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5"
+                  />
+                </div>
               </div>
+
+              <select
+                value={activityType}
+                onChange={(e) => setActivityType(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+              >
+                <option value="service">Service</option>
+                <option value="vente">Vente</option>
+                <option value="liberal">Libéral</option>
+              </select>
+
+              <select
+                value={declarationFrequency}
+                onChange={(e) =>
+                  setDeclarationFrequency(
+                    e.target.value as "monthly" | "quarterly"
+                  )
+                }
+                className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5"
+              >
+                <option value="monthly">Mensuelle</option>
+                <option value="quarterly">Trimestrielle</option>
+              </select>
+
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-4">
+                <input
+                  type="checkbox"
+                  checked={acre}
+                  onChange={() => setAcre(!acre)}
+                  className="mt-1 h-4 w-4"
+                />
+                <div>
+                  <p className="font-semibold text-slate-900">ACRE</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-500">
+                    Active cette option si tu bénéficies de l’ACRE.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-4">
+                <input
+                  type="checkbox"
+                  checked={versement}
+                  onChange={() => setVersement(!versement)}
+                  className="mt-1 h-4 w-4"
+                />
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    Versement libératoire
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-500">
+                    Active cette option si tu as choisi ce mode de paiement de
+                    l’impôt.
+                  </p>
+                </div>
+              </label>
 
               <button
                 onClick={handleSubmit}
@@ -219,13 +270,6 @@ export default function OnboardingPage() {
               >
                 {loading ? "Enregistrement..." : "Continuer"}
               </button>
-            </div>
-
-            <div className="mt-8 border-t border-slate-200 pt-6">
-              <p className="text-sm leading-6 text-slate-500">
-                Une fois ton profil enregistré, ton dashboard sera configuré en
-                fonction de ton activité.
-              </p>
             </div>
           </div>
         </section>

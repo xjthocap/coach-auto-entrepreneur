@@ -14,11 +14,19 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("stripe_customer_id")
       .eq("id", user.id)
       .single()
+
+    if (profileError) {
+      console.error("Erreur profil:", profileError.message)
+      return NextResponse.json(
+        { error: "Profil introuvable" },
+        { status: 404 }
+      )
+    }
 
     let customerId = profile?.stripe_customer_id || null
 
@@ -32,10 +40,14 @@ export async function POST() {
 
       customerId = customer.id
 
-      await supabase
+      const { error: updateError } = await supabase
         .from("profiles")
         .update({ stripe_customer_id: customerId })
         .eq("id", user.id)
+
+      if (updateError) {
+        console.error("Erreur update stripe_customer_id:", updateError.message)
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -49,14 +61,24 @@ export async function POST() {
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=cancel`,
+
+      // metadata sur la session Checkout
       metadata: {
         supabase_user_id: user.id,
+      },
+
+      // metadata aussi sur l’abonnement Stripe
+      subscription_data: {
+        metadata: {
+          supabase_user_id: user.id,
+        },
       },
     })
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error("Stripe checkout error:", error)
+
     return NextResponse.json(
       { error: "Impossible de créer la session Stripe" },
       { status: 500 }
