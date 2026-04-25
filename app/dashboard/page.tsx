@@ -18,6 +18,7 @@ import { calculateMicro } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
+import ExportPeriodButton from "@/components/ExportPeriodButton"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)
@@ -355,6 +356,10 @@ export default async function DashboardPage({
                   >
                     Période suivante →
                   </Link>
+
+                  {isPremium && (
+                    <ExportPeriodButton date={formatLocalDate(baseDate)} />
+                    )}
                 </div>
               </div>
             </section>

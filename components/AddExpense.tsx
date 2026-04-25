@@ -16,7 +16,13 @@ export default function AddExpense() {
   const [type, setType] = useState<"one_time" | "recurring">("one_time")
   const [loading, setLoading] = useState(false)
 
+  const [supplierName, setSupplierName] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState("")
+  const [reference, setReference] = useState("")
+
   async function handleAdd() {
+    if (loading) return
+
     setLoading(true)
 
     const {
@@ -30,11 +36,14 @@ export default function AddExpense() {
 
     const { error } = await supabase.from("expenses").insert({
       user_id: user.id,
-      label,
+      label: label.trim(),
       amount: parseFloat(amount),
       date,
       type,
       active: true,
+      supplier_name: supplierName.trim(),
+      payment_method: paymentMethod,
+      reference: reference.trim(),
     })
 
     if (error) {
@@ -43,25 +52,33 @@ export default function AddExpense() {
       return
     }
 
+    setSupplierName("")
+    setPaymentMethod("")
+    setReference("")
     setLabel("")
     setAmount("")
     setDate(today)
     setType("one_time")
     setLoading(false)
+
     router.refresh()
   }
 
   return (
     <div className="rounded-[28px] border border-red-200 bg-gradient-to-br from-red-50 to-white p-5 shadow-[0_10px_30px_rgba(239,68,68,0.08)]">
-  <div className="mb-4">
-    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
-      Sortie d’argent
-    </p>
-    <h2 className="text-xl font-semibold text-slate-900">Ajouter une dépense</h2>
-    <p className="text-sm text-slate-500">
-      Ajoute une dépense ponctuelle ou récurrente.
-    </p>
-  </div>
+      <div className="mb-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
+          Sortie d’argent
+        </p>
+
+        <h2 className="text-xl font-semibold text-slate-900">
+          Ajouter une dépense
+        </h2>
+
+        <p className="text-sm text-slate-500">
+          Ajoute une dépense ponctuelle ou récurrente.
+        </p>
+      </div>
 
       <div className="space-y-3">
         <input
@@ -90,18 +107,50 @@ export default function AddExpense() {
 
           <select
             value={type}
-            onChange={(e) => setType(e.target.value as "one_time" | "recurring")}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            onChange={(e) =>
+              setType(e.target.value as "one_time" | "recurring")
+            }
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
           >
             <option value="one_time">Ponctuelle</option>
             <option value="recurring">Récurrente</option>
           </select>
+
+          <input
+            type="text"
+            value={supplierName}
+            onChange={(e) => setSupplierName(e.target.value)}
+            placeholder="Fournisseur"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          />
+
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          >
+            <option value="">Mode de paiement</option>
+            <option value="Virement">Virement</option>
+            <option value="Carte bancaire">Carte bancaire</option>
+            <option value="Espèces">Espèces</option>
+            <option value="Chèque">Chèque</option>
+          </select>
+
+          <input
+            type="text"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="Référence justificatif"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          />
         </div>
 
         <button
           onClick={handleAdd}
-          style={{ cursor: "pointer" }}
-className="w-full rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(239,68,68,0.18)] transition hover:bg-red-500"        >
+          disabled={loading}
+          style={{ cursor: loading ? "not-allowed" : "pointer" }}
+          className="w-full rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(239,68,68,0.18)] transition hover:bg-red-500 disabled:opacity-50"
+        >
           {loading ? "..." : "Ajouter"}
         </button>
       </div>

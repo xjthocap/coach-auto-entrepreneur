@@ -1,4 +1,5 @@
 "use client"
+import UpgradeButton from "@/components/UpgradeButton"
 
 type PricingModalProps = {
   open: boolean
@@ -17,7 +18,7 @@ export default function PricingModal({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">
-              Pylot Premium
+              KeskiReste Premium
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
               Passe au niveau supérieur
@@ -60,9 +61,7 @@ export default function PricingModal({
               <p>• Insights intelligents</p>
             </div>
 
-            <button className="mt-8 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-3 font-semibold text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)] transition hover:scale-[1.01] hover:opacity-95">
-              Choisir Premium
-            </button>
+            <UpgradeButton/>
 
             <p className="mt-3 text-center text-xs text-slate-400">
               Stripe à brancher ensuite

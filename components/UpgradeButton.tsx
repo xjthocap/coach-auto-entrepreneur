@@ -1,16 +1,36 @@
 "use client"
 
-type UpgradeButtonProps = {
-  onClick: () => void
-}
+import { useState } from "react"
 
-export default function UpgradeButton({ onClick }: UpgradeButtonProps) {
+export default function UpgradeButton() {
+  const [loading, setLoading] = useState(false)
+
+  async function handleUpgrade() {
+    setLoading(true)
+
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+    })
+
+    const data = await res.json()
+
+    console.log("Stripe checkout response:", data)
+
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      alert("Pas d'URL Stripe reçue")
+      setLoading(false)
+    }
+  }
+
   return (
     <button
-      onClick={onClick}
-      className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 font-semibold text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)] transition hover:scale-[1.01] hover:opacity-95"
+      onClick={handleUpgrade}
+      disabled={loading}
+      className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 font-semibold text-white"
     >
-      Passer en Premium
+      {loading ? "Redirection..." : "Passer en Premium"}
     </button>
   )
 }
