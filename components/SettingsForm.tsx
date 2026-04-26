@@ -19,6 +19,8 @@ type Profile = {
   bank_holder?: string | null
   iban?: string | null
   bic?: string | null
+  vat_applicable?: boolean | null
+  vat_rate?: number | null
 }
 
 export default function SettingsForm({ profile }: { profile: Profile }) {
@@ -41,6 +43,9 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const [bankHolder, setBankHolder] = useState(profile?.bank_holder || "")
   const [iban, setIban] = useState(profile?.iban || "")
   const [bic, setBic] = useState(profile?.bic || "")
+
+  const [vatApplicable, setVatApplicable] = useState(profile?.vat_applicable || false)
+  const [vatRate, setVatRate] = useState(profile?.vat_rate || 20)
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -65,6 +70,8 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         bank_holder: bankHolder.trim(),
         iban: iban.trim(),
         bic: bic.trim(),
+        vat_applicable: vatApplicable,
+        vat_rate: vatRate,
       })
       .eq("id", profile.id)
 
@@ -194,6 +201,32 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         placeholder="SIRET"
         className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
       />
+
+      <label className="flex items-center justify-between gap-3 rounded-2xl bg-[#f8f9fd] px-4 py-4 transition hover:bg-[#f1f3f9]">
+        <div>
+          <span className="font-medium text-slate-700">TVA applicable</span>
+          <p className="mt-1 text-xs text-slate-500">
+            Active cette option uniquement si tu es assujetti à la TVA.
+          </p>
+        </div>
+
+        <input
+          type="checkbox"
+          checked={vatApplicable}
+          onChange={(e) => setVatApplicable(e.target.checked)}
+          className="h-4 w-4 accent-blue-500"
+        />
+      </label>
+
+      {vatApplicable && (
+        <input
+          type="number"
+          value={vatRate}
+          onChange={(e) => setVatRate(Number(e.target.value))}
+          placeholder="Taux de TVA"
+          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        />
+      )}
 
       <div className="border-t border-slate-200 pt-6">
         <h3 className="text-lg font-semibold text-slate-900">

@@ -53,7 +53,32 @@ export async function GET(
   const blue = rgb(0.2, 0.5, 0.9)
   const line = rgb(0.65, 0.68, 0.72)
 
-  const amount = Number(invoice.amount || 0)
+  const rawItems = Array.isArray(invoice.items) ? invoice.items : []
+
+  const invoiceItems =
+    rawItems.length > 0
+      ? rawItems
+      : [
+          {
+            description: invoice.description || "Prestation",
+            quantity: 1,
+            unit_price: Number(invoice.amount || 0),
+            total: Number(invoice.amount || 0),
+          },
+        ]
+
+  const amountHT = invoiceItems.reduce((sum, item) => {
+    const quantity = Number(item.quantity || 0)
+    const unitPrice = Number(item.unit_price || 0)
+    const total = Number(item.total || quantity * unitPrice)
+
+    return sum + total
+  }, 0)
+
+  const isVatApplicable = profile?.vat_applicable === true
+  const vatRate = Number(profile?.vat_rate || 20)
+  const vatAmount = isVatApplicable ? amountHT * (vatRate / 100) : 0
+  const amountTTC = amountHT + vatAmount
 
   const issuerName =
     profile?.company_name ||
@@ -64,7 +89,6 @@ export async function GET(
   const invoiceNumber = safe(invoice.invoice_number)
   const invoiceDate = safe(invoice.issued_at)
 
-  // Logo simple
   page.drawRectangle({
     x: 50,
     y: 765,
@@ -105,7 +129,7 @@ export async function GET(
     color: black,
   })
 
-  page.drawText(`Fait le ${invoiceDate}`, {
+  page.drawText(`${invoiceDate}`, {
     x: 445,
     y: 758,
     size: 11,
@@ -113,7 +137,6 @@ export async function GET(
     color: black,
   })
 
-  // Émetteur
   page.drawText(issuerName, {
     x: 50,
     y: 690,
@@ -162,7 +185,6 @@ export async function GET(
     color: gray,
   })
 
-  // Client
   page.drawText("Le Client", {
     x: 360,
     y: 640,
@@ -195,7 +217,6 @@ export async function GET(
     color: black,
   })
 
-  // Tableau
   const tableTop = 500
 
   page.drawText("Désignation", {
@@ -214,7 +235,7 @@ export async function GET(
     color: black,
   })
 
-  page.drawText("Prix", {
+  page.drawText("Prix HT", {
     x: 385,
     y: tableTop,
     size: 10,
@@ -237,61 +258,62 @@ export async function GET(
     color: line,
   })
 
-  page.drawText(safe(invoice.description || "Prestation"), {
-    x: 50,
-    y: tableTop - 38,
-    size: 10,
-    font,
-    color: black,
-    maxWidth: 190,
-  })
+  let rowY = tableTop - 38
 
-  page.drawText("1", {
-    x: 270,
-    y: tableTop - 38,
-    size: 10,
-    font,
-    color: black,
-  })
+  invoiceItems.forEach((item) => {
+    const description = safe(item.description)
+    const quantity = Number(item.quantity || 0)
+    const unitPrice = Number(item.unit_price || 0)
+    const total = Number(item.total || quantity * unitPrice)
 
-  page.drawText(money(amount), {
-    x: 380,
-    y: tableTop - 38,
-    size: 10,
-    font,
-    color: black,
-  })
-
-  page.drawText(money(amount), {
-    x: 500,
-    y: tableTop - 38,
-    size: 10,
-    font: bold,
-    color: black,
-  })
-
-  if (invoice.description_details) {
-    page.drawText(invoice.description_details, {
+    page.drawText(description, {
       x: 50,
-      y: tableTop - 72,
-      size: 9,
+      y: rowY,
+      size: 10,
       font,
-      color: gray,
-      maxWidth: 220,
+      color: black,
+      maxWidth: 190,
     })
-  }
+
+    page.drawText(String(quantity), {
+      x: 270,
+      y: rowY,
+      size: 10,
+      font,
+      color: black,
+    })
+
+    page.drawText(money(unitPrice), {
+      x: 380,
+      y: rowY,
+      size: 10,
+      font,
+      color: black,
+    })
+
+    page.drawText(money(total), {
+      x: 500,
+      y: rowY,
+      size: 10,
+      font: bold,
+      color: black,
+    })
+
+    rowY -= 24
+  })
+
+  const tableBottomY = rowY - 30
 
   page.drawLine({
-    start: { x: 50, y: tableTop - 115 },
-    end: { x: 545, y: tableTop - 115 },
+    start: { x: 50, y: tableBottomY },
+    end: { x: 545, y: tableBottomY },
     thickness: 1,
     color: line,
   })
 
-  // Totaux
   const totalX = 380
   const valueX = 510
-  const totalY = tableTop - 160
+  const totalY = tableBottomY - 45
 
   page.drawText("Total HT", {
     x: totalX,
@@ -301,7 +323,7 @@ export async function GET(
     color: black,
   })
 
-  page.drawText(money(amount), {
+  page.drawText(money(amountHT), {
     x: valueX,
     y: totalY,
     size: 10,
@@ -309,7 +331,7 @@ export async function GET(
     color: black,
   })
 
-  page.drawText("TVA", {
+  page.drawText(`TVA ${isVatApplicable ? `${vatRate}%` : "0%"}`, {
     x: totalX,
     y: totalY - 22,
     size: 10,
@@ -317,39 +339,39 @@ export async function GET(
     color: black,
   })
 
-  page.drawText("0,00 €", {
+  page.drawText(money(vatAmount), {
     x: valueX,
     y: totalY - 22,
     size: 10,
     font,
+    color: black,
+  })
+
+  page.drawText("Total TTC", {
+    x: totalX,
+    y: totalY - 44,
+    size: 10,
+    font: bold,
+    color: black,
+  })
+
+  page.drawText(money(amountTTC), {
+    x: valueX,
+    y: totalY - 44,
+    size: 10,
+    font: bold,
     color: black,
   })
 
   page.drawText("Net à payer", {
     x: totalX,
-    y: totalY - 44,
-    size: 10,
-    font: bold,
-    color: black,
-  })
-
-  page.drawText(money(amount), {
-    x: valueX,
-    y: totalY - 44,
-    size: 10,
-    font: bold,
-    color: black,
-  })
-
-  page.drawText("Montant à payer", {
-    x: totalX,
     y: totalY - 72,
     size: 10,
     font: bold,
     color: black,
   })
 
-  page.drawText(money(amount), {
+  page.drawText(money(amountTTC), {
     x: valueX,
     y: totalY - 72,
     size: 10,
@@ -357,14 +379,15 @@ export async function GET(
     color: black,
   })
 
-  // Footer légal
-  page.drawText("TVA non applicable, article 293B du Code Général des Impôts", {
-    x: 50,
-    y: 115,
-    size: 9,
-    font,
-    color: gray,
-  })
+  if (!isVatApplicable) {
+    page.drawText("TVA non applicable, article 293B du Code Général des Impôts", {
+      x: 50,
+      y: 115,
+      size: 9,
+      font,
+      color: gray,
+    })
+  }
 
   page.drawText("Détails bancaires :", {
     x: 50,
@@ -399,12 +422,12 @@ export async function GET(
   })
 
   const pdfBytes = await pdfDoc.save()
-    const pdfBuffer = Buffer.from(pdfBytes)
+  const pdfBuffer = Buffer.from(pdfBytes)
 
-    return new NextResponse(pdfBuffer, {
+  return new NextResponse(pdfBuffer, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="facture-${invoiceNumber}.pdf"`,
+      "Content-Disposition": `attachment; filename="F-${invoiceNumber}${profile?.company_name ? `-${profile.company_name}` : ''}.pdf"`,
     },
   })
 }

@@ -16,20 +16,66 @@ export default function AddRevenue() {
   const [loading, setLoading] = useState(false)
 
   const [clientName, setClientName] = useState("")
+  const [clientCompany, setClientCompany] = useState("")
+  const [clientEmail, setClientEmail] = useState("")
+  const [clientAddress, setClientAddress] = useState("")
+
   const [paymentMethod, setPaymentMethod] = useState("")
   const [reference, setReference] = useState("")
 
   const [generateInvoice, setGenerateInvoice] = useState(false)
-  const [clientEmail, setClientEmail] = useState("")
-  const [clientAddress, setClientAddress] = useState("")
-  const [invoiceDescription, setInvoiceDescription] = useState("")
   const [dueAt, setDueAt] = useState("")
   const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
+
+  const [items, setItems] = useState([
+    {
+      description: "",
+      quantity: "1",
+      unitPrice: "",
+    },
+  ])
 
   function generateInvoiceNumber() {
     const timestamp = Date.now()
     return `FAC-${new Date().getFullYear()}-${timestamp}`
   }
+
+  function updateItem(index: number, field: string, value: string) {
+    const updatedItems = [...items]
+
+    updatedItems[index] = {
+      ...updatedItems[index],
+      [field]: value,
+    }
+
+    setItems(updatedItems)
+  }
+
+  function addItem() {
+    setItems([
+      ...items,
+      {
+        description: "",
+        quantity: "1",
+        unitPrice: "",
+      },
+    ])
+  }
+
+  function removeItem(index: number) {
+    if (items.length === 1) return
+
+    const updatedItems = items.filter((_, itemIndex) => itemIndex !== index)
+
+    setItems(updatedItems)
+  }
+
+  const invoiceTotal = items.reduce((total, item) => {
+    const quantity = Number(item.quantity || 0)
+    const unitPrice = Number(item.unitPrice || 0)
+
+    return total + quantity * unitPrice
+  }, 0)
 
   async function handleAdd() {
     if (loading) return
@@ -47,8 +93,9 @@ export default function AddRevenue() {
     }
 
     const parsedAmount = parseFloat(amount)
+    const finalAmount = generateInvoice ? invoiceTotal : parsedAmount
 
-    if (!label.trim() || !amount || Number.isNaN(parsedAmount)) {
+    if (!label.trim() || Number.isNaN(finalAmount) || finalAmount <= 0) {
       setLoading(false)
       return
     }
@@ -58,9 +105,10 @@ export default function AddRevenue() {
       .insert({
         user_id: user.id,
         label: label.trim(),
-        amount: parsedAmount,
+        amount: finalAmount,
         date,
         client_name: clientName.trim(),
+        client_company: clientCompany.trim(),
         payment_method: paymentMethod,
         reference: reference.trim(),
       })
@@ -83,10 +131,17 @@ export default function AddRevenue() {
           revenue_id: revenue.id,
           invoice_number: invoiceNumber,
           client_name: clientName.trim(),
+          client_company: clientCompany.trim(),
           client_email: clientEmail.trim(),
           client_address: clientAddress.trim(),
-          description: invoiceDescription.trim() || label.trim(),
-          amount: parsedAmount,
+          description: items[0]?.description.trim() || label.trim(),
+          amount: invoiceTotal,
+          items: items.map((item) => ({
+            description: item.description.trim(),
+            quantity: Number(item.quantity || 0),
+            unit_price: Number(item.unitPrice || 0),
+            total: Number(item.quantity || 0) * Number(item.unitPrice || 0),
+          })),
           issued_at: date,
           due_at: dueAt || null,
           status: "draft",
@@ -104,16 +159,23 @@ export default function AddRevenue() {
     }
 
     setClientName("")
-    setPaymentMethod("")
-    setReference("")
+    setClientCompany("")
     setClientEmail("")
     setClientAddress("")
-    setInvoiceDescription("")
+    setPaymentMethod("")
+    setReference("")
     setDueAt("")
     setGenerateInvoice(false)
     setLabel("")
     setAmount("")
     setDate(today)
+    setItems([
+      {
+        description: "",
+        quantity: "1",
+        unitPrice: "",
+      },
+    ])
     setLoading(false)
 
     router.refresh()
@@ -148,9 +210,10 @@ export default function AddRevenue() {
           <input
             type="number"
             placeholder="Montant €"
-            value={amount}
+            value={generateInvoice ? invoiceTotal.toString() : amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            disabled={generateInvoice}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
           />
 
           <input
@@ -164,7 +227,7 @@ export default function AddRevenue() {
             type="text"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
-            placeholder="Client"
+            placeholder="Nom du client"
             className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
           />
 
@@ -179,15 +242,7 @@ export default function AddRevenue() {
             <option value="Espèces">Espèces</option>
             <option value="Chèque">Chèque</option>
           </select>
-
-          <input
-            type="text"
-            value={reference}
-            onChange={(e) => setReference(e.target.value)}
-            placeholder="Référence facture"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 md:col-span-2"
-          />
-        </div>
+          </div>
 
         <label className="flex items-center gap-3 rounded-2xl border border-green-100 bg-white px-4 py-4 text-sm font-medium text-slate-700">
           <input
@@ -200,43 +255,106 @@ export default function AddRevenue() {
         </label>
 
         {generateInvoice && (
-          <div className="rounded-2xl border border-green-100 bg-white/80 p-4">
-            <p className="mb-3 text-sm font-semibold text-slate-800">
-              Informations facture
+          <div className="space-y-3 rounded-2xl border border-green-100 bg-white/80 p-4">
+
+            <input
+              type="text"
+              value={clientCompany}
+              onChange={(e) => setClientCompany(e.target.value)}
+              placeholder="Société du client"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            />
+
+            <input
+              type="email"
+              value={clientEmail}
+              onChange={(e) => setClientEmail(e.target.value)}
+              placeholder="Email client"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            />
+
+            <input
+              type="text"
+              value={clientAddress}
+              onChange={(e) => setClientAddress(e.target.value)}
+              placeholder="Adresse client"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            />
+
+            <input
+            type="text"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="Référence facture"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            />
+
+
+            <p className="text-sm font-semibold text-slate-800">
+              Lignes de facture
             </p>
 
-            <div className="grid gap-3 md:grid-cols-2">
-              <input
-                type="email"
-                value={clientEmail}
-                onChange={(e) => setClientEmail(e.target.value)}
-                placeholder="Email client"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-              />
+            <input
+              type="date"
+              value={dueAt}
+              onChange={(e) => setDueAt(e.target.value)}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            />
 
-              <input
-                type="date"
-                value={dueAt}
-                onChange={(e) => setDueAt(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-              />
+            {items.map((item, index) => (
+              <div key={index} className="grid gap-3 md:grid-cols-4">
+                <input
+                  type="text"
+                  value={item.description}
+                  onChange={(e) =>
+                    updateItem(index, "description", e.target.value)
+                  }
+                  placeholder="Description"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+                />
 
-              <input
-                type="text"
-                value={clientAddress}
-                onChange={(e) => setClientAddress(e.target.value)}
-                placeholder="Adresse client"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 md:col-span-2"
-              />
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    updateItem(index, "quantity", e.target.value)
+                  }
+                  placeholder="Quantité"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+                />
 
-              <input
-                type="text"
-                value={invoiceDescription}
-                onChange={(e) => setInvoiceDescription(e.target.value)}
-                placeholder="Description de la prestation"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 md:col-span-2"
-              />
-            </div>
+                <input
+                  type="number"
+                  value={item.unitPrice}
+                  onChange={(e) =>
+                    updateItem(index, "unitPrice", e.target.value)
+                  }
+                  placeholder="Prix unitaire HT"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  disabled={items.length === 1}
+                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Supprimer
+                </button>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addItem}
+              className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-100"
+            >
+              Ajouter une ligne
+            </button>
+
+            <p className="text-sm font-semibold text-slate-800">
+              Total HT : {invoiceTotal.toFixed(2).replace(".", ",")} €
+            </p>
           </div>
         )}
 
