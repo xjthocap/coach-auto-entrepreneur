@@ -8,229 +8,195 @@ export default function HistoryPaywall() {
 
   return (
     <>
-      {/* Blur overlay + CTA */}
       <div
         style={{
           borderRadius: "var(--r-xl)",
           border: "1px solid var(--cream-200)",
-          background: "var(--cream-50)",
-          boxShadow: "var(--shadow-md)",
+          background: "var(--ink-900)",
+          boxShadow: "var(--shadow-lg)",
           overflow: "hidden",
           position: "relative",
         }}
       >
-        {/* Fake blurred content */}
+        {/* Glow déco */}
         <div
           style={{
-            filter: "blur(6px)",
-            opacity: 0.5,
+            position: "absolute",
+            inset: 0,
             pointerEvents: "none",
-            userSelect: "none",
-            padding: 24,
+            background:
+              "radial-gradient(ellipse 60% 80% at 100% 50%, rgba(196, 181, 253, 0.14) 0%, transparent 70%)",
           }}
+        />
+
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0,
+            padding: "48px 24px",
+          }}
+          className="md:flex-row md:items-center md:gap-0 md:p-0"
         >
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 16 }}>
-            {["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû"].map((m) => (
+          {/* Left — texte */}
+          <div
+            style={{ flex: 1, padding: "0 0 0 0" }}
+            className="md:p-12"
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                borderRadius: 999,
+                background: "rgba(196, 181, 253, 0.12)",
+                border: "1px solid rgba(196, 181, 253, 0.2)",
+                padding: "4px 12px",
+                marginBottom: 20,
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--violet-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--violet-500)" }}>
+                Premium
+              </span>
+            </div>
+
+            <h2
+              style={{
+                fontSize: "clamp(24px, 4vw, 36px)",
+                fontWeight: 600,
+                letterSpacing: "-0.03em",
+                color: "var(--cream-50)",
+                lineHeight: 1.15,
+                marginBottom: 14,
+              }}
+            >
+              Historique complet
+            </h2>
+
+            <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink-300)", marginBottom: 24, maxWidth: 380 }}>
+              Accède à l'intégralité de ton historique mensuel,
+              compare tes périodes et exporte tes données en Excel.
+            </p>
+
+            <ul style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32 }}>
+              {[
+                "Grille mensuelle avec mini-graphiques",
+                "Détail revenus & dépenses par mois",
+                "Export Excel (livre de recettes)",
+              ].map((item) => (
+                <li
+                  key={item}
+                  style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--cream-50)" }}
+                >
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      background: "rgba(196, 181, 253, 0.15)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--violet-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                  </div>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <button
+              onClick={() => setOpen(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                borderRadius: 999,
+                border: "none",
+                background: "var(--violet-500)",
+                color: "var(--ink-900)",
+                padding: "12px 24px",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 8px 24px rgba(196, 181, 253, 0.3)",
+              }}
+            >
+              Passer en Premium →
+            </button>
+
+            <p style={{ marginTop: 12, fontSize: 12, color: "var(--ink-400)" }}>
+              19,90€ / mois · sans engagement
+            </p>
+          </div>
+
+          {/* Right — visual déco */}
+          <div
+            className="hidden md:flex"
+            style={{
+              width: 320,
+              flexShrink: 0,
+              padding: "40px 40px 40px 0",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            {/* Fake month cards */}
+            {[
+              { label: "AVR 2026", value: "+3 200 €", bars: [30, 45, 60, 80] },
+              { label: "MAR 2026", value: "+2 790 €", bars: [50, 35, 70, 55] },
+              { label: "FÉV 2026", value: "+1 800 €", bars: [20, 40, 35, 45] },
+            ].map((card, i) => (
               <div
-                key={m}
+                key={i}
                 style={{
                   borderRadius: "var(--r-md)",
-                  background: "var(--cream-100)",
-                  padding: "18px 20px 16px",
-                  height: 110,
+                  background: i === 0 ? "rgba(196, 181, 253, 0.12)" : "rgba(255,255,255,0.04)",
+                  border: i === 0 ? "1px solid rgba(196, 181, 253, 0.2)" : "1px solid rgba(255,255,255,0.06)",
+                  padding: "14px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  opacity: i === 0 ? 1 : 0.5 - i * 0.1,
+                  filter: i === 0 ? "none" : `blur(${i * 0.8}px)`,
                 }}
               >
-                <p style={{ fontSize: 11, color: "var(--ink-400)", marginBottom: 8 }}>{m}</p>
-                <div
-                  style={{
-                    width: "60%",
-                    height: 20,
-                    borderRadius: 4,
-                    background: "var(--cream-300)",
-                  }}
-                />
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginTop: 24, height: 28 }}>
-                  {[60, 40, 70, 50].map((h, i) => (
+                <div>
+                  <p style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--ink-300)", marginBottom: 4 }}>
+                    {card.label}
+                  </p>
+                  <p style={{ fontFamily: "monospace", fontSize: 18, fontWeight: 300, color: i === 0 ? "var(--violet-500)" : "var(--ink-300)", letterSpacing: "-0.03em" }}>
+                    {card.value}
+                  </p>
+                </div>
+                {/* Mini bar chart */}
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 32 }}>
+                  {card.bars.map((h, j) => (
                     <div
-                      key={i}
+                      key={j}
                       style={{
-                        flex: 1,
+                        width: 6,
                         height: h * 0.4,
                         borderRadius: 2,
-                        background: i === 3 ? "var(--violet-500)" : "var(--cream-300)",
+                        background: j === card.bars.length - 1 && i === 0
+                          ? "var(--violet-500)"
+                          : "rgba(255,255,255,0.15)",
                       }}
                     />
                   ))}
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Overlay backdrop */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(248, 247, 252, 0.7)",
-            backdropFilter: "blur(2px)",
-          }}
-        />
-
-        {/* Center card */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 420,
-              borderRadius: "var(--r-lg)",
-              border: "1px solid var(--cream-200)",
-              background: "var(--cream-50)",
-              padding: 32,
-              textAlign: "center",
-              boxShadow: "var(--shadow-lg)",
-            }}
-          >
-            {/* Lock icon */}
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 44,
-                height: 44,
-                borderRadius: "var(--r-sm)",
-                background: "var(--ink-900)",
-                marginBottom: 16,
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--violet-500)"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="11" width="18" height="11" rx="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-              </svg>
-            </div>
-
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--violet-700)",
-                marginBottom: 10,
-              }}
-            >
-              Premium
-            </p>
-
-            <h3
-              style={{
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                color: "var(--ink-900)",
-                marginBottom: 10,
-                lineHeight: 1.2,
-              }}
-            >
-              Historique complet
-            </h3>
-
-            <p
-              style={{
-                fontSize: 13,
-                lineHeight: 1.7,
-                color: "var(--ink-500)",
-                marginBottom: 20,
-              }}
-            >
-              Accède à l'intégralité de ton historique mensuel,
-              compare tes périodes et exporte tes données en Excel.
-            </p>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-                marginBottom: 22,
-                textAlign: "left",
-              }}
-            >
-              {[
-                "Grille mensuelle avec mini-graphiques",
-                "Détail revenus & dépenses par mois",
-                "Export Excel (livre de recettes)",
-              ].map((item) => (
-                <div
-                  key={item}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    borderRadius: "var(--r-sm)",
-                    background: "var(--cream-100)",
-                    padding: "9px 14px",
-                    fontSize: 13,
-                    color: "var(--ink-700)",
-                  }}
-                >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="var(--violet-700)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20 6L9 17l-5-5"/>
-                  </svg>
-                  {item}
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setOpen(true)}
-              style={{
-                width: "100%",
-                borderRadius: "var(--r-sm)",
-                border: "none",
-                background: "var(--ink-900)",
-                color: "var(--violet-500)",
-                padding: "13px 16px",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-                boxShadow: "var(--shadow-md)",
-              }}
-            >
-              Passer en Premium →
-            </button>
-
-            <p style={{ marginTop: 10, fontSize: 12, color: "var(--ink-400)" }}>
-              19,90€ / mois · sans engagement
-            </p>
           </div>
         </div>
       </div>
