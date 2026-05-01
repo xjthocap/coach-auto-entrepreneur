@@ -6,10 +6,9 @@ import AppSidebar from "@/components/AppSidebar"
 import MobileNav from "@/components/MobileNav"
 import AddRevenue from "@/components/AddRevenue"
 import AddExpense from "@/components/AddExpense"
-import RevenueList from "@/components/RevenueList"
-import ExpenseList from "@/components/ExpenseList"
 import RevenueChart from "@/components/RevenueChart"
 import StatCard from "@/components/StatCard"
+import RecentMovements from "@/components/RecentMovements"
 import ProjectionCard from "@/components/ProjectionCard"
 import ThresholdAlert from "@/components/ThresholdAlert"
 import AIInsightsCard from "@/components/AIInsightsCard"
@@ -102,6 +101,25 @@ export default async function DashboardPage({
 
   const totalRevenue =
     revenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
+
+  // ===== INVOICES POUR LES REVENUS =====
+  const revenueIds = (revenues || []).map((r) => r.id)
+  const { data: invoices } =
+    revenueIds.length > 0
+      ? await supabase
+          .from("invoices")
+          .select("id, revenue_id")
+          .in("revenue_id", revenueIds)
+      : { data: [] }
+  const invoiceByRevenueId = new Map(
+    (invoices || []).map((inv) => [inv.revenue_id, inv.id])
+  )
+  const revenuesWithInvoices = (revenues || []).map((r) => ({
+    ...r,
+    invoices: invoiceByRevenueId.has(r.id)
+      ? [{ id: invoiceByRevenueId.get(r.id)! }]
+      : [],
+  }))
 
   // ===== REVENUS DE L'ANNÉE DE LA PÉRIODE AFFICHÉE =====
   const selectedYear = baseDate.getFullYear()
@@ -448,21 +466,12 @@ export default async function DashboardPage({
               </div>
             </section>
 
-            {/* ── LISTES ── */}
-            <section className="grid gap-4 xl:grid-cols-2">
-              <div
-                className="overflow-hidden"
-                style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
-              >
-                <RevenueList revenues={revenues || []} />
-              </div>
-              <div
-                className="overflow-hidden"
-                style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
-              >
-                <ExpenseList expenses={expensesWithPeriodInfo} showPeriodInfo />
-              </div>
-            </section>
+            {/* ── DERNIERS MOUVEMENTS ── */}
+            <RecentMovements
+              revenues={revenuesWithInvoices}
+              expenses={expensesWithPeriodInfo}
+              limit={10}
+            />
 
             {/* ── GRAPHIQUE ── */}
             <section
