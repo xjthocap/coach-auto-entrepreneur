@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import AppSidebar from "@/components/AppSidebar"
 import MobileNav from "@/components/MobileNav"
 import SettingsForm from "@/components/SettingsForm"
+import ManageSubscriptionButton from "@/components/ManageSubscriptionButton"
+import UpgradeButton from "@/components/UpgradeButton"
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -24,6 +26,9 @@ export default async function SettingsPage() {
   if (!profile) {
     redirect("/onboarding")
   }
+
+  const isPremium = profile.plan === "premium"
+  const isFounder = !!(profile.founder_number)
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -73,6 +78,68 @@ export default async function SettingsPage() {
 
               {/* INFO COLUMN */}
               <div className="space-y-3">
+
+                {/* ── PLAN CARD ── */}
+                {isPremium ? (
+                  <div
+                    className="p-5"
+                    style={{ background: "var(--ink-900)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)" }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--ink-300)" }}>
+                        Ton plan
+                      </p>
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-full font-semibold"
+                        style={{
+                          background: isFounder ? "rgba(196, 181, 253, 0.2)" : "var(--violet-500)",
+                          color: isFounder ? "var(--violet-400)" : "var(--ink-900)",
+                        }}
+                      >
+                        {isFounder
+                          ? `⭐ Founder #${profile.founder_number}`
+                          : "Premium"}
+                      </span>
+                    </div>
+                    <p className="text-sm mb-4" style={{ color: "var(--ink-300)", lineHeight: 1.6 }}>
+                      {isFounder
+                        ? "Accès à vie · toutes les fonctionnalités Premium incluses."
+                        : "Tu as accès au coach IA, à l'historique complet et aux exports."}
+                    </p>
+                    <ManageSubscriptionButton />
+                  </div>
+                ) : (
+                  <div
+                    className="p-5 relative overflow-hidden"
+                    style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)", border: "1px solid var(--cream-200)" }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
+                        background: "radial-gradient(ellipse 80% 60% at 100% 0%, rgba(196, 181, 253, 0.1) 0%, transparent 70%)",
+                      }}
+                    />
+                    <div style={{ position: "relative" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
+                          Ton plan
+                        </p>
+                        <span
+                          className="text-xs px-2.5 py-1 rounded-full font-medium"
+                          style={{ background: "var(--cream-200)", color: "var(--ink-500)" }}
+                        >
+                          Gratuit
+                        </span>
+                      </div>
+                      <p className="text-sm mb-4" style={{ color: "var(--ink-500)", lineHeight: 1.6 }}>
+                        Passe en Premium pour débloquer le coach IA, l'historique complet et les exports Excel.
+                      </p>
+                      <UpgradeButton label="Passer en Premium · 19,90€/mois" />
+                    </div>
+                  </div>
+                )}
                 <div
                   className="p-5"
                   style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)" }}

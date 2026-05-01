@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import AppSidebar from "@/components/AppSidebar"
 import MobileNav from "@/components/MobileNav"
@@ -14,6 +15,7 @@ import ThresholdAlert from "@/components/ThresholdAlert"
 import AIInsightsCard from "@/components/AIInsightsCard"
 import DashboardPremiumShell from "@/components/DashboardPremiumShell"
 import DevPlanSwitcher from "@/components/DevPlanSwitcher"
+import CheckoutBanner from "@/components/CheckoutBanner"
 import { calculateMicro } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
@@ -185,6 +187,9 @@ export default async function DashboardPage({
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
+      <Suspense fallback={null}>
+        <CheckoutBanner />
+      </Suspense>
       <div className="flex min-h-screen">
         <AppSidebar activePage="dashboard" profile={profile} userEmail={user.email} />
 
@@ -198,7 +203,7 @@ export default async function DashboardPage({
           >
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 md:px-8">
               <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: "var(--cream-300)" }}>
+                <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
                   Dashboard
                 </p>
                 <h1 className="truncate text-[22px] font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
@@ -243,7 +248,7 @@ export default async function DashboardPage({
               {/* Radial lime glow */}
               <div
                 className="pointer-events-none absolute inset-0"
-                style={{ background: "radial-gradient(ellipse 55% 50% at 85% 10%, rgba(196, 181, 253, 0.16) 0%, transparent 70%)" }}
+                style={{ background: "radial-gradient(ellipse 90% 90% at 90% 100%, rgba(245, 96, 51, 0.16) 0%, transparent 70%)" }}
               />
 
               <div className="relative grid gap-8 lg:grid-cols-[1.2fr_1fr]">
@@ -251,11 +256,11 @@ export default async function DashboardPage({
                 <div>
                   <div className="mb-3 flex items-center gap-2">
                     <span className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--violet-500)" }} />
-                    <span className="text-[11px] uppercase tracking-[0.12em]" style={{ color: "var(--cream-200)" }}>
+                    <span className="text-[11px] uppercase tracking-[0.12em]" style={{ color: "var(--ink-300)" }}>
                       Disponible réel · {period.label}
                     </span>
                   </div>
-                  <p className="mb-4 text-sm" style={{ color: "var(--cream-300)" }}>
+                  <p className="mb-4 text-sm" style={{ color: "var(--ink-300)" }}>
                     Voici ce qu'il te reste vraiment, après tout.
                   </p>
                   <div
@@ -264,8 +269,8 @@ export default async function DashboardPage({
                   >
                     {realNet.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}&nbsp;€
                   </div>
-                  <p className="mt-4 max-w-sm text-xs leading-relaxed" style={{ color: "var(--cream-300)" }}>
-                    Tu peux dépenser ce montant sans toucher à ce que tu dois à l'URSSAF, aux impôts ou à tes charges fixes.
+                  <p className="mt-4 max-w-sm text-xs leading-relaxed" style={{ color: "var(--ink-300)" }}>
+                    Tu peux dépenser ce montant sans toucher à ce que tu dois à l&apos;URSSAF, aux impôts ou à tes charges fixes.
                   </p>
                 </div>
 
@@ -275,21 +280,21 @@ export default async function DashboardPage({
                     {
                       label: "Chiffre d'affaires",
                       tag: "brut",
-                      tagStyle: { background: "rgba(196, 181, 253, 0.15)", color: "var(--lime-500)" },
+                      tagStyle: { background: "rgba(196, 181, 253, 0.15)", color: "var(--violet-500)" },
                       value: `+${totalRevenue.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                      valueColor: "var(--lime-500)",
+                      valueColor: "var(--violet-500)",
                     },
                     {
                       label: "Charges URSSAF",
                       tag: `${(result.socialRate * 100).toFixed(1)}%`,
-                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--cream-200)" },
+                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" },
                       value: `−${result.charges.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
                       valueColor: "var(--rose-500)",
                     },
                     {
                       label: "Impôt libératoire",
                       tag: `${(result.taxRate * 100).toFixed(1)}%`,
-                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--cream-200)" },
+                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" },
                       value: `−${result.tax.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
                       valueColor: "var(--rose-500)",
                     },
@@ -304,7 +309,7 @@ export default async function DashboardPage({
                       className="water-row flex items-center justify-between py-3"
                       style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
                     >
-                      <span className="flex items-center gap-2 text-sm" style={{ color: "var(--cream-200)" }}>
+                      <span className="flex items-center gap-2 text-sm" style={{ color: "var(--ink-300)" }}>
                         {row.label}
                         {row.tag && (
                           <span className="rounded px-1.5 py-0.5 text-[10px]" style={row.tagStyle}>
@@ -349,7 +354,7 @@ export default async function DashboardPage({
                       style={{ width: `${pct}%`, background: fillColor }}
                     />
                   </div>
-                  <p className="mt-2.5 font-mono text-xs" style={{ color: "var(--cream-300)" }}>
+                  <p className="mt-2.5 font-mono text-xs" style={{ color: "var(--ink-400)" }}>
                     {yearRevenue.toLocaleString("fr-FR")} € / {threshold.toLocaleString("fr-FR")} € — il te reste{" "}
                     {Math.max(0, threshold - yearRevenue).toLocaleString("fr-FR")} € avant le seuil
                   </p>
@@ -380,7 +385,7 @@ export default async function DashboardPage({
                     {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
                     <span className="text-base font-light"> €</span>
                   </p>
-                  <p className="mt-2 text-xs" style={{ color: "var(--cream-300)" }}>{stat.sub}</p>
+                  <p className="mt-2 text-xs" style={{ color: "var(--ink-400)" }}>{stat.sub}</p>
                 </div>
               ))}
             </section>
@@ -429,7 +434,7 @@ export default async function DashboardPage({
                 <h2 className="text-lg font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
                   Actions rapides
                 </h2>
-                <p className="mt-1 text-sm" style={{ color: "var(--cream-300)" }}>
+                <p className="mt-1 text-sm" style={{ color: "var(--ink-400)" }}>
                   Ajoute rapidement une entrée ou une sortie.
                 </p>
               </div>
@@ -476,7 +481,7 @@ export default async function DashboardPage({
                 <h2 className="text-lg font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
                   À déclarer sur cette période
                 </h2>
-                <p className="mt-1 text-sm" style={{ color: "var(--cream-300)" }}>
+                <p className="mt-1 text-sm" style={{ color: "var(--ink-400)" }}>
                   Montants estimés pour anticiper ta déclaration.
                 </p>
               </div>
@@ -487,14 +492,14 @@ export default async function DashboardPage({
                   { label: "Impôt libératoire", value: result.tax, sub: `${(result.taxRate * 100).toFixed(2)}%` },
                 ].map((item, i) => (
                   <div key={i} className="rounded-[14px] p-4" style={{ background: "var(--cream-100)" }}>
-                    <p className="text-xs uppercase tracking-[0.06em]" style={{ color: "var(--cream-300)" }}>{item.label}</p>
+                    <p className="text-xs uppercase tracking-[0.06em]" style={{ color: "var(--ink-400)" }}>{item.label}</p>
                     <p
                       className="mt-2 font-mono text-xl font-normal"
                       style={{ letterSpacing: "-0.03em", color: "var(--ink-900)" }}
                     >
                       {item.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
                     </p>
-                    {item.sub && <p className="mt-1 text-xs" style={{ color: "var(--cream-300)" }}>{item.sub}</p>}
+                    {item.sub && <p className="mt-1 text-xs" style={{ color: "var(--ink-400)" }}>{item.sub}</p>}
                   </div>
                 ))}
               </div>

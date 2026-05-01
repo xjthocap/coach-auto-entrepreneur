@@ -21,26 +21,55 @@ function LockedPreviewCard({
   features: string[]
 }) {
   return (
-    <div className="rounded-[24px] border border-slate-200 bg-white/80 p-5 shadow-sm">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-600">
+    <div
+      style={{
+        borderRadius: "var(--r-md)",
+        border: "1px solid var(--cream-200)",
+        background: "var(--cream-50)",
+        padding: 20,
+        boxShadow: "var(--shadow-sm)",
+      }}
+    >
+      <p
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: "var(--violet-700)",
+          marginBottom: 8,
+        }}
+      >
         {eyebrow}
       </p>
-
-      <h3 className="mt-2 text-xl font-semibold tracking-tight text-slate-900">
+      <h3
+        style={{
+          fontSize: 18,
+          fontWeight: 600,
+          letterSpacing: "-0.02em",
+          color: "var(--ink-900)",
+          marginBottom: 6,
+        }}
+      >
         {title}
       </h3>
-
-      <p className="mt-2 text-sm leading-6 text-slate-500">
+      <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--ink-500)", marginBottom: 12 }}>
         {subtitle}
       </p>
-
-      <div className="mt-4 space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {features.map((feature, index) => (
           <div
             key={index}
-            className="rounded-2xl border border-slate-100 bg-[#f8f9fd] px-4 py-3 text-sm text-slate-700"
+            style={{
+              borderRadius: "var(--r-sm)",
+              border: "1px solid var(--cream-200)",
+              background: "var(--cream-100)",
+              padding: "10px 14px",
+              fontSize: 13,
+              color: "var(--ink-700)",
+            }}
           >
-            <span className="mr-2 font-semibold text-violet-600">•</span>
+            <span style={{ marginRight: 8, fontWeight: 700, color: "var(--violet-700)" }}>•</span>
             {feature}
           </div>
         ))}
@@ -49,101 +78,179 @@ function LockedPreviewCard({
   )
 }
 
-function PremiumTeaser({
-  onUpgradeClick,
-}: {
-  onUpgradeClick: () => void
-}) {
+function PremiumTeaser({ onUpgradeClick }: { onUpgradeClick: () => void }) {
   return (
-    <div className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-white via-violet-50/60 to-fuchsia-50/60 p-6 shadow-[0_12px_30px_rgba(139,92,246,0.08)]">
-      <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-        <div className="max-w-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-600">
-            Premium
-          </p>
+    <div
+      style={{
+        borderRadius: "var(--r-xl)",
+        border: "1px solid var(--cream-200)",
+        background: "var(--cream-50)",
+        padding: 28,
+        boxShadow: "var(--shadow-md)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Subtle violet glow */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "radial-gradient(ellipse 60% 50% at 100% 0%, rgba(196, 181, 253, 0.12) 0%, transparent 70%)",
+        }}
+      />
 
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
-            Débloque le vrai copilote financier
-          </h2>
+      <div style={{ position: "relative" }}>
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 24,
+            alignItems: "flex-start",
+          }}
+          className="xl:flex-row xl:items-start xl:justify-between"
+        >
+          <div style={{ maxWidth: 480 }}>
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--violet-700)",
+                marginBottom: 8,
+              }}
+            >
+              Premium
+            </p>
+            <h2
+              style={{
+                fontSize: "clamp(22px, 3vw, 30px)",
+                fontWeight: 600,
+                letterSpacing: "-0.03em",
+                color: "var(--ink-900)",
+                marginBottom: 10,
+                lineHeight: 1.2,
+              }}
+            >
+              Débloque le vrai copilote financier
+            </h2>
+            <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink-500)", marginBottom: 16 }}>
+              Passe en Premium pour obtenir une analyse IA de ta situation,
+              des projections de fin de période et des recommandations actionnables.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {["Score de santé", "Conseils IA", "Projection fin de période", "Export Excel"].map((tag) => (
+                <span
+                  key={tag}
+                  style={{
+                    borderRadius: 999,
+                    border: "1px solid var(--cream-300)",
+                    background: "var(--cream-100)",
+                    padding: "4px 12px",
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: "var(--ink-700)",
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
 
-          <p className="mt-3 text-sm leading-7 text-slate-500">
-            Passe en Premium pour obtenir une analyse intelligente de ta situation,
-            des projections de fin de période et des recommandations actionnables.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-2">
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
-              Score de santé
-            </span>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
-              Conseils IA
-            </span>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
-              Projection de fin de période
-            </span>
+          {/* CTA card */}
+          <div
+            style={{
+              borderRadius: "var(--r-md)",
+              border: "1px solid var(--cream-200)",
+              background: "var(--ink-900)",
+              padding: 20,
+              minWidth: 240,
+              width: "100%",
+              maxWidth: 300,
+            }}
+          >
+            <p style={{ fontSize: 13, color: "var(--ink-300)", marginBottom: 6 }}>KeskiReste Premium</p>
+            <p
+              style={{
+                fontFamily: "monospace",
+                fontSize: 36,
+                fontWeight: 300,
+                letterSpacing: "-0.04em",
+                color: "var(--cream-50)",
+                lineHeight: 1,
+                marginBottom: 4,
+              }}
+            >
+              19,90€
+              <span style={{ fontSize: 14, fontWeight: 400, color: "var(--ink-300)" }}> / mois</span>
+            </p>
+            <p style={{ fontSize: 13, color: "var(--ink-400)", marginBottom: 18 }}>
+              Pour piloter ton activité avec plus de clarté.
+            </p>
+            <button
+              onClick={onUpgradeClick}
+              style={{
+                width: "100%",
+                borderRadius: "var(--r-sm)",
+                border: "none",
+                background: "var(--violet-500)",
+                color: "var(--ink-900)",
+                padding: "12px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Voir les offres →
+            </button>
           </div>
         </div>
 
-        <div className="w-full max-w-sm rounded-[24px] border border-white/80 bg-white/90 p-5 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
-          <p className="text-sm font-medium text-slate-500">Pylot Premium</p>
-          <p className="mt-2 text-4xl font-semibold tracking-tight text-slate-900">
-            19,90€
-            <span className="text-base font-medium text-slate-400"> / mois</span>
-          </p>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Pour piloter ton activité avec plus de clarté et moins de stress.
-          </p>
-
-          <button
-            onClick={onUpgradeClick}
-            className="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-3 font-semibold text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)] transition hover:scale-[1.01] hover:opacity-95"
-          >
-            Passer en Premium
-          </button>
-
-          <p className="mt-3 text-center text-xs text-slate-400">
-            Débloque toutes les fonctionnalités avancées
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-4 xl:grid-cols-2">
-        <div className="opacity-75 blur-[2px]">
-          <LockedPreviewCard
-            eyebrow="Coach IA"
-            title="Analyse intelligente"
-            subtitle="Une lecture simple et utile de ta situation avec des conseils concrets."
-            features={[
-              "Score de santé financier",
-              "Conseils intelligents",
-              "Alertes personnalisées",
-            ]}
-          />
-        </div>
-
-        <div className="opacity-75 blur-[2px]">
-          <LockedPreviewCard
-            eyebrow="Projection"
-            title="Fin de période"
-            subtitle="Anticipe ton atterrissage et visualise ton équilibre avant la fin du mois."
-            features={[
-              "Projection du chiffre d’affaires",
-              "Projection charges et impôts",
-              "Vision claire de la fin de période",
-            ]}
-          />
+        {/* Blurred previews */}
+        <div
+          style={{
+            marginTop: 24,
+            display: "grid",
+            gap: 16,
+          }}
+          className="xl:grid-cols-2"
+        >
+          <div style={{ opacity: 0.65, filter: "blur(2px)", pointerEvents: "none", userSelect: "none" }}>
+            <LockedPreviewCard
+              eyebrow="Coach IA"
+              title="Analyse intelligente"
+              subtitle="Une lecture simple et utile de ta situation avec des conseils concrets."
+              features={[
+                "Score de santé financier",
+                "Conseils intelligents personnalisés",
+                "Alertes si tu dépasses les seuils",
+              ]}
+            />
+          </div>
+          <div style={{ opacity: 0.65, filter: "blur(2px)", pointerEvents: "none", userSelect: "none" }}>
+            <LockedPreviewCard
+              eyebrow="Projection"
+              title="Fin de période"
+              subtitle="Anticipe ton atterrissage avant la fin du mois."
+              features={[
+                "Projection du chiffre d'affaires",
+                "Projection charges et impôts",
+                "Solde disponible estimé",
+              ]}
+            />
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default function DashboardPremiumShell({
-  isPremium,
-  ai,
-  projection,
-}: Props) {
+export default function DashboardPremiumShell({ isPremium, ai, projection }: Props) {
   const [open, setOpen] = useState(false)
 
   if (isPremium) {

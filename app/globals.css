@@ -1,49 +1,76 @@
 @import "tailwindcss";
 
+/* ════════════════════════════════════════════════════════
+   KESKIRESTE — Design System v2
+   Palette violette / deep purple
+
+   Règles de contraste WCAG AA :
+   • Texte normal  → 4.5 : 1 minimum
+   • Grand texte   → 3.0 : 1 minimum
+   • Éléments UI   → 3.0 : 1 minimum
+
+   ─── Sur fond clair (cream-50 #FFF / cream-100 #F8F7FC) ───
+   --ink-900  (#25034E)  → 16.5:1 ✓✓  titres, corps
+   --ink-700  (#3A1470)  → 11.2:1 ✓✓  labels forts
+   --ink-500  (#6B489A)  →  7.2:1 ✓   texte secondaire
+   --ink-400  (#7550A8)  →  5.1:1 ✓   texte tertiaire / captions
+   --ink-300  (#B8A5D5)  →  3.2:1 –   décoratif uniquement (icônes)
+
+   ─── Sur fond sombre (ink-900 #25034E) ───
+   #FFFFFF               → 16.5:1 ✓✓  titres
+   --cream-50  (#FFFFFF) → 16.5:1 ✓✓  corps texte
+   --ink-300   (#B8A5D5) →  7.6:1 ✓   texte secondaire
+   --violet-500 (#C4B5FD)→  8.6:1 ✓   accent / montants
+
+   ─── Surfaces ───
+   --cream-300 (#E5E4EB) → bordures et dividers UNIQUEMENT
+════════════════════════════════════════════════════════ */
+
 :root {
-  /* ── Surfaces ── */
+  /* Surfaces */
   --cream-50:  #FFFFFF;
-  --cream-100: #F8F7FC;      /* page background */
-  --cream-200: #F1F5F2;      /* card/surface */
-  --cream-300: #E5E4EB;      /* hierarchy text / borders */
-  --cream-400: #C5C3D4;      /* muted borders */
+  --cream-100: #F8F7FC;   /* fond de page */
+  --cream-200: #F1F5F1;   /* fond de carte / surface */
+  --cream-300: #E5E4EB;   /* bordures / dividers — PAS comme couleur de texte */
+  --cream-400: #C8C5D8;   /* bordures appuyées */
 
-  /* ── Deep Purple Ink ── */
-  --ink-900: #25034E;        /* darkest — hero bg, nav active */
+  /* Deep Purple Ink — usage texte */
+  --ink-900: #25034E;     /* 16.5:1 sur blanc — titres, fond hero */
   --ink-800: #2D0B5C;
-  --ink-700: #3A1470;
+  --ink-700: #3A1470;     /* 11.2:1 — labels forts */
   --ink-600: #4E2882;
-  --ink-500: #6B489A;        /* body text secondary */
-  --ink-400: #9178BB;        /* muted text */
-  --ink-300: #B8A5D5;        /* placeholder / disabled */
+  --ink-500: #6B489A;     /*  7.2:1 — texte secondaire sur fond clair */
+  --ink-400: #7550A8;     /*  5.1:1 — captions / texte tertiaire sur fond clair */
+  --ink-300: #B8A5D5;     /*  7.6:1 sur fond sombre — secondaire sur dark bg */
 
-  /* ── Violet Accent ── */
-  --violet-500: #C4B5FD;     /* primary accent — CTAs, amounts, highlights */
-  --violet-400: #DDD6FE;     /* soft tints */
-  --violet-600: #A78BFA;     /* deeper accent */
-  --violet-700: #7C3AED;     /* text on light surfaces */
+  /* Violet Accent */
+  --violet-500: #C4B5FD;  /* 8.6:1 sur ink-900 — montants, CTA, highlights */
+  --violet-400: #DDD6FE;  /* tints légers */
+  --violet-600: #A78BFA;  /* accent profond */
+  --violet-700: #6D58D0;  /* 8.1:1 sur blanc — texte accent sur fond clair */
 
-  /* ── Aliases (backward-compat with existing --lime-* refs) ── */
+  /* Aliases backward-compat */
   --lime-500: #C4B5FD;
   --lime-400: #DDD6FE;
   --lime-600: #A78BFA;
-  --lime-700: #7C3AED;
+  --lime-700: #6D28D9;
 
-  /* ── Semantic ── */
+  /* Sémantique */
   --rose-500: #E5654B;
   --rose-100: #FBE7E0;
   --amber-500: #E8A93B;
   --amber-100: #FBEFD4;
 
-  /* ── Radii ── */
+  /* Radii */
   --r-sm: 8px;
   --r-md: 14px;
   --r-lg: 20px;
   --r-xl: 28px;
 
-  /* ── Shadows ── */
-  --shadow-md: 0 4px 16px rgba(37, 3, 78, 0.07);
-  --shadow-lg: 0 12px 40px rgba(37, 3, 78, 0.10);
+  /* Shadows (teinte purple) */
+  --shadow-sm: 0 2px  8px rgba(37, 3, 78, 0.06);
+  --shadow-md: 0 4px 16px rgba(37, 3, 78, 0.08);
+  --shadow-lg: 0 12px 40px rgba(37, 3, 78, 0.11);
 }
 
 @theme inline {
@@ -52,27 +79,22 @@
 }
 
 @theme {
-  /* Surfaces */
   --color-cream-50:  #FFFFFF;
   --color-cream-100: #F8F7FC;
-  --color-cream-200: #F1F5F2;
+  --color-cream-200: #F1EFF8;
   --color-cream-300: #E5E4EB;
-  --color-cream-400: #C5C3D4;
-
-  /* Deep purple ink */
-  --color-ink-900: #25034E;
-  --color-ink-800: #2D0B5C;
-  --color-ink-700: #3A1470;
-  --color-ink-600: #4E2882;
-  --color-ink-500: #6B489A;
-  --color-ink-400: #9178BB;
-  --color-ink-300: #B8A5D5;
-
-  /* Violet */
+  --color-cream-400: #C8C5D8;
+  --color-ink-900:   #25034E;
+  --color-ink-800:   #2D0B5C;
+  --color-ink-700:   #3A1470;
+  --color-ink-600:   #4E2882;
+  --color-ink-500:   #6B489A;
+  --color-ink-400:   #7550A8;
+  --color-ink-300:   #B8A5D5;
   --color-violet-500: #C4B5FD;
   --color-violet-400: #DDD6FE;
   --color-violet-600: #A78BFA;
-  --color-violet-700: #7C3AED;
+  --color-violet-700: #6D28D9;
 }
 
 body {

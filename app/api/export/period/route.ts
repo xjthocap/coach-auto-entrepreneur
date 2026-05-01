@@ -71,49 +71,41 @@ export async function GET(req: Request) {
   const recettes = workbook.addWorksheet("Livre des recettes")
   const achats = workbook.addWorksheet("Registre des achats")
 
-  // ===== HEADER INFO =====
-  recettes.addRow([
-    "Livre des recettes - Keskireste",
-  ])
-  recettes.addRow([
-    `Utilisateur : ${profile.first_name}`,
-  ])
-  recettes.addRow([
-    `Période : ${period.label}`,
-  ])
-  recettes.addRow([])
-
-  achats.addRow([
-    "Registre des achats - Keskireste",
-  ])
-  achats.addRow([
-    `Utilisateur : ${profile.first_name}`,
-  ])
-  achats.addRow([
-    `Période : ${period.label}`,
-  ])
-  achats.addRow([])
-
-  // ===== COLONNES =====
+  // ===== COLONNES (sans header pour éviter l'écrasement de la ligne 1) =====
   recettes.columns = [
-    { header: "Date", key: "date", width: 16 },
-    { header: "Client", key: "client", width: 26 },
-    { header: "Libellé", key: "label", width: 32 },
-    { header: "Montant", key: "amount", width: 16 },
-    { header: "Paiement", key: "payment", width: 20 },
-    { header: "Référence", key: "reference", width: 26 },
+    { key: "date", width: 16 },
+    { key: "client", width: 26 },
+    { key: "label", width: 32 },
+    { key: "amount", width: 16 },
+    { key: "payment", width: 20 },
+    { key: "reference", width: 26 },
   ]
 
   achats.columns = [
-    { header: "Date", key: "date", width: 16 },
-    { header: "Fournisseur", key: "client", width: 26 },
-    { header: "Libellé", key: "label", width: 32 },
-    { header: "Montant", key: "amount", width: 16 },
-    { header: "Paiement", key: "payment", width: 20 },
-    { header: "Référence", key: "reference", width: 26 },
+    { key: "date", width: 16 },
+    { key: "client", width: 26 },
+    { key: "label", width: 32 },
+    { key: "amount", width: 16 },
+    { key: "payment", width: 20 },
+    { key: "reference", width: 26 },
   ]
 
-  // ===== DONNÉES =====
+  // ===== LIGNES D'EN-TÊTE =====
+  recettes.addRow(["Livre des recettes - Keskireste"])
+  recettes.addRow([`Utilisateur : ${profile.first_name || ""}`])
+  recettes.addRow([`Période : ${period.label}`])
+  recettes.addRow([])
+
+  achats.addRow(["Registre des achats - Keskireste"])
+  achats.addRow([`Utilisateur : ${profile.first_name || ""}`])
+  achats.addRow([`Période : ${period.label}`])
+  achats.addRow([])
+
+  // ===== LIGNE DE COLONNES (row 5) =====
+  recettes.addRow(["Date", "Client", "Libellé", "Montant", "Paiement", "Référence"])
+  achats.addRow(["Date", "Fournisseur", "Libellé", "Montant", "Paiement", "Référence"])
+
+  // ===== DONNÉES (row 6+) =====
   recettes.addRows(
     (revenues || []).map((rev) => ({
       date: rev.date,
@@ -140,12 +132,17 @@ export async function GET(req: Request) {
   for (const sheet of [recettes, achats]) {
     const headerRowIndex = 5
 
+    // Style ligne titre
+    const titleRow = sheet.getRow(1)
+    titleRow.font = { bold: true, size: 13 }
+
+    // Style ligne colonnes
     const header = sheet.getRow(headerRowIndex)
     header.font = { bold: true, color: { argb: "FFFFFF" } }
     header.fill = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F7DF3" },
+      fgColor: { argb: "1E293B" },
     }
 
     sheet.getColumn("A").numFmt = "dd/mm/yyyy"

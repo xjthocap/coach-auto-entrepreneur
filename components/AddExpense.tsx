@@ -4,6 +4,17 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  borderRadius: "var(--r-sm)",
+  border: "1px solid var(--cream-300)",
+  background: "var(--cream-50)",
+  color: "var(--ink-900)",
+  padding: "12px 16px",
+  outline: "none",
+  fontSize: 14,
+}
+
 export default function AddExpense() {
   const supabase = createClient()
   const router = useRouter()
@@ -22,17 +33,10 @@ export default function AddExpense() {
 
   async function handleAdd() {
     if (loading) return
-
     setLoading(true)
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      setLoading(false)
-      return
-    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setLoading(false); return }
 
     const { error } = await supabase.from("expenses").insert({
       user_id: user.id,
@@ -65,69 +69,85 @@ export default function AddExpense() {
   }
 
   return (
-    <div className="rounded-[28px] border border-red-200 bg-gradient-to-br from-red-50 to-white p-5 shadow-[0_10px_30px_rgba(239,68,68,0.08)]">
-      <div className="mb-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
-          Sortie d’argent
+    <div
+      style={{
+        borderRadius: "var(--r-xl)",
+        border: "1px solid var(--cream-200)",
+        background: "var(--cream-50)",
+        padding: 20,
+        boxShadow: "var(--shadow-md)",
+      }}
+    >
+      {/* Header */}
+      <div style={{ marginBottom: 16 }}>
+        <p
+          style={{
+            marginBottom: 6,
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--rose-500)",
+          }}
+        >
+          Sortie d'argent
         </p>
-
-        <h2 className="text-xl font-semibold text-slate-900">
+        <h2 style={{ fontSize: 20, fontWeight: 600, color: "var(--ink-900)", marginBottom: 4 }}>
           Ajouter une dépense
         </h2>
-
-        <p className="text-sm text-slate-500">
+        <p style={{ fontSize: 14, color: "var(--ink-500)" }}>
           Ajoute une dépense ponctuelle ou récurrente.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* Libellé */}
         <input
           type="text"
           placeholder="Libellé"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          style={inputStyle}
         />
 
-        <div className="grid gap-3 md:grid-cols-3">
+        {/* Montant + Date + Type */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           <input
             type="number"
             placeholder="Montant €"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            style={inputStyle}
           />
-
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            style={inputStyle}
           />
-
           <select
             value={type}
-            onChange={(e) =>
-              setType(e.target.value as "one_time" | "recurring")
-            }
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            onChange={(e) => setType(e.target.value as "one_time" | "recurring")}
+            style={inputStyle}
           >
             <option value="one_time">Ponctuelle</option>
             <option value="recurring">Récurrente</option>
           </select>
+        </div>
 
+        {/* Fournisseur + Mode + Référence */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           <input
             type="text"
             value={supplierName}
             onChange={(e) => setSupplierName(e.target.value)}
             placeholder="Fournisseur"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            style={inputStyle}
           />
-
           <select
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            style={inputStyle}
           >
             <option value="">Mode de paiement</option>
             <option value="Virement">Virement</option>
@@ -135,23 +155,34 @@ export default function AddExpense() {
             <option value="Espèces">Espèces</option>
             <option value="Chèque">Chèque</option>
           </select>
-
           <input
             type="text"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             placeholder="Référence justificatif"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            style={inputStyle}
           />
         </div>
 
+        {/* Submit */}
         <button
           onClick={handleAdd}
           disabled={loading}
-          style={{ cursor: loading ? "not-allowed" : "pointer" }}
-          className="w-full rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(239,68,68,0.18)] transition hover:bg-red-500 disabled:opacity-50"
+          style={{
+            width: "100%",
+            borderRadius: "var(--r-sm)",
+            border: "none",
+            background: "var(--ink-900)",
+            color: "var(--violet-500)",
+            padding: "14px 20px",
+            fontSize: 15,
+            fontWeight: 600,
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.5 : 1,
+            boxShadow: "var(--shadow-md)",
+          }}
         >
-          {loading ? "..." : "Ajouter"}
+          {loading ? "Enregistrement…" : "Ajouter la dépense"}
         </button>
       </div>
     </div>

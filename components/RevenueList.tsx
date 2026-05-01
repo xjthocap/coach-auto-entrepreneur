@@ -23,6 +23,7 @@ export default function RevenueList({ revenues }: { revenues: Revenue[] }) {
         <p className="mt-0.5 text-sm" style={{ color: "var(--ink-400)" }}>
           Liste des encaissements sur la période active.
         </p>
+        
       </div>
 
       {/* ── Liste ── */}

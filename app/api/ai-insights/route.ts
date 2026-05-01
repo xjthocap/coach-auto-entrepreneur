@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server"
 import { OpenAI } from "openai"
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-})
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
@@ -180,6 +176,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE, sans markdown, avec ce format exact :
 }
 `
 
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
       messages: [

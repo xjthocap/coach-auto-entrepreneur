@@ -16,35 +16,115 @@ export default function PremiumLockCard({
   onUpgradeClick,
 }: PremiumLockCardProps) {
   return (
-    <div className="relative overflow-hidden rounded-[28px] border border-violet-200 bg-white shadow-[0_12px_30px_rgba(139,92,246,0.08)]">
-      <div className="pointer-events-none select-none blur-[5px] opacity-60">
-        <div className="p-6">{children}</div>
+    <div
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "var(--r-xl)",
+        border: "1px solid var(--cream-200)",
+        background: "var(--cream-50)",
+        boxShadow: "var(--shadow-md)",
+      }}
+    >
+      {/* Blurred preview */}
+      <div style={{ pointerEvents: "none", userSelect: "none", filter: "blur(5px)", opacity: 0.55 }}>
+        <div style={{ padding: 24 }}>{children}</div>
       </div>
 
-      <div className="absolute inset-0 bg-white/55 backdrop-blur-[2px]" />
+      {/* Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(248, 247, 252, 0.6)",
+          backdropFilter: "blur(2px)",
+        }}
+      />
 
-      <div className="absolute inset-0 flex items-center justify-center p-6">
-        <div className="w-full max-w-md rounded-[24px] border border-white/80 bg-white/90 p-6 text-center shadow-[0_16px_35px_rgba(15,23,42,0.12)]">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">
+      {/* Lock panel */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 24,
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 400,
+            borderRadius: "var(--r-lg)",
+            border: "1px solid var(--cream-200)",
+            background: "var(--cream-50)",
+            padding: 28,
+            textAlign: "center",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              borderRadius: "var(--r-sm)",
+              background: "var(--ink-900)",
+              marginBottom: 14,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--violet-500)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--violet-700)",
+              marginBottom: 8,
+            }}
+          >
             Premium
           </p>
 
-          <h3 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h3
+            style={{
+              fontSize: 20,
+              fontWeight: 600,
+              letterSpacing: "-0.02em",
+              color: "var(--ink-900)",
+              marginBottom: 10,
+            }}
+          >
             {title}
           </h3>
 
-          <p className="mt-3 text-sm leading-7 text-slate-500">
+          <p style={{ fontSize: 13, lineHeight: 1.7, color: "var(--ink-500)", marginBottom: 16 }}>
             {description}
           </p>
 
           {bullets.length > 0 && (
-            <div className="mt-5 space-y-2 text-left">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20, textAlign: "left" }}>
               {bullets.map((bullet, index) => (
                 <div
                   key={index}
-                  className="rounded-2xl bg-[#f8f9fd] px-4 py-3 text-sm text-slate-700"
+                  style={{
+                    borderRadius: "var(--r-sm)",
+                    background: "var(--cream-100)",
+                    padding: "10px 14px",
+                    fontSize: 13,
+                    color: "var(--ink-700)",
+                  }}
                 >
-                  <span className="mr-2 font-semibold text-violet-600">•</span>
+                  <span style={{ marginRight: 8, fontWeight: 700, color: "var(--violet-700)" }}>•</span>
                   {bullet}
                 </div>
               ))}
@@ -53,13 +133,24 @@ export default function PremiumLockCard({
 
           <button
             onClick={onUpgradeClick}
-            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-3 font-semibold text-white shadow-[0_12px_24px_rgba(139,92,246,0.22)] transition hover:scale-[1.01] hover:opacity-95"
+            style={{
+              width: "100%",
+              borderRadius: "var(--r-sm)",
+              border: "none",
+              background: "var(--ink-900)",
+              color: "var(--violet-500)",
+              padding: "12px 16px",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+              boxShadow: "var(--shadow-md)",
+            }}
           >
             Passer en Premium
           </button>
 
-          <p className="mt-3 text-xs text-slate-400">
-            Débloque les projections, l’IA complète et les fonctionnalités avancées.
+          <p style={{ marginTop: 10, fontSize: 12, color: "var(--ink-400)" }}>
+            Débloque toutes les fonctionnalités avancées
           </p>
         </div>
       </div>

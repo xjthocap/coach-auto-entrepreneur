@@ -5,6 +5,7 @@ import AppSidebar from "@/components/AppSidebar"
 import MobileNav from "@/components/MobileNav"
 import { calculateMicro } from "@/lib/calculations"
 import ExportMonthButton from "@/components/ExportMonthButton"
+import HistoryPaywall from "@/components/HistoryPaywall"
 
 type Revenue = {
   id: string
@@ -206,6 +207,11 @@ export default async function HistoryPage({
 
           <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 md:px-8 md:py-8">
 
+            {/* ── PAYWALL ── */}
+            {!isPremium && (
+              <HistoryPaywall />
+            )}
+
             {/* ── STAT TOTAUX ── */}
             <section className="grid gap-3 grid-cols-2 md:grid-cols-3">
               {[
@@ -240,8 +246,8 @@ export default async function HistoryPage({
               ))}
             </section>
 
-            {/* ── GRILLE DES MOIS ── */}
-            <section
+            {/* ── GRILLE DES MOIS (premium only) ── */}
+            {isPremium && <section
               className="p-6"
               style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
             >
@@ -349,10 +355,10 @@ export default async function HistoryPage({
                   })}
                 </div>
               )}
-            </section>
+            </section>}
 
-            {/* ── DÉTAIL DU MOIS SÉLECTIONNÉ ── */}
-            {selectedMonth && (
+            {/* ── DÉTAIL DU MOIS SÉLECTIONNÉ (premium only) ── */}
+            {isPremium && selectedMonth && (
               <section
                 className="p-6 md:p-7"
                 style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}

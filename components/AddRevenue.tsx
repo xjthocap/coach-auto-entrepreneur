@@ -4,6 +4,21 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  borderRadius: "var(--r-sm)",
+  border: "1px solid var(--cream-300)",
+  background: "var(--cream-50)",
+  color: "var(--ink-900)",
+  padding: "12px 16px",
+  outline: "none",
+  fontSize: 14,
+}
+
+const inputProps = {
+  style: inputStyle,
+}
+
 export default function AddRevenue() {
   const supabase = createClient()
   const router = useRouter()
@@ -42,55 +57,30 @@ export default function AddRevenue() {
 
   function updateItem(index: number, field: string, value: string) {
     const updatedItems = [...items]
-
-    updatedItems[index] = {
-      ...updatedItems[index],
-      [field]: value,
-    }
-
+    updatedItems[index] = { ...updatedItems[index], [field]: value }
     setItems(updatedItems)
   }
 
   function addItem() {
-    setItems([
-      ...items,
-      {
-        description: "",
-        quantity: "1",
-        unitPrice: "",
-      },
-    ])
+    setItems([...items, { description: "", quantity: "1", unitPrice: "" }])
   }
 
   function removeItem(index: number) {
     if (items.length === 1) return
-
-    const updatedItems = items.filter((_, itemIndex) => itemIndex !== index)
-
-    setItems(updatedItems)
+    setItems(items.filter((_, i) => i !== index))
   }
 
   const invoiceTotal = items.reduce((total, item) => {
-    const quantity = Number(item.quantity || 0)
-    const unitPrice = Number(item.unitPrice || 0)
-
-    return total + quantity * unitPrice
+    return total + Number(item.quantity || 0) * Number(item.unitPrice || 0)
   }, 0)
 
   async function handleAdd() {
     if (loading) return
-
     setLoading(true)
     setLastInvoiceId(null)
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      setLoading(false)
-      return
-    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setLoading(false); return }
 
     const parsedAmount = parseFloat(amount)
     const finalAmount = generateInvoice ? invoiceTotal : parsedAmount
@@ -169,72 +159,89 @@ export default function AddRevenue() {
     setLabel("")
     setAmount("")
     setDate(today)
-    setItems([
-      {
-        description: "",
-        quantity: "1",
-        unitPrice: "",
-      },
-    ])
+    setItems([{ description: "", quantity: "1", unitPrice: "" }])
     setLoading(false)
 
     router.refresh()
   }
 
   return (
-    <div className="rounded-[28px] border border-green-200 bg-gradient-to-br from-green-50 to-white p-5 shadow-[0_10px_30px_rgba(34,197,94,0.08)]">
-      <div className="mb-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-green-600">
-          Entrée d’argent
+    <div
+      style={{
+        borderRadius: "var(--r-xl)",
+        border: "1px solid var(--cream-200)",
+        background: "var(--cream-50)",
+        padding: 20,
+        boxShadow: "var(--shadow-md)",
+      }}
+    >
+      {/* Header */}
+      <div style={{ marginBottom: 16 }}>
+        <p
+          style={{
+            marginBottom: 6,
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--violet-700)",
+          }}
+        >
+          Entrée d'argent
         </p>
-
-        <h2 className="text-xl font-semibold text-slate-900">
+        <h2 style={{ fontSize: 20, fontWeight: 600, color: "var(--ink-900)", marginBottom: 4 }}>
           Ajouter un revenu
         </h2>
-
-        <p className="text-sm text-slate-500">
+        <p style={{ fontSize: 14, color: "var(--ink-500)" }}>
           Renseigne un revenu et génère une facture si besoin.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* Libellé */}
         <input
           type="text"
-          placeholder="Libellé"
+          placeholder="Libellé (ex. Mission UI design - Mairie Montpellier)"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          {...inputProps}
         />
 
-        <div className="grid gap-3 md:grid-cols-2">
+        {/* Montant + Date */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <input
             type="number"
             placeholder="Montant €"
             value={generateInvoice ? invoiceTotal.toString() : amount}
             onChange={(e) => setAmount(e.target.value)}
             disabled={generateInvoice}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
+            style={{
+              ...inputStyle,
+              background: generateInvoice ? "var(--cream-200)" : "var(--cream-50)",
+              color: generateInvoice ? "var(--ink-400)" : "var(--ink-900)",
+            }}
           />
-
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            {...inputProps}
           />
+        </div>
 
+        {/* Client + Paiement */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <input
             type="text"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             placeholder="Nom du client"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            {...inputProps}
           />
-
           <select
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            style={inputStyle}
           >
             <option value="">Mode de paiement</option>
             <option value="Virement">Virement</option>
@@ -242,104 +249,138 @@ export default function AddRevenue() {
             <option value="Espèces">Espèces</option>
             <option value="Chèque">Chèque</option>
           </select>
-          </div>
+        </div>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-green-100 bg-white px-4 py-4 text-sm font-medium text-slate-700">
+        {/* Toggle facture */}
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            borderRadius: "var(--r-sm)",
+            border: "1px solid var(--cream-200)",
+            background: "var(--cream-100)",
+            padding: "12px 16px",
+            fontSize: 14,
+            fontWeight: 500,
+            color: "var(--ink-700)",
+            cursor: "pointer",
+          }}
+        >
           <input
             type="checkbox"
             checked={generateInvoice}
             onChange={() => setGenerateInvoice(!generateInvoice)}
-            className="h-4 w-4 accent-green-600"
+            style={{ width: 16, height: 16, accentColor: "var(--violet-700)" }}
           />
           Générer une facture PDF pour cette entrée
         </label>
 
+        {/* Détails facture */}
         {generateInvoice && (
-          <div className="space-y-3 rounded-2xl border border-green-100 bg-white/80 p-4">
+          <div
+            style={{
+              borderRadius: "var(--r-md)",
+              border: "1px solid var(--cream-200)",
+              background: "var(--cream-100)",
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            {/* Société + Email */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <input
+                type="text"
+                value={clientCompany}
+                onChange={(e) => setClientCompany(e.target.value)}
+                placeholder="Société du client"
+                {...inputProps}
+              />
+              <input
+                type="email"
+                value={clientEmail}
+                onChange={(e) => setClientEmail(e.target.value)}
+                placeholder="Email client"
+                {...inputProps}
+              />
+            </div>
 
-            <input
-              type="text"
-              value={clientCompany}
-              onChange={(e) => setClientCompany(e.target.value)}
-              placeholder="Société du client"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-            />
+            {/* Adresse + Référence */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <input
+                type="text"
+                value={clientAddress}
+                onChange={(e) => setClientAddress(e.target.value)}
+                placeholder="Adresse client"
+                {...inputProps}
+              />
+              <input
+                type="text"
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                placeholder="Référence facture"
+                {...inputProps}
+              />
+            </div>
 
-            <input
-              type="email"
-              value={clientEmail}
-              onChange={(e) => setClientEmail(e.target.value)}
-              placeholder="Email client"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-            />
-
-            <input
-              type="text"
-              value={clientAddress}
-              onChange={(e) => setClientAddress(e.target.value)}
-              placeholder="Adresse client"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-            />
-
-            <input
-            type="text"
-            value={reference}
-            onChange={(e) => setReference(e.target.value)}
-            placeholder="Référence facture"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
-            />
-
-
-            <p className="text-sm font-semibold text-slate-800">
-              Lignes de facture
-            </p>
-
+            {/* Date d'échéance */}
             <input
               type="date"
               value={dueAt}
               onChange={(e) => setDueAt(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+              {...inputProps}
             />
 
+            {/* Lignes */}
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-700)" }}>
+              Lignes de facture
+            </p>
+
             {items.map((item, index) => (
-              <div key={index} className="grid gap-3 md:grid-cols-4">
+              <div
+                key={index}
+                style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 8 }}
+              >
                 <input
                   type="text"
                   value={item.description}
-                  onChange={(e) =>
-                    updateItem(index, "description", e.target.value)
-                  }
+                  onChange={(e) => updateItem(index, "description", e.target.value)}
                   placeholder="Description"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+                  {...inputProps}
                 />
-
                 <input
                   type="number"
                   value={item.quantity}
-                  onChange={(e) =>
-                    updateItem(index, "quantity", e.target.value)
-                  }
-                  placeholder="Quantité"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+                  onChange={(e) => updateItem(index, "quantity", e.target.value)}
+                  placeholder="Qté"
+                  {...inputProps}
                 />
-
                 <input
                   type="number"
                   value={item.unitPrice}
-                  onChange={(e) =>
-                    updateItem(index, "unitPrice", e.target.value)
-                  }
-                  placeholder="Prix unitaire HT"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+                  onChange={(e) => updateItem(index, "unitPrice", e.target.value)}
+                  placeholder="Prix HT"
+                  {...inputProps}
                 />
-
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
                   disabled={items.length === 1}
-                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  style={{
+                    borderRadius: "var(--r-sm)",
+                    border: "1px solid var(--cream-300)",
+                    background: "var(--cream-50)",
+                    color: items.length === 1 ? "var(--ink-300)" : "var(--rose-500)",
+                    padding: "12px 14px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: items.length === 1 ? "not-allowed" : "pointer",
+                    opacity: items.length === 1 ? 0.4 : 1,
+                  }}
                 >
-                  Supprimer
+                  ✕
                 </button>
               </div>
             ))}
@@ -347,34 +388,76 @@ export default function AddRevenue() {
             <button
               type="button"
               onClick={addItem}
-              className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-100"
+              style={{
+                borderRadius: "var(--r-sm)",
+                border: "1px solid var(--cream-300)",
+                background: "var(--cream-200)",
+                color: "var(--ink-700)",
+                padding: "10px 16px",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                alignSelf: "flex-start",
+              }}
             >
-              Ajouter une ligne
+              + Ajouter une ligne
             </button>
 
-            <p className="text-sm font-semibold text-slate-800">
+            <p
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: "var(--ink-900)",
+                borderTop: "1px solid var(--cream-300)",
+                paddingTop: 10,
+              }}
+            >
               Total HT : {invoiceTotal.toFixed(2).replace(".", ",")} €
             </p>
           </div>
         )}
 
+        {/* Submit */}
         <button
           onClick={handleAdd}
           disabled={loading}
-          style={{ cursor: loading ? "not-allowed" : "pointer" }}
-          className="w-full rounded-2xl bg-green-600 px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(34,197,94,0.18)] transition hover:bg-green-500 disabled:opacity-50"
+          style={{
+            width: "100%",
+            borderRadius: "var(--r-sm)",
+            border: "none",
+            background: "var(--ink-900)",
+            color: "var(--violet-500)",
+            padding: "14px 20px",
+            fontSize: 15,
+            fontWeight: 600,
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.5 : 1,
+            boxShadow: "var(--shadow-md)",
+          }}
         >
-          {loading ? "..." : "Ajouter"}
+          {loading ? "Enregistrement…" : "Ajouter le revenu"}
         </button>
 
+        {/* Lien téléchargement facture */}
         {lastInvoiceId && (
           <a
             href={`/api/invoices/${lastInvoiceId}/pdf`}
             target="_blank"
             rel="noreferrer"
-            className="block rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-center text-sm font-semibold text-green-700 transition hover:bg-green-100"
+            style={{
+              display: "block",
+              borderRadius: "var(--r-sm)",
+              border: "1px solid var(--cream-300)",
+              background: "var(--cream-200)",
+              color: "var(--violet-700)",
+              padding: "12px 16px",
+              textAlign: "center",
+              fontSize: 14,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
           >
-            Télécharger la facture PDF
+            ↓ Télécharger la facture PDF
           </a>
         )}
       </div>

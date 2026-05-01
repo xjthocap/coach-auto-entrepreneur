@@ -32,9 +32,7 @@ export default async function ExpensesPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect("/login")
-  }
+  if (!user) redirect("/login")
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -42,9 +40,7 @@ export default async function ExpensesPage({
     .eq("id", user.id)
     .single()
 
-  if (!profile) {
-    redirect("/onboarding")
-  }
+  if (!profile) redirect("/onboarding")
 
   const frequency =
     profile.declaration_frequency === "quarterly" ? "quarterly" : "monthly"
@@ -70,6 +66,7 @@ export default async function ExpensesPage({
       exp.type === "one_time"
         ? exp.date >= period.start && exp.date <= period.end
         : exp.type === "recurring" && exp.active
+
     return { ...exp, isInPeriod }
   })
 
@@ -77,7 +74,9 @@ export default async function ExpensesPage({
     expenses?.filter((e) => e.type === "recurring" && e.active).length || 0
 
   const totalOneTime =
-    expenses?.filter((e) => e.type === "one_time" && e.date >= period.start && e.date <= period.end).length || 0
+    expenses?.filter(
+      (e) => e.type === "one_time" && e.date >= period.start && e.date <= period.end
+    ).length || 0
 
   const monthlyRecurringTotal =
     expenses
@@ -86,30 +85,40 @@ export default async function ExpensesPage({
 
   const periodOneTimeTotal =
     expenses
-      ?.filter((e) => e.type === "one_time" && e.date >= period.start && e.date <= period.end)
+      ?.filter(
+        (e) => e.type === "one_time" && e.date >= period.start && e.date <= period.end
+      )
       .reduce((sum, e) => sum + Number(e.amount), 0) || 0
 
   const totalPeriod = monthlyRecurringTotal + periodOneTimeTotal
-
   const isPremium = profile.plan === "premium"
 
   return (
-    <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
+    <main
+      className="min-h-screen"
+      style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}
+    >
       <div className="flex min-h-screen">
         <AppSidebar activePage="expenses" profile={profile} userEmail={user.email} />
 
-        {/* CONTENT */}
         <section className="min-w-0 flex-1 pb-20 lg:pb-0 page-enter">
           {/* TOPBAR */}
           <header
             className="sticky top-0 z-20 backdrop-blur"
-            style={{ background: "rgba(248, 247, 252, 0.92)", borderBottom: "1px solid var(--cream-300)" }}
+            style={{
+              background: "rgba(248, 247, 252, 0.92)",
+              borderBottom: "1px solid var(--cream-300)",
+            }}
           >
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 md:px-8">
               <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
+                <p
+                  className="text-[11px] uppercase tracking-[0.08em]"
+                  style={{ color: "var(--ink-400)" }}
+                >
                   Dépenses
                 </p>
+
                 <h1
                   className="truncate text-[22px] font-semibold tracking-tight"
                   style={{ color: "var(--ink-900)" }}
@@ -119,10 +128,13 @@ export default async function ExpensesPage({
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Période */}
                 <div
                   className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm md:flex"
-                  style={{ background: "var(--cream-50)", border: "1px solid var(--cream-200)", color: "var(--ink-500)" }}
+                  style={{
+                    background: "var(--cream-50)",
+                    border: "1px solid var(--cream-200)",
+                    color: "var(--ink-500)",
+                  }}
                 >
                   <span
                     className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full"
@@ -130,56 +142,87 @@ export default async function ExpensesPage({
                   />
                   {period.label}
                 </div>
+
                 <Link
                   href={`/Expenses?date=${formatLocalDate(prevDate)}`}
                   className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
-                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
+                  style={{
+                    borderColor: "var(--cream-200)",
+                    background: "var(--cream-50)",
+                    color: "var(--ink-500)",
+                  }}
                 >
                   ←
                 </Link>
+
                 <Link
                   href={`/Expenses?date=${formatLocalDate(nextDate)}`}
                   className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
-                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
+                  style={{
+                    borderColor: "var(--cream-200)",
+                    background: "var(--cream-50)",
+                    color: "var(--ink-500)",
+                  }}
                 >
                   →
                 </Link>
+
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
           </header>
 
           <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">
+            {/* HERO + FORM */}
+            <section className="grid items-stretch gap-6 xl:grid-cols-[420px_1fr]">
+              <div className="h-full">
+                <section
+                  className="relative h-full overflow-hidden p-8 md:p-10"
+                  style={{
+                    background: "var(--rose-100)",
+                    borderRadius: "var(--r-xl)",
+                  }}
+                >
+                  <div className="mb-3 flex items-center gap-2">
+                    <span
+                      className="text-[11px] uppercase tracking-[0.12em]"
+                      style={{ color: "var(--rose-500)" }}
+                    >
+                      Sorties · {period.label}
+                    </span>
+                  </div>
 
-            {/* HERO */}
-            <section
-              className="relative overflow-hidden p-8 md:p-10"
-              style={{ background: "var(--rose-100)", borderRadius: "var(--r-xl)" }}
-            >
-              <div className="mb-3 flex items-center gap-2">
-                <span className="text-[11px] uppercase tracking-[0.12em]" style={{ color: "var(--rose-500)" }}>
-                  Sorties · {period.label}
-                </span>
+                  <div
+                    className="font-mono font-light"
+                    style={{
+                      fontSize: "clamp(42px, 6vw, 64px)",
+                      letterSpacing: "-0.05em",
+                      color: "var(--rose-500)",
+                      lineHeight: 1.05,
+                    }}
+                  >
+                    {totalPeriod.toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    &nbsp;€
+                  </div>
+
+                  <p className="mt-3 text-sm" style={{ color: "var(--ink-500)" }}>
+                    {totalRecurring} récurrente{totalRecurring > 1 ? "s" : ""} ·{" "}
+                    {totalOneTime} ponctuelle{totalOneTime > 1 ? "s" : ""} sur la
+                    période
+                  </p>
+                </section>
               </div>
-              <div
-                className="font-mono font-light"
-                style={{
-                  fontSize: "clamp(42px, 6vw, 64px)",
-                  letterSpacing: "-0.05em",
-                  color: "var(--rose-500)",
-                  lineHeight: 1.05,
-                }}
-              >
-                {totalPeriod.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}&nbsp;€
+
+              <div className="h-full min-w-0">
+                <AddExpense />
               </div>
-              <p className="mt-3 text-sm" style={{ color: "var(--ink-500)" }}>
-                {totalRecurring} récurrente{totalRecurring > 1 ? "s" : ""} · {totalOneTime} ponctuelle
-                {totalOneTime > 1 ? "s" : ""} sur la période
-              </p>
             </section>
 
             {/* STAT GRID */}
-            <section className="grid gap-3 grid-cols-2 md:grid-cols-3">
+            <section className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {[
                 { label: "Ponctuelles", count: totalOneTime, sub: `Période ${period.label}` },
                 { label: "Récurrentes actives", count: totalRecurring, sub: "comptées chaque période" },
@@ -199,12 +242,20 @@ export default async function ExpensesPage({
                   >
                     {stat.label}
                   </p>
+
                   {"value" in stat ? (
                     <p
                       className="mt-3 font-mono font-normal"
-                      style={{ fontSize: 22, letterSpacing: "-0.04em", color: "var(--rose-500)" }}
+                      style={{
+                        fontSize: 22,
+                        letterSpacing: "-0.04em",
+                        color: "var(--rose-500)",
+                      }}
                     >
-                      {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
+                      {stat.value.toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                      })}{" "}
+                      €
                     </p>
                   ) : (
                     <p
@@ -218,38 +269,25 @@ export default async function ExpensesPage({
                       {stat.count}
                     </p>
                   )}
-                  <p className="mt-2 text-xs" style={{ color: stat.dark ? "var(--ink-400)" : "var(--ink-400)" }}>
+
+                  <p
+                    className="mt-2 text-xs"
+                    style={{ color: stat.dark ? "var(--ink-400)" : "var(--ink-400)" }}
+                  >
                     {stat.sub}
                   </p>
                 </div>
               ))}
             </section>
 
-            {/* AJOUTER */}
-            <section
-              className="p-6 md:p-8"
-              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
-            >
-              <div className="mb-5">
-                <h2
-                  className="text-lg font-semibold tracking-tight"
-                  style={{ color: "var(--ink-900)" }}
-                >
-                  Ajouter une dépense
-                </h2>
-                <p className="mt-1 text-sm" style={{ color: "var(--ink-400)" }}>
-                  Renseigne une nouvelle sortie. Choisis &quot;Récurrente&quot; si elle revient chaque période.
-                </p>
-              </div>
-              <div className="rounded-[14px] p-2" style={{ background: "var(--cream-100)" }}>
-                <AddExpense />
-              </div>
-            </section>
-
             {/* LISTE */}
             <section
               className="overflow-hidden"
-              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+              style={{
+                background: "var(--cream-50)",
+                borderRadius: "var(--r-lg)",
+                boxShadow: "var(--shadow-md)",
+              }}
             >
               <ExpenseList expenses={expensesWithPeriodInfo} showPeriodInfo />
             </section>
