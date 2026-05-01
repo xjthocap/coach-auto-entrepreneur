@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import AppSidebar from "@/components/AppSidebar"
@@ -6,6 +5,7 @@ import MobileNav from "@/components/MobileNav"
 import AddExpense from "@/components/AddExpense"
 import ExpenseList from "@/components/ExpenseList"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
+import TopbarPeriod from "@/components/TopbarPeriod"
 import { getPeriodRange } from "@/lib/period"
 
 function parseLocalDate(value: string) {
@@ -18,6 +18,15 @@ function formatLocalDate(date: Date) {
   const m = String(date.getMonth() + 1).padStart(2, "0")
   const d = String(date.getDate()).padStart(2, "0")
   return `${y}-${m}-${d}`
+}
+
+function buildPeriodLabel(frequency: "monthly" | "quarterly", period: { label: string; start: string; end: string }) {
+  if (frequency === "monthly") return period.label
+  const [sy, sm] = period.start.split("-").map(Number)
+  const [ey, em] = period.end.split("-").map(Number)
+  const startMonth = new Date(sy, sm - 1, 1).toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")
+  const endMonth = new Date(ey, em - 1, 1).toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")
+  return `${period.label} · ${startMonth}. → ${endMonth}.`
 }
 
 export default async function ExpensesPage({
@@ -127,46 +136,13 @@ export default async function ExpensesPage({
                 </h1>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div
-                  className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm md:flex"
-                  style={{
-                    background: "var(--cream-50)",
-                    border: "1px solid var(--cream-200)",
-                    color: "var(--ink-500)",
-                  }}
-                >
-                  <span
-                    className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ background: "var(--rose-500)" }}
-                  />
-                  {period.label}
-                </div>
-
-                <Link
-                  href={`/Expenses?date=${formatLocalDate(prevDate)}`}
-                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
-                  style={{
-                    borderColor: "var(--cream-200)",
-                    background: "var(--cream-50)",
-                    color: "var(--ink-500)",
-                  }}
-                >
-                  ←
-                </Link>
-
-                <Link
-                  href={`/Expenses?date=${formatLocalDate(nextDate)}`}
-                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
-                  style={{
-                    borderColor: "var(--cream-200)",
-                    background: "var(--cream-50)",
-                    color: "var(--ink-500)",
-                  }}
-                >
-                  →
-                </Link>
-
+              <div className="hidden md:flex items-center gap-2">
+                <TopbarPeriod
+                  label={buildPeriodLabel(frequency, period)}
+                  prevUrl={`/Expenses?date=${formatLocalDate(prevDate)}`}
+                  nextUrl={`/Expenses?date=${formatLocalDate(nextDate)}`}
+                  addAnchor="add-expense"
+                />
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
@@ -216,7 +192,7 @@ export default async function ExpensesPage({
                 </section>
               </div>
 
-              <div className="h-full min-w-0">
+              <div id="add-expense" className="h-full min-w-0">
                 <AddExpense />
               </div>
             </section>

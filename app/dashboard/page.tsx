@@ -20,6 +20,7 @@ import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
+import TopbarPeriod from "@/components/TopbarPeriod"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)
@@ -36,6 +37,16 @@ function formatLocalDate(date: Date) {
 function parsePeriodDate(dateStr: string) {
   const [y, m, d] = dateStr.split("-").map(Number)
   return new Date(y, m - 1, d)
+}
+
+function buildPeriodLabel(frequency: "monthly" | "quarterly", period: { label: string; start: string; end: string }) {
+  if (frequency === "monthly") return period.label
+  // quarterly → "T2 2026 · avr. → juin"
+  const startDate = parsePeriodDate(period.start)
+  const endDate = parsePeriodDate(period.end)
+  const startMonth = startDate.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")
+  const endMonth = endDate.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")
+  return `${period.label} · ${startMonth}. → ${endMonth}.`
 }
 
 export default async function DashboardPage({
@@ -229,28 +240,13 @@ export default async function DashboardPage({
                 </h1>
               </div>
 
-              <div className="flex items-center gap-2">
-                <div
-                  className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm md:flex"
-                  style={{ background: "var(--cream-50)", border: "1px solid var(--cream-200)", color: "var(--ink-500)" }}
-                >
-                  <span className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--lime-500)" }} />
-                  {period.label}
-                </div>
-                <Link
-                  href={`/dashboard?date=${formatLocalDate(prevDate)}`}
-                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
-                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
-                >
-                  ←
-                </Link>
-                <Link
-                  href={`/dashboard?date=${formatLocalDate(nextDate)}`}
-                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
-                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
-                >
-                  →
-                </Link>
+              <div className="hidden md:flex items-center gap-2">
+                <TopbarPeriod
+                  label={buildPeriodLabel(frequency, period)}
+                  prevUrl={`/dashboard?date=${formatLocalDate(prevDate)}`}
+                  nextUrl={`/dashboard?date=${formatLocalDate(nextDate)}`}
+                  addAnchor="quick-add"
+                />
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
@@ -445,6 +441,7 @@ export default async function DashboardPage({
 
             {/* ── ACTIONS RAPIDES ── */}
             <section
+              id="quick-add"
               className="p-6 md:p-8"
               style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
             >
