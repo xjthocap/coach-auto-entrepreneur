@@ -639,10 +639,7 @@ export default async function DashboardPage({
                 </p>
               </div>
               <div className="grid gap-6 xl:grid-cols-2">
-                <div className="rounded-[14px] p-2" style={{ background: "var(--cream-100)" }}>
                   <AddRevenue />
-                </div>
-                <div className="rounded-[14px] p-2" style={{ background: "var(--cream-100)" }}>
                   <AddExpense />
                 </div>
               </div>
