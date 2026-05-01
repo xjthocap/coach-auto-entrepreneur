@@ -641,7 +641,6 @@ export default async function DashboardPage({
               <div className="grid gap-6 xl:grid-cols-2">
                   <AddRevenue />
                   <AddExpense />
-                </div>
               </div>
             </section>
 
