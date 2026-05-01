@@ -79,7 +79,7 @@ export default function AddExpense() {
       }}
     >
       {/* Header */}
-      <div className="flex column space between" style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16 }}>
         <p
           style={{
             marginBottom: 6,
@@ -98,6 +98,7 @@ export default function AddExpense() {
         <p style={{ fontSize: 14, color: "var(--ink-500)" }}>
           Ajoute une dépense ponctuelle ou récurrente.
         </p>
+      </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {/* Libellé */}
@@ -161,7 +162,6 @@ export default function AddExpense() {
             placeholder="Référence justificatif"
             style={inputStyle}
           />
-        </div>
         </div>
 
         {/* Submit */}
