@@ -101,6 +101,32 @@ export default async function DashboardPage({
     Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   )
 
+  // ===== ALERTE DÉCLARATION (basée sur la date réelle) =====
+  const realToday = new Date()
+  const realCurrentPeriod = getPeriodRange(frequency, realToday)
+  const realCurrentEnd = parsePeriodDate(realCurrentPeriod.end)
+  const daysUntilCurrentEnd = Math.ceil(
+    (realCurrentEnd.getTime() - realToday.getTime()) / (1000 * 60 * 60 * 24)
+  )
+
+  // Période précédente pour fenêtre de déclaration
+  const realPrevDate = new Date(realToday)
+  realPrevDate.setMonth(realPrevDate.getMonth() - step)
+  const realPrevPeriod = getPeriodRange(frequency, realPrevDate)
+  const realPrevEnd = parsePeriodDate(realPrevPeriod.end)
+
+  // Deadline = dernier jour du mois suivant la fin de période
+  const deadlineDate = new Date(realPrevEnd.getFullYear(), realPrevEnd.getMonth() + 2, 0)
+  const daysUntilDeadline = Math.ceil(
+    (deadlineDate.getTime() - realToday.getTime()) / (1000 * 60 * 60 * 24)
+  )
+  const isInDeclarationWindow = realPrevEnd < realToday && daysUntilDeadline >= 0
+  const isApproachingEnd = !isInDeclarationWindow && daysUntilCurrentEnd >= 0 && daysUntilCurrentEnd <= 7
+
+  function formatDeadline(d: Date) {
+    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+  }
+
   // ===== REVENUS DE LA PÉRIODE =====
   const { data: revenues } = await supabase
     .from("revenues")
@@ -193,6 +219,42 @@ export default async function DashboardPage({
 
   const realNet = result.net - totalExpenses
   const reserveAmount = result.charges + result.tax
+
+  // ===== PÉRIODE PRÉCÉDENTE (pour comparatifs) =====
+  const prevPeriod = getPeriodRange(frequency, prevDate)
+
+  const { data: prevRevenues } = await supabase
+    .from("revenues")
+    .select("*")
+    .eq("user_id", user.id)
+    .gte("date", prevPeriod.start)
+    .lte("date", prevPeriod.end)
+
+  const prevTotalRevenue =
+    prevRevenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
+
+  const prevTotalExpenses =
+    expenses?.reduce((sum, exp) => {
+      if (exp.type === "one_time") {
+        if (exp.date >= prevPeriod.start && exp.date <= prevPeriod.end) {
+          return sum + Number(exp.amount)
+        }
+        return sum
+      }
+      if (exp.type === "recurring" && exp.active) {
+        return sum + Number(exp.amount)
+      }
+      return sum
+    }, 0) || 0
+
+  const prevResult = calculateMicro({
+    revenue: prevTotalRevenue,
+    activityType: profile.activity_type,
+    acre: profile.acre,
+    versementLiberatoire: profile.versement_liberatoire,
+  })
+  const prevReserveAmount = prevResult.charges + prevResult.tax
+  const prevRealNet = prevResult.net - prevTotalExpenses
 
   // ===== PROJECTION =====
   const projection = calculateProjection({
@@ -377,32 +439,148 @@ export default async function DashboardPage({
               )
             })()}
 
+            {/* ── DECLARATION ALERTS ── */}
+            {isInDeclarationWindow && (
+              <section
+                className="flex items-start gap-3 px-5 py-4"
+                style={{
+                  background: "var(--rose-100)",
+                  borderRadius: "var(--r-md)",
+                  border: "1px solid rgba(251,113,133,0.35)",
+                }}
+              >
+                <span
+                  style={{
+                    flexShrink: 0,
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--r-sm)",
+                    background: "var(--rose-500)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 1,
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold" style={{ color: "var(--rose-500)" }}>
+                    Période {realPrevPeriod.label} — déclaration en cours
+                  </p>
+                  <p className="mt-0.5 text-sm" style={{ color: "var(--rose-500)" }}>
+                    Tu es dans la fenêtre de déclaration. Soumets ton chiffre d'affaires sur autoentrepreneur.urssaf.fr avant le{" "}
+                    <strong>{formatDeadline(deadlineDate)}</strong>
+                    {daysUntilDeadline <= 5 && (
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          borderRadius: 999,
+                          background: "var(--rose-500)",
+                          padding: "2px 8px",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: "white",
+                        }}
+                      >
+                        {daysUntilDeadline === 0 ? "Dernier jour !" : `J-${daysUntilDeadline}`}
+                      </span>
+                    )}
+                    .
+                  </p>
+                </div>
+              </section>
+            )}
+
+            {isApproachingEnd && (
+              <section
+                className="flex items-start gap-3 px-5 py-4"
+                style={{
+                  background: "#FFFBEB",
+                  borderRadius: "var(--r-md)",
+                  border: "1px solid rgba(245,158,11,0.35)",
+                }}
+              >
+                <span
+                  style={{
+                    flexShrink: 0,
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--r-sm)",
+                    background: "#F59E0B",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 1,
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold" style={{ color: "#92400E" }}>
+                    La période {realCurrentPeriod.label} se termine dans {daysUntilCurrentEnd} jour{daysUntilCurrentEnd > 1 ? "s" : ""}
+                  </p>
+                  <p className="mt-0.5 text-sm" style={{ color: "#B45309" }}>
+                    Vérifie que tous tes encaissements et dépenses sont bien enregistrés avant de clôturer cette période.
+                  </p>
+                </div>
+              </section>
+            )}
+
             {/* ── STAT GRID ── */}
             <section className="grid gap-3 grid-cols-2 xl:grid-cols-4">
               {[
-                { label: "Chiffre d'affaires", value: totalRevenue, sub: `Période ${period.label}` },
-                { label: "À mettre de côté",   value: reserveAmount, sub: "Charges + impôt" },
-                { label: "Dépenses période",   value: totalExpenses,  sub: "Fixes + ponctuelles" },
-                { label: "Disponible réel",    value: realNet,        sub: "Après tout", dark: true },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="rounded-[14px] p-5 transition hover:-translate-y-0.5"
-                  style={{ background: stat.dark ? "var(--violet-500)" : "var(--cream-50)", boxShadow: "var(--shadow-md)" }}
-                >
-                  <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: stat.dark ? "var(--cream-200)" : "var(--cream-300)" }}>
-                    {stat.label}
-                  </p>
-                  <p
-                    className="mt-3 font-mono font-normal"
-                    style={{ fontSize: 26, letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
+                { label: "Chiffre d'affaires", value: totalRevenue,   sub: `Période ${period.label}`, prev: prevTotalRevenue,   positiveUp: true },
+                { label: "À mettre de côté",   value: reserveAmount,  sub: "Charges + impôt",         prev: prevReserveAmount,  positiveUp: false },
+                { label: "Dépenses période",   value: totalExpenses,  sub: "Fixes + ponctuelles",     prev: prevTotalExpenses,  positiveUp: false },
+                { label: "Disponible réel",    value: realNet,        sub: "Après tout",              prev: prevRealNet,        positiveUp: true, dark: true },
+              ].map((stat, i) => {
+                const delta = stat.prev !== 0
+                  ? ((stat.value - stat.prev) / Math.abs(stat.prev)) * 100
+                  : null
+                const isGood = delta !== null && (stat.positiveUp ? delta > 0 : delta < 0)
+                const isBad  = delta !== null && (stat.positiveUp ? delta < 0 : delta > 0)
+                return (
+                  <div
+                    key={i}
+                    className="rounded-[14px] p-5 transition hover:-translate-y-0.5"
+                    style={{ background: stat.dark ? "var(--violet-500)" : "var(--cream-50)", boxShadow: "var(--shadow-md)" }}
                   >
-                    {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
-                    <span className="text-base font-light"> €</span>
-                  </p>
-                  <p className="mt-2 text-xs" style={{ color: "var(--ink-400)" }}>{stat.sub}</p>
-                </div>
-              ))}
+                    <div className="flex items-start justify-between gap-1">
+                      <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: stat.dark ? "rgba(255,255,255,0.55)" : "var(--ink-400)" }}>
+                        {stat.label}
+                      </p>
+                      {delta !== null && (
+                        <span
+                          className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+                          style={{
+                            background: isGood ? "rgba(196,181,253,0.22)" : isBad ? "rgba(251,113,133,0.22)" : "rgba(0,0,0,0.06)",
+                            color: isGood
+                              ? stat.dark ? "var(--lime-500)" : "var(--violet-700)"
+                              : isBad ? "var(--rose-500)" : "var(--ink-400)",
+                          }}
+                        >
+                          {delta >= 0 ? "+" : ""}{delta.toFixed(1).replace(".", ",")}%
+                        </span>
+                      )}
+                    </div>
+                    <p
+                      className="mt-3 font-mono font-normal"
+                      style={{ fontSize: 26, letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
+                    >
+                      {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                      <span className="text-base font-light"> €</span>
+                    </p>
+                    <p className="mt-2 text-xs" style={{ color: stat.dark ? "rgba(255,255,255,0.4)" : "var(--ink-400)" }}>{stat.sub}</p>
+                  </div>
+                )
+              })}
             </section>
 
             {/* ── PREMIUM BLOCK ── */}
@@ -422,6 +600,8 @@ export default async function DashboardPage({
                       periodLabel={period.label}
                       activityType={profile.activity_type}
                       daysRemaining={daysRemainingInPeriod}
+                      prevRevenue={prevTotalRevenue}
+                      prevPeriodLabel={prevPeriod.label}
                     />
                   ) : null
                 }
@@ -434,6 +614,10 @@ export default async function DashboardPage({
                       projectedTax={projectedResult.tax}
                       projectedExpenses={projection.projectedExpenses}
                       projectedRealNet={projectedRealNet}
+                      currentRevenue={totalRevenue}
+                      currentExpenses={totalExpenses}
+                      daysElapsed={projection.elapsedDays}
+                      totalDays={projection.totalDays}
                     />
                   ) : null
                 }

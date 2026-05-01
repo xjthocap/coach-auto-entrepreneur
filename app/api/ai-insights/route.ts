@@ -95,6 +95,8 @@ export async function POST(req: Request) {
       periodLabel,
       activityType,
       daysRemaining,
+      prevRevenue,
+      prevPeriodLabel,
     } = body
 
     const revenue = Number(totalRevenue || 0)
@@ -105,6 +107,9 @@ export async function POST(req: Request) {
     const reserve = Number(reserveAmount || 0)
     const yearlyThresholdRatio = Number(thresholdRatio || 0)
     const remainingDays = Number(daysRemaining || 0)
+    const prevRev = Number(prevRevenue || 0)
+    const prevLabel = prevPeriodLabel || ""
+    const revDelta = prevRev > 0 ? ((revenue - prevRev) / prevRev) * 100 : null
 
     const health = computeFinancialHealth({
       totalRevenue: revenue,
@@ -128,6 +133,15 @@ export async function POST(req: Request) {
       })
     }
 
+    let deltaStr: string | null = null
+    if (revDelta !== null) {
+      const sign = revDelta >= 0 ? "+" : ""
+      deltaStr = sign + revDelta.toFixed(1) + "%"
+    }
+    const comparisonContext = deltaStr && prevLabel
+      ? "- Comparatif periode precedente (" + prevLabel + ") : CA etait " + prevRev + " EUR, evolution " + deltaStr
+      : ""
+
     const prompt = `
 Tu es un expert en gestion financière spécialisé en micro-entreprise française.
 
@@ -150,6 +164,7 @@ DONNÉES :
 - À mettre de côté : ${reserve}€
 - Jours restants dans la période : ${remainingDays}
 - Ratio du seuil annuel : ${Math.round(yearlyThresholdRatio * 100)}%
+${comparisonContext}
 
 SCORE ET STATUT DÉJÀ CALCULÉS :
 - Score : ${health.score}/100
@@ -159,14 +174,16 @@ SCORE ET STATUT DÉJÀ CALCULÉS :
 
 RÈGLES :
 - Tu ne dois PAS changer le score, le statut ni le message global
-- Tu dois seulement expliquer la situation et proposer 3 actions utiles
+- Tu dois seulement expliquer la situation et proposer 3 insights/actions utiles
+- Si une comparaison avec la période précédente est disponible, mentionne-la dans un insight pertinent
+- Utilise **texte en gras** (double astérisque markdown) pour mettre en valeur les chiffres clés dans tes insights
 - Si les dépenses sont faibles, ne sois pas alarmiste
 - Si les coûts sont élevés, sois direct mais concret
-- Réponses courtes, utiles, sans jargon, sans ton dramatique inutile
+- Réponses courtes (max 2 phrases par insight), utiles, sans jargon, sans ton dramatique inutile
 - Pas de conseils juridiques
-- Pas de “vois un expert” sauf situation vraiment critique
+- Pas de "vois un expert" sauf situation vraiment critique
 
-RÉPONDS UNIQUEMENT EN JSON VALIDE, sans markdown, avec ce format exact :
+RÉPONDS UNIQUEMENT EN JSON VALIDE, sans markdown autour, avec ce format exact :
 {
   "insights": [
     "conseil 1",

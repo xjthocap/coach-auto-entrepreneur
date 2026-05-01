@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 type InsightData = {
   score: number
@@ -20,40 +20,62 @@ type Props = {
   periodLabel: string
   activityType: string
   daysRemaining: number
+  prevRevenue?: number
+  prevPeriodLabel?: string
 }
 
 const statusConfig = {
   safe: {
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    text: "text-emerald-700",
-    dot: "bg-emerald-500",
     label: "Situation saine",
+    dot: "var(--lime-500)",
+    badge: { background: "rgba(196,181,253,0.18)", color: "var(--violet-700)" },
+    msg: { background: "rgba(196,181,253,0.12)", border: "rgba(196,181,253,0.35)", color: "var(--violet-700)" },
   },
   warning: {
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    text: "text-amber-700",
-    dot: "bg-amber-500",
     label: "Attention requise",
+    dot: "#F59E0B",
+    badge: { background: "rgba(245,158,11,0.12)", color: "#92400E" },
+    msg: { background: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.3)", color: "#92400E" },
   },
   danger: {
-    bg: "bg-red-50",
-    border: "border-red-200",
-    text: "text-red-700",
-    dot: "bg-red-500",
     label: "Situation tendue",
+    dot: "var(--rose-500)",
+    badge: { background: "rgba(251,113,133,0.12)", color: "var(--rose-600, #E11D48)" },
+    msg: { background: "rgba(251,113,133,0.08)", border: "rgba(251,113,133,0.3)", color: "var(--rose-600, #E11D48)" },
   },
+}
+
+function parseInsightText(text: string) {
+  // Support **bold** markdown in insight text
+  const parts = text.split(/(\*\*[^*]+\*\*)/)
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} style={{ fontWeight: 700, color: "var(--ink-900)" }}>{part.slice(2, -2)}</strong>
+    }
+    return <span key={i}>{part}</span>
+  })
 }
 
 export default function AIInsightsCard(props: Props) {
   const [data, setData] = useState<InsightData | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
+  const loadedOnce = useRef(false)
 
   useEffect(() => {
-    loadInsights()
-  }, [props.totalRevenue, props.expenses])
+    if (!loadedOnce.current) {
+      loadedOnce.current = true
+      loadInsights()
+    }
+  }, [])
+
+  // Reload when period changes
+  useEffect(() => {
+    if (loadedOnce.current) {
+      loadInsights()
+    }
+  }, [props.totalRevenue, props.expenses, props.periodLabel])
 
   async function loadInsights(isManual = false) {
     try {
@@ -68,6 +90,7 @@ export default function AIInsightsCard(props: Props) {
 
       const json = await res.json()
       setData(json)
+      setUpdatedAt(new Date())
     } catch {
       setData({
         score: 50,
@@ -85,86 +108,208 @@ export default function AIInsightsCard(props: Props) {
     }
   }
 
+  function formatUpdatedAt(date: Date) {
+    const diff = Math.floor((Date.now() - date.getTime()) / 60000)
+    if (diff < 1) return "à l'instant"
+    if (diff < 60) return `il y a ${diff} min`
+    return `il y a ${Math.floor(diff / 60)}h`
+  }
+
   if (loading) {
     return (
-      <div className="rounded-[28px] border border-purple-100 bg-white p-6">
-        <div className="flex items-center gap-3">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-purple-400" />
-          <p className="text-sm font-medium text-slate-500">
-            Analyse IA en cours...
-          </p>
+      <div
+        style={{
+          borderRadius: "var(--r-lg)",
+          background: "var(--cream-50)",
+          boxShadow: "var(--shadow-md)",
+          padding: "28px 28px",
+          overflow: "hidden",
+        }}
+      >
+        {/* Header skeleton */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--cream-200)", animation: "pulse 1.5s infinite" }} />
+            <div style={{ width: 70, height: 12, borderRadius: 6, background: "var(--cream-200)" }} />
+          </div>
+          <div style={{ width: 80, height: 28, borderRadius: 999, background: "var(--cream-200)" }} />
         </div>
-        <div className="mt-4 space-y-3">
-          <div className="h-8 w-24 animate-pulse rounded-xl bg-slate-100" />
-          <div className="h-4 w-full animate-pulse rounded-xl bg-slate-100" />
-          <div className="h-4 w-3/4 animate-pulse rounded-xl bg-slate-100" />
+        {/* Body skeleton */}
+        <div style={{ display: "grid", gap: 16, gridTemplateColumns: "auto 1fr" }}>
+          <div style={{ width: 100, height: 80, borderRadius: "var(--r-sm)", background: "var(--cream-200)" }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{ height: 44, borderRadius: "var(--r-sm)", background: "var(--cream-200)", opacity: 1 - i * 0.15 }} />
+            ))}
+          </div>
         </div>
+        <p style={{ marginTop: 16, fontSize: 13, color: "var(--ink-400)" }}>
+          Analyse IA en cours…
+        </p>
       </div>
     )
   }
 
   if (!data) return null
 
-  const config = statusConfig[data.status]
+  const cfg = statusConfig[data.status]
 
   return (
-    <div className="rounded-[28px] border border-purple-100 bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-600">
+    <div
+      style={{
+        borderRadius: "var(--r-lg)",
+        background: "var(--cream-50)",
+        boxShadow: "var(--shadow-md)",
+        overflow: "hidden",
+      }}
+    >
+      {/* ── HEADER ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "16px 24px",
+          borderBottom: "1px solid var(--cream-200)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Animated dot */}
+          <span
+            className="pulsing-dot"
+            style={{ display: "inline-block", width: 7, height: 7, borderRadius: 999, background: cfg.dot, flexShrink: 0 }}
+          />
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-900)" }}>
             Coach IA
           </span>
-          <span className="text-xs text-slate-400">{props.periodLabel}</span>
+          <span style={{ fontSize: 12, color: "var(--ink-400)" }}>·</span>
+          <span style={{ fontSize: 12, color: "var(--ink-400)" }}>{props.periodLabel}</span>
         </div>
 
-        <button
-          onClick={() => loadInsights(true)}
-          disabled={refreshing}
-          className="rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 disabled:opacity-50"
-        >
-          {refreshing ? "Actualisation..." : "Actualiser"}
-        </button>
-      </div>
-
-      <div className="mt-5 flex items-end gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Score de santé
-          </p>
-          <p className="mt-1 text-5xl font-black tracking-tight text-slate-950">
-            {data.score}
-            <span className="text-2xl font-medium text-slate-400">/100</span>
-          </p>
-        </div>
-
-        <div
-          className={`mb-2 flex items-center gap-2 rounded-full border px-3 py-1.5 ${config.bg} ${config.border}`}
-        >
-          <span className={`h-2 w-2 rounded-full ${config.dot}`} />
-          <span className={`text-xs font-semibold ${config.text}`}>
-            {config.label}
-          </span>
-        </div>
-      </div>
-
-      <div
-        className={`mt-4 rounded-2xl border p-4 ${config.bg} ${config.border}`}
-      >
-        <p className={`text-sm font-medium ${config.text}`}>{data.message}</p>
-      </div>
-
-      <div className="mt-4 space-y-3">
-        {data.insights?.map((insight, i) => (
-          <div
-            key={i}
-            className="flex gap-3 rounded-2xl border border-slate-100 bg-[#f8f9fd] p-4"
-          >
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-100 text-xs font-bold text-purple-600">
-              {i + 1}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {updatedAt && (
+            <span style={{ fontSize: 11, color: "var(--ink-400)" }}>
+              Mis à jour {formatUpdatedAt(updatedAt)}
             </span>
-            <p className="text-sm leading-6 text-slate-700">{insight}</p>
+          )}
+          <button
+            onClick={() => loadInsights(true)}
+            disabled={refreshing}
+            style={{
+              borderRadius: 999,
+              border: "1px solid var(--cream-300)",
+              background: "var(--cream-100)",
+              color: "var(--ink-700)",
+              padding: "5px 14px",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: refreshing ? "default" : "pointer",
+              opacity: refreshing ? 0.6 : 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {refreshing ? "…" : "↻ Actualiser"}
+          </button>
+        </div>
+      </div>
+
+      {/* ── BODY ── */}
+      <div style={{ padding: "20px 24px 24px", display: "grid", gap: 20 }}>
+
+        {/* Score + insights grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 16, alignItems: "start" }}>
+
+          {/* Score column */}
+          <div
+            style={{
+              background: "var(--ink-900)",
+              borderRadius: "var(--r-md)",
+              padding: "16px 12px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-400)" }}>
+              Score
+            </p>
+            <div style={{ textAlign: "center" }}>
+              <span style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 42, fontWeight: 300, letterSpacing: "-0.04em", color: "var(--lime-500)", lineHeight: 1 }}>
+                {data.score}
+              </span>
+              <span style={{ fontSize: 14, color: "var(--ink-400)", marginLeft: 1 }}>/100</span>
+            </div>
+            <span
+              style={{
+                borderRadius: 999,
+                padding: "4px 10px",
+                fontSize: 10,
+                fontWeight: 700,
+                background: cfg.badge.background,
+                color: data.status === "safe" ? "var(--lime-500)" : cfg.badge.color,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {cfg.label}
+            </span>
           </div>
-        ))}
+
+          {/* Insights column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {data.insights?.map((insight, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  background: "var(--cream-100)",
+                  borderRadius: "var(--r-sm)",
+                  padding: "10px 12px",
+                  border: "1px solid var(--cream-200)",
+                }}
+              >
+                <span
+                  style={{
+                    flexShrink: 0,
+                    width: 20,
+                    height: 20,
+                    borderRadius: 999,
+                    background: "var(--ink-900)",
+                    color: "var(--lime-500)",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 1,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--ink-700)", margin: 0 }}>
+                  {parseInsightText(insight)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Message */}
+        <div
+          style={{
+            borderRadius: "var(--r-sm)",
+            border: `1px solid ${cfg.msg.border}`,
+            background: cfg.msg.background,
+            padding: "12px 16px",
+          }}
+        >
+          <p style={{ fontSize: 13, lineHeight: 1.6, color: cfg.msg.color, margin: 0, fontStyle: "italic" }}>
+            « {data.message} »
+          </p>
+        </div>
+
       </div>
     </div>
   )

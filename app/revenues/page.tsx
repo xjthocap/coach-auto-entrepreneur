@@ -140,6 +140,7 @@ export default async function RevenuesPage({
                   currentDate={formatLocalDate(baseDate)}
                   addAnchor="add-revenue"
                 />
+                {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
           </header>
