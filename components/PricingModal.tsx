@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import UpgradeButton from "@/components/UpgradeButton"
 import FounderOfferCard from "@/components/FounderOfferCard"
 
@@ -11,6 +12,10 @@ type PricingModalProps = {
 
 export default function PricingModal({ open, onClose }: PricingModalProps) {
   const [founderCount, setFounderCount] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  // Nécessaire pour éviter les erreurs SSR avec createPortal
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     if (open) {
@@ -18,25 +23,52 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
         .then((r) => r.json())
         .then((d) => setFounderCount(d.count ?? 0))
         .catch(() => {})
+      // Bloque le scroll du body
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
     }
+    return () => { document.body.style.overflow = "" }
   }, [open])
 
-  if (!open) return null
+  // Fermer avec Escape
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose() }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [open, onClose])
+
+  if (!open || !mounted) return null
 
   const showFounder = founderCount < 50
 
-  return (
+  const modal = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(14, 37, 32, 0.5)", backdropFilter: "blur(8px)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        background: "rgba(37, 3, 78, 0.55)",
+        backdropFilter: "blur(8px)",
+      }}
     >
       <div
-        className="w-full max-w-2xl overflow-hidden"
         style={{
+          width: "100%",
+          maxWidth: 640,
+          maxHeight: "90vh",
+          overflowY: "auto",
           background: "var(--cream-50)",
           borderRadius: "var(--r-xl)",
           boxShadow: "var(--shadow-lg)",
           border: "1px solid var(--cream-200)",
+          animation: "fade-up 0.2s ease-out both",
         }}
       >
         {/* Header */}
@@ -44,7 +76,7 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
           <div>
             <p
               className="text-[11px] font-semibold uppercase tracking-[0.12em]"
-              style={{ color: "var(--lime-700)" }}
+              style={{ color: "var(--violet-700)" }}
             >
               KeskiReste Premium
             </p>
@@ -79,10 +111,7 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
               <p className="text-sm font-medium" style={{ color: "var(--ink-400)" }}>
                 Version gratuite
               </p>
-              <p
-                className="mt-3 font-mono text-3xl font-light"
-                style={{ color: "var(--ink-900)" }}
-              >
+              <p className="mt-3 font-mono text-3xl font-light" style={{ color: "var(--ink-900)" }}>
                 0€
               </p>
               <div className="mt-5 space-y-2.5">
@@ -104,24 +133,16 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
             {/* Premium */}
             <div
               className="rounded-[16px] p-5"
-              style={{
-                background: "var(--ink-900)",
-                border: "1px solid var(--ink-800)",
-              }}
+              style={{ background: "var(--ink-900)", border: "1px solid var(--ink-800)" }}
             >
-              <p className="text-sm font-medium" style={{ color: "var(--lime-500)" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--violet-500)" }}>
                 Version Premium
               </p>
               <div className="mt-3 flex items-end gap-2">
-                <p
-                  className="font-mono text-3xl font-light"
-                  style={{ color: "var(--cream-50)" }}
-                >
+                <p className="font-mono text-3xl font-light" style={{ color: "var(--cream-50)" }}>
                   19,90€
                 </p>
-                <p className="mb-1 text-sm" style={{ color: "var(--ink-400)" }}>
-                  / mois
-                </p>
+                <p className="mb-1 text-sm" style={{ color: "var(--ink-400)" }}>/ mois</p>
               </div>
               <div className="mt-5 space-y-2.5">
                 {[
@@ -136,7 +157,7 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
                     {i === 0 ? (
                       <div className="h-1 w-1 rounded-full" style={{ background: "var(--ink-400)" }} />
                     ) : (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--lime-500)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--violet-500)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 6L9 17l-5-5"/>
                       </svg>
                     )}
@@ -150,7 +171,6 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
             </div>
           </div>
 
-          {/* Founder offer */}
           {showFounder && (
             <div className="mt-4">
               <FounderOfferCard founderCount={founderCount} />
@@ -160,4 +180,6 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
       </div>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }
