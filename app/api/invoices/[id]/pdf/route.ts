@@ -53,9 +53,16 @@ export async function GET(
   const blue = rgb(0.2, 0.5, 0.9)
   const line = rgb(0.65, 0.68, 0.72)
 
-  const rawItems = Array.isArray(invoice.items) ? invoice.items : []
+  type InvoiceItem = {
+    description?: string
+    quantity?: number | string
+    unit_price?: number | string
+    total?: number | string
+  }
 
-  const invoiceItems =
+  const rawItems: InvoiceItem[] = Array.isArray(invoice.items) ? invoice.items : []
+
+  const invoiceItems: InvoiceItem[] =
     rawItems.length > 0
       ? rawItems
       : [
@@ -67,7 +74,7 @@ export async function GET(
           },
         ]
 
-  const amountHT = invoiceItems.reduce((sum, item) => {
+  const amountHT = invoiceItems.reduce((sum: number, item: InvoiceItem) => {
     const quantity = Number(item.quantity || 0)
     const unitPrice = Number(item.unit_price || 0)
     const total = Number(item.total || quantity * unitPrice)
