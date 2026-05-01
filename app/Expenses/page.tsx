@@ -139,8 +139,9 @@ export default async function ExpensesPage({
               <div className="hidden md:flex items-center gap-2">
                 <TopbarPeriod
                   label={buildPeriodLabel(frequency, period)}
-                  prevUrl={`/Expenses?date=${formatLocalDate(prevDate)}`}
-                  nextUrl={`/Expenses?date=${formatLocalDate(nextDate)}`}
+                  frequency={frequency}
+                  basePath="/Expenses"
+                  currentDate={formatLocalDate(baseDate)}
                   addAnchor="add-expense"
                 />
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}

@@ -243,8 +243,9 @@ export default async function DashboardPage({
               <div className="hidden md:flex items-center gap-2">
                 <TopbarPeriod
                   label={buildPeriodLabel(frequency, period)}
-                  prevUrl={`/dashboard?date=${formatLocalDate(prevDate)}`}
-                  nextUrl={`/dashboard?date=${formatLocalDate(nextDate)}`}
+                  frequency={frequency}
+                  basePath="/dashboard"
+                  currentDate={formatLocalDate(baseDate)}
                   addAnchor="quick-add"
                 />
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}

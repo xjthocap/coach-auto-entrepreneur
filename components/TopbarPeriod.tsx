@@ -3,41 +3,68 @@
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
+const MONTHS_SHORT = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"]
+const QUARTERS = ["T1", "T2", "T3", "T4"]
+
 type Props = {
-  /** Ex: "T2 2026 · avr. → juin"  ou  "Avril 2026" */
   label: string
-  prevUrl: string
-  nextUrl: string
-  /** id de la section à scroller pour le bouton + Ajouter */
+  frequency: "monthly" | "quarterly"
+  /** chemin de base, ex: "/dashboard", "/revenues", "/Expenses" */
+  basePath: string
+  /** date courante au format "YYYY-MM-DD" */
+  currentDate: string
   addAnchor?: string
+}
+
+function pad(n: number) {
+  return String(n).padStart(2, "0")
 }
 
 export default function TopbarPeriod({
   label,
-  prevUrl,
-  nextUrl,
+  frequency,
+  basePath,
+  currentDate,
   addAnchor = "quick-add",
 }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
+  // Année affichée dans le picker (initialisée sur l'année courante)
+  const currentYear = parseInt(currentDate.split("-")[0])
+  const currentMonth = parseInt(currentDate.split("-")[1]) - 1 // 0-indexed
+  const currentQuarter = Math.floor(currentMonth / 3)
+  const [pickerYear, setPickerYear] = useState(currentYear)
+
   // Close on outside click
   useEffect(() => {
     function onPointerDown(e: PointerEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
     document.addEventListener("pointerdown", onPointerDown)
     return () => document.removeEventListener("pointerdown", onPointerDown)
   }, [])
 
+  // Reset picker year quand on ouvre
+  useEffect(() => {
+    if (open) setPickerYear(currentYear)
+  }, [open, currentYear])
+
+  function navigate(year: number, month0: number) {
+    const url = `${basePath}?date=${year}-${pad(month0 + 1)}-01`
+    router.push(url)
+    setOpen(false)
+  }
+
   function scrollToAdd() {
     const el = document.getElementById(addAnchor)
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  const isCurrentPeriod = (year: number, month0: number) => {
+    if (frequency === "monthly") return year === currentYear && month0 === currentMonth
+    return year === currentYear && Math.floor(month0 / 3) === currentQuarter
   }
 
   return (
@@ -67,14 +94,9 @@ export default function TopbarPeriod({
           />
           {label}
           <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            width="12" height="12" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2.5"
+            strokeLinecap="round" strokeLinejoin="round"
             style={{
               flexShrink: 0,
               transition: "transform 0.15s",
@@ -86,7 +108,7 @@ export default function TopbarPeriod({
           </svg>
         </button>
 
-        {/* Dropdown */}
+        {/* ── Dropdown picker ── */}
         {open && (
           <div
             style={{
@@ -98,60 +120,86 @@ export default function TopbarPeriod({
               border: "1px solid var(--cream-200)",
               background: "var(--cream-50)",
               boxShadow: "var(--shadow-lg)",
-              minWidth: 200,
-              overflow: "hidden",
+              width: frequency === "monthly" ? 252 : 220,
+              padding: 12,
               animation: "fade-up 0.15s ease-out both",
             }}
           >
-            <button
-              onClick={() => { router.push(prevUrl); setOpen(false) }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                width: "100%",
-                padding: "11px 16px",
-                fontSize: 13,
-                fontWeight: 500,
-                color: "var(--ink-700)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                borderBottom: "1px solid var(--cream-200)",
-                textAlign: "left",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = "var(--cream-100)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 5l-7 7 7 7"/>
-              </svg>
-              Période précédente
-            </button>
-            <button
-              onClick={() => { router.push(nextUrl); setOpen(false) }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                width: "100%",
-                padding: "11px 16px",
-                fontSize: 13,
-                fontWeight: 500,
-                color: "var(--ink-700)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = "var(--cream-100)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-              Période suivante
-            </button>
+            {/* Year nav */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <button
+                onClick={() => setPickerYear(y => y - 1)}
+                style={{ width: 28, height: 28, borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)", background: "var(--cream-100)", color: "var(--ink-500)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-900)" }}>{pickerYear}</span>
+              <button
+                onClick={() => setPickerYear(y => y + 1)}
+                style={{ width: 28, height: 28, borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)", background: "var(--cream-100)", color: "var(--ink-500)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+
+            {/* Monthly grid */}
+            {frequency === "monthly" && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                {MONTHS_SHORT.map((m, i) => {
+                  const active = isCurrentPeriod(pickerYear, i)
+                  return (
+                    <button
+                      key={m}
+                      onClick={() => navigate(pickerYear, i)}
+                      style={{
+                        padding: "7px 0",
+                        borderRadius: "var(--r-sm)",
+                        border: "none",
+                        background: active ? "var(--ink-900)" : "transparent",
+                        color: active ? "var(--violet-500)" : "var(--ink-600)",
+                        fontSize: 12,
+                        fontWeight: active ? 600 : 400,
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "var(--cream-100)" }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent" }}
+                    >
+                      {m}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Quarterly grid */}
+            {frequency === "quarterly" && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                {QUARTERS.map((q, i) => {
+                  const month0 = i * 3
+                  const active = isCurrentPeriod(pickerYear, month0)
+                  return (
+                    <button
+                      key={q}
+                      onClick={() => navigate(pickerYear, month0)}
+                      style={{
+                        padding: "10px 0",
+                        borderRadius: "var(--r-sm)",
+                        border: "none",
+                        background: active ? "var(--ink-900)" : "transparent",
+                        color: active ? "var(--violet-500)" : "var(--ink-600)",
+                        fontSize: 13,
+                        fontWeight: active ? 600 : 400,
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "var(--cream-100)" }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent" }}
+                    >
+                      {q}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -160,29 +208,16 @@ export default function TopbarPeriod({
       <button
         title="Notifications"
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 36,
-          height: 36,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          width: 36, height: 36,
           borderRadius: 999,
           border: "1px solid var(--cream-300)",
           background: "var(--cream-50)",
           color: "var(--ink-500)",
-          cursor: "pointer",
-          flexShrink: 0,
+          cursor: "pointer", flexShrink: 0,
         }}
       >
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
@@ -192,19 +227,11 @@ export default function TopbarPeriod({
       <button
         onClick={scrollToAdd}
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          borderRadius: 999,
-          border: "none",
-          background: "var(--ink-900)",
-          color: "var(--cream-50)",
-          padding: "8px 16px",
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: "pointer",
-          flexShrink: 0,
-          whiteSpace: "nowrap",
+          display: "flex", alignItems: "center", gap: 6,
+          borderRadius: 999, border: "none",
+          background: "var(--ink-900)", color: "var(--cream-50)",
+          padding: "8px 16px", fontSize: 13, fontWeight: 600,
+          cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
         }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

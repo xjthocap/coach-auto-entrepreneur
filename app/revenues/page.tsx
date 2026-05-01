@@ -135,8 +135,9 @@ export default async function RevenuesPage({
               <div className="hidden md:flex items-center gap-2">
                 <TopbarPeriod
                   label={buildPeriodLabel(frequency, period)}
-                  prevUrl={`/revenues?date=${formatLocalDate(prevDate)}`}
-                  nextUrl={`/revenues?date=${formatLocalDate(nextDate)}`}
+                  frequency={frequency}
+                  basePath="/revenues"
+                  currentDate={formatLocalDate(baseDate)}
                   addAnchor="add-revenue"
                 />
               </div>
