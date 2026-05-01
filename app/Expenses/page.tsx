@@ -1,13 +1,32 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import AppSidebar from "@/components/AppSidebar"
+import MobileNav from "@/components/MobileNav"
 import AddExpense from "@/components/AddExpense"
 import ExpenseList from "@/components/ExpenseList"
-import LogoutButton from "@/components/LogoutButton"
-import PlanBadge from "@/components/PlanBadge"
+import ExportPeriodButton from "@/components/ExportPeriodButton"
+import { getPeriodRange } from "@/lib/period"
 
-export default async function ExpensesPage() {
+function parseLocalDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number)
+  return new Date(year, month - 1, day)
+}
+
+function formatLocalDate(date: Date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
+export default async function ExpensesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>
+}) {
   const supabase = await createClient()
+  const resolvedSearchParams = await searchParams
 
   const {
     data: { user },
@@ -27,225 +46,218 @@ export default async function ExpensesPage() {
     redirect("/onboarding")
   }
 
+  const frequency =
+    profile.declaration_frequency === "quarterly" ? "quarterly" : "monthly"
+
+  const dateParam = resolvedSearchParams?.date ?? null
+  const baseDate = dateParam ? parseLocalDate(dateParam) : new Date()
+  const period = getPeriodRange(frequency, baseDate)
+
+  const step = frequency === "quarterly" ? 3 : 1
+  const prevDate = new Date(baseDate)
+  prevDate.setMonth(prevDate.getMonth() - step)
+  const nextDate = new Date(baseDate)
+  nextDate.setMonth(nextDate.getMonth() + step)
+
   const { data: expenses } = await supabase
     .from("expenses")
     .select("*")
     .eq("user_id", user.id)
     .order("date", { ascending: false })
 
+  const expensesWithPeriodInfo = (expenses || []).map((exp) => {
+    const isInPeriod =
+      exp.type === "one_time"
+        ? exp.date >= period.start && exp.date <= period.end
+        : exp.type === "recurring" && exp.active
+    return { ...exp, isInPeriod }
+  })
+
+  const totalRecurring =
+    expenses?.filter((e) => e.type === "recurring" && e.active).length || 0
+
+  const totalOneTime =
+    expenses?.filter((e) => e.type === "one_time" && e.date >= period.start && e.date <= period.end).length || 0
+
+  const monthlyRecurringTotal =
+    expenses
+      ?.filter((e) => e.type === "recurring" && e.active)
+      .reduce((sum, e) => sum + Number(e.amount), 0) || 0
+
+  const periodOneTimeTotal =
+    expenses
+      ?.filter((e) => e.type === "one_time" && e.date >= period.start && e.date <= period.end)
+      .reduce((sum, e) => sum + Number(e.amount), 0) || 0
+
+  const totalPeriod = monthlyRecurringTotal + periodOneTimeTotal
+
+  const isPremium = profile.plan === "premium"
+
   return (
-    <main className="min-h-screen bg-[#f7f8f4] text-[#0f172a]">
+    <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
       <div className="flex min-h-screen">
-        {/* SIDEBAR DESKTOP */}
-        <aside className="hidden w-[280px] shrink-0 border-r border-black/5 bg-white/70 px-5 py-6 backdrop-blur lg:block">
-          <div className="sticky top-6 flex h-[calc(100vh-3rem)] flex-col">
-            <div>
-              <Link href="/dashboard" className="inline-block">
-                <div className="text-3xl font-extrabold tracking-tight text-slate-950">
-                  KeskiReste<span className="text-[#22c55e]">.</span>
-                </div>
-              </Link>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                Ton vrai solde, sans prise de tête.
-              </p>
-            </div>
-
-            <nav className="mt-8 space-y-2">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                <span className="text-base">🏠</span>
-                <span>Tableau de bord</span>
-              </Link>
-
-              <Link
-                href="/revenues"
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                <span className="text-base">💰</span>
-                <span>Revenus</span>
-              </Link>
-
-              <Link
-                href="/expenses"
-                className="flex items-center gap-3 rounded-2xl bg-[#0f172a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
-              >
-                <span className="text-base">💸</span>
-                <span>Dépenses</span>
-              </Link>
-
-              <Link
-                href="/settings"
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                <span className="text-base">⚙️</span>
-                <span>Paramètres</span>
-              </Link>
-            </nav>
-
-            <div className="mt-8 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-slate-900">Ton plan</p>
-                <PlanBadge plan={profile.plan} />
-              </div>
-
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                Garde un œil sur toutes tes sorties pour mieux protéger ton disponible réel.
-              </p>
-
-              <Link
-                href="/dashboard"
-                className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-[#f8fafc] px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-              >
-                Retour au dashboard
-              </Link>
-            </div>
-
-            <div className="mt-auto pt-6">
-              <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-sm font-semibold text-slate-900">
-                  Session active
-                </p>
-                <p className="mt-2 truncate text-sm text-slate-500">
-                  {profile.first_name || user.email}
-                </p>
-                <div className="mt-4">
-                  <LogoutButton />
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <AppSidebar activePage="expenses" profile={profile} userEmail={user.email} />
 
         {/* CONTENT */}
-        <section className="min-w-0 flex-1">
+        <section className="min-w-0 flex-1 pb-20 lg:pb-0 page-enter">
           {/* TOPBAR */}
-          <header className="sticky top-0 z-20 border-b border-black/5 bg-[#f7f8f4]/80 backdrop-blur">
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+          <header
+            className="sticky top-0 z-20 backdrop-blur"
+            style={{ background: "rgba(248, 247, 252, 0.92)", borderBottom: "1px solid var(--cream-300)" }}
+          >
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 md:px-8">
               <div className="min-w-0">
-                <p className="text-sm text-slate-500">Dépenses</p>
-                <h1 className="truncate text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
-                  Gère toutes tes sorties simplement
+                <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
+                  Dépenses
+                </p>
+                <h1
+                  className="truncate text-[22px] font-semibold tracking-tight"
+                  style={{ color: "var(--ink-900)" }}
+                >
+                  Sorties · {period.label}
                 </h1>
               </div>
 
-              <div className="hidden items-center gap-3 md:flex">
-                <Link
-                  href="/revenues"
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              <div className="flex items-center gap-2">
+                {/* Période */}
+                <div
+                  className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm md:flex"
+                  style={{ background: "var(--cream-50)", border: "1px solid var(--cream-200)", color: "var(--ink-500)" }}
                 >
-                  Revenus
-                </Link>
-
+                  <span
+                    className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ background: "var(--rose-500)" }}
+                  />
+                  {period.label}
+                </div>
                 <Link
-                  href="/dashboard"
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  href={`/Expenses?date=${formatLocalDate(prevDate)}`}
+                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
+                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
                 >
-                  Dashboard
+                  ←
                 </Link>
-
                 <Link
-                  href="/settings"
-                  className="rounded-xl bg-[#0f172a] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                  href={`/Expenses?date=${formatLocalDate(nextDate)}`}
+                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
+                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
                 >
-                  Paramètres
+                  →
                 </Link>
+                {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
           </header>
 
-          <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 md:px-8 md:py-8">
+          <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">
+
             {/* HERO */}
-            <section className="rounded-[32px] border border-[#fee2e2] bg-gradient-to-r from-[#fff7f7] to-white p-6 shadow-sm md:p-8">
-              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-                <div className="max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-[#fee2e2] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#b91c1c]">
-                      Pilotage des dépenses
-                    </span>
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-                      Ponctuelles + récurrentes
-                    </span>
-                  </div>
+            <section
+              className="relative overflow-hidden p-8 md:p-10"
+              style={{ background: "var(--rose-100)", borderRadius: "var(--r-xl)" }}
+            >
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-[11px] uppercase tracking-[0.12em]" style={{ color: "var(--rose-500)" }}>
+                  Sorties · {period.label}
+                </span>
+              </div>
+              <div
+                className="font-mono font-light"
+                style={{
+                  fontSize: "clamp(42px, 6vw, 64px)",
+                  letterSpacing: "-0.05em",
+                  color: "var(--rose-500)",
+                  lineHeight: 1.05,
+                }}
+              >
+                {totalPeriod.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}&nbsp;€
+              </div>
+              <p className="mt-3 text-sm" style={{ color: "var(--ink-500)" }}>
+                {totalRecurring} récurrente{totalRecurring > 1 ? "s" : ""} · {totalOneTime} ponctuelle
+                {totalOneTime > 1 ? "s" : ""} sur la période
+              </p>
+            </section>
 
-                  <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-                    Visualise où part ton argent.
-                  </h2>
-
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
-                    Ajoute, consulte et ajuste toutes tes dépenses pour garder une
-                    vision claire de ta trésorerie et de ton disponible réel.
+            {/* STAT GRID */}
+            <section className="grid gap-3 grid-cols-2 md:grid-cols-3">
+              {[
+                { label: "Ponctuelles", count: totalOneTime, sub: `Période ${period.label}` },
+                { label: "Récurrentes actives", count: totalRecurring, sub: "comptées chaque période" },
+                { label: "Impact / période", value: totalPeriod, sub: "sur ton disponible", dark: true },
+              ].map((stat, i) => (
+                <div
+                  key={i}
+                  className="rounded-[14px] p-5"
+                  style={{
+                    background: stat.dark ? "var(--ink-900)" : "var(--cream-50)",
+                    boxShadow: "var(--shadow-md)",
+                  }}
+                >
+                  <p
+                    className="text-[11px] uppercase tracking-[0.08em]"
+                    style={{ color: stat.dark ? "var(--ink-300)" : "var(--ink-400)" }}
+                  >
+                    {stat.label}
+                  </p>
+                  {"value" in stat ? (
+                    <p
+                      className="mt-3 font-mono font-normal"
+                      style={{ fontSize: 22, letterSpacing: "-0.04em", color: "var(--rose-500)" }}
+                    >
+                      {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
+                    </p>
+                  ) : (
+                    <p
+                      className="mt-3 font-mono font-normal"
+                      style={{
+                        fontSize: 26,
+                        letterSpacing: "-0.04em",
+                        color: stat.dark ? "var(--lime-500)" : "var(--ink-900)",
+                      }}
+                    >
+                      {stat.count}
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs" style={{ color: stat.dark ? "var(--ink-400)" : "var(--ink-400)" }}>
+                    {stat.sub}
                   </p>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <Link
-                    href="/dashboard"
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                  >
-                    Retour au dashboard
-                  </Link>
-                </div>
-              </div>
+              ))}
             </section>
 
-            {/* SUMMARY CARDS */}
-            <section className="grid gap-5 md:grid-cols-3">
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Total enregistré</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  {expenses?.length || 0}
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  dépenses enregistrées
-                </p>
-              </div>
-
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Suivi simplifié</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  Clair
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  ponctuel + récurrent
-                </p>
-              </div>
-
-              <div className="rounded-[28px] bg-[#0f172a] p-6 shadow-[0_20px_50px_rgba(15,23,42,0.15)]">
-                <p className="text-sm text-slate-300">Objectif</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-[#4ade80]">
-                  Mieux piloter
-                </p>
-                <p className="mt-2 text-sm text-slate-300">
-                  pour protéger ton disponible réel
-                </p>
-              </div>
-            </section>
-
-            {/* ADD EXPENSE */}
-            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-black tracking-tight text-slate-950">
+            {/* AJOUTER */}
+            <section
+              className="p-6 md:p-8"
+              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+            >
+              <div className="mb-5">
+                <h2
+                  className="text-lg font-semibold tracking-tight"
+                  style={{ color: "var(--ink-900)" }}
+                >
                   Ajouter une dépense
                 </h2>
-                <p className="mt-2 text-sm leading-7 text-slate-500">
-                  Renseigne une nouvelle sortie pour garder ton suivi à jour.
+                <p className="mt-1 text-sm" style={{ color: "var(--ink-400)" }}>
+                  Renseigne une nouvelle sortie. Choisis &quot;Récurrente&quot; si elle revient chaque période.
                 </p>
               </div>
-
-              <div className="rounded-[28px] bg-[#f8fafc] p-2">
+              <div className="rounded-[14px] p-2" style={{ background: "var(--cream-100)" }}>
                 <AddExpense />
               </div>
             </section>
 
-            {/* LIST */}
-            <section className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
-              <ExpenseList expenses={expenses || []} />
+            {/* LISTE */}
+            <section
+              className="overflow-hidden"
+              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+            >
+              <ExpenseList expenses={expensesWithPeriodInfo} showPeriodInfo />
             </section>
           </div>
         </section>
       </div>
+
+      <MobileNav />
     </main>
   )
 }

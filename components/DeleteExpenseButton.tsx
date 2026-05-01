@@ -4,33 +4,16 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { useState } from "react"
 
-export default function DeleteExpenseButton({
-  expenseId,
-}: {
-  expenseId: string
-}) {
+export default function DeleteExpenseButton({ expenseId }: { expenseId: string }) {
   const supabase = createClient()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
   async function handleDelete() {
-    const confirmDelete = confirm("Supprimer cette dépense ?")
-
-    if (!confirmDelete) return
-
+    if (!confirm("Supprimer cette dépense ?")) return
     setLoading(true)
-
-    const { error } = await supabase
-      .from("expenses")
-      .delete()
-      .eq("id", expenseId)
-
-    if (error) {
-      console.error("Erreur suppression :", error.message)
-      setLoading(false)
-      return
-    }
-
+    const { error } = await supabase.from("expenses").delete().eq("id", expenseId)
+    if (error) { console.error(error.message); setLoading(false); return }
     router.refresh()
   }
 
@@ -38,10 +21,17 @@ export default function DeleteExpenseButton({
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="rounded-xl border border-red-200 bg-red-50 px-3 py-1 text-sm text-red-600 transition hover:bg-red-100 disabled:opacity-50"
-      style={{ cursor: "pointer" }}
+      title="Supprimer"
+      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70 disabled:opacity-30"
+      style={{ color: "var(--ink-300)" }}
     >
-      {loading ? "..." : "Supprimer"}
+      {loading ? (
+        <span className="text-xs">…</span>
+      ) : (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+      )}
     </button>
   )
 }

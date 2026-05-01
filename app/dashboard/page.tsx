@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import LogoutButton from "@/components/LogoutButton"
+import AppSidebar from "@/components/AppSidebar"
+import MobileNav from "@/components/MobileNav"
 import AddRevenue from "@/components/AddRevenue"
 import AddExpense from "@/components/AddExpense"
 import RevenueList from "@/components/RevenueList"
@@ -12,14 +13,12 @@ import ProjectionCard from "@/components/ProjectionCard"
 import ThresholdAlert from "@/components/ThresholdAlert"
 import AIInsightsCard from "@/components/AIInsightsCard"
 import DashboardPremiumShell from "@/components/DashboardPremiumShell"
-import PlanBadge from "@/components/PlanBadge"
 import DevPlanSwitcher from "@/components/DevPlanSwitcher"
 import { calculateMicro } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
-import UpgradeButton from "@/components/UpgradeButton"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)
@@ -145,11 +144,9 @@ export default async function DashboardPage({
         }
         return sum
       }
-
       if (exp.type === "recurring" && exp.active) {
         return sum + Number(exp.amount)
       }
-
       return sum
     }, 0) || 0
 
@@ -160,10 +157,7 @@ export default async function DashboardPage({
           ? exp.date >= period.start && exp.date <= period.end
           : exp.type === "recurring" && exp.active
 
-      return {
-        ...exp,
-        isInPeriod,
-      }
+      return { ...exp, isInPeriod }
     }) || []
 
   const realNet = result.net - totalExpenses
@@ -190,236 +184,208 @@ export default async function DashboardPage({
   const isPremium = profile.plan === "premium"
 
   return (
-    <main className="min-h-screen bg-[#f7f8f4] text-[#0f172a]">
+    <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
       <div className="flex min-h-screen">
-        {/* SIDEBAR DESKTOP */}
-        <aside className="hidden w-[280px] shrink-0 border-r border-black/5 bg-white/70 px-5 py-6 backdrop-blur lg:block">
-          <div className="sticky top-6 flex h-[calc(100vh-3rem)] flex-col">
-            <div>
-              <Link href="/dashboard" className="inline-block">
-                <div className="text-3xl font-extrabold tracking-tight text-slate-950">
-                  KeskiReste<span className="text-[#22c55e]">.</span>
-                </div>
-              </Link>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                Ton vrai solde, sans prise de tête.
-              </p>
-            </div>
-
-            <nav className="mt-8 space-y-2">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 rounded-2xl bg-[#0f172a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
-              >
-                <span className="text-base">🏠</span>
-                <span>Tableau de bord</span>
-              </Link>
-
-              <Link
-                href="/revenues"
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                <span className="text-base">💰</span>
-                <span>Revenus</span>
-              </Link>
-
-              <Link
-                href="/Expenses"
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                <span className="text-base">💸</span>
-                <span>Dépenses</span>
-              </Link>
-
-              <Link
-                href="/settings"
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                <span className="text-base">⚙️</span>
-                <span>Paramètres</span>
-              </Link>
-            </nav>
-
-            <div className="mt-8 rounded-[28px] border border-[#dcfce7] bg-[#f0fdf4] p-5 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-slate-900">Ton plan</p>
-                <PlanBadge plan={profile.plan} />
-              </div>
-
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                {isPremium
-                  ? "Tu as accès aux outils avancés de pilotage et aux insights IA."
-                  : "Passe en premium pour débloquer les projections et les insights IA."}
-              </p>
-
-              {!isPremium && (
-                <Link
-                  href="/settings"
-                  className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#22c55e] px-4 py-3 text-sm font-bold text-[#0f172a] transition hover:opacity-90"
-                >
-                  Passer en premium
-                </Link>
-              )}
-            </div>
-
-            <div className="mt-auto pt-6">
-              <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-sm font-semibold text-slate-900">
-                  Session active
-                </p>
-                <p className="mt-2 truncate text-sm text-slate-500">
-                  {profile.first_name || user.email}
-                </p>
-                <div className="mt-4">
-                  <LogoutButton />
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <AppSidebar activePage="dashboard" profile={profile} userEmail={user.email} />
 
         {/* CONTENT */}
-        <section className="min-w-0 flex-1">
-          {/* TOPBAR */}
-          <header className="sticky top-0 z-20 border-b border-black/5 bg-[#f7f8f4]/80 backdrop-blur">
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+        <section className="min-w-0 flex-1 pb-20 lg:pb-0 page-enter">
+
+          {/* ── TOPBAR ── */}
+          <header
+            className="sticky top-0 z-20 backdrop-blur"
+            style={{ background: "rgba(248, 247, 252, 0.92)", borderBottom: "1px solid var(--cream-300)" }}
+          >
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 md:px-8">
               <div className="min-w-0">
-                <p className="text-sm text-slate-500">Dashboard</p>
-                <h1 className="truncate text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
-                  Bonjour {profile.first_name || user.email || "à toi"} 👋
+                <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: "var(--cream-300)" }}>
+                  Dashboard
+                </p>
+                <h1 className="truncate text-[22px] font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
+                  Bonjour {profile.first_name || "à toi"}&nbsp;<span className="wave-emoji">👋</span>
                 </h1>
               </div>
 
-              <div className="hidden items-center gap-3 md:flex">
-                <Link
-                  href="/revenues"
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              <div className="flex items-center gap-2">
+                <div
+                  className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm md:flex"
+                  style={{ background: "var(--cream-50)", border: "1px solid var(--cream-200)", color: "var(--ink-500)" }}
                 >
-                  Revenus
-                </Link>
-
+                  <span className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--lime-500)" }} />
+                  {period.label}
+                </div>
                 <Link
-                  href="/Expenses"
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  href={`/dashboard?date=${formatLocalDate(prevDate)}`}
+                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
+                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
                 >
-                  Dépenses
+                  ←
                 </Link>
-
                 <Link
-                  href="/settings"
-                  className="rounded-xl bg-[#0f172a] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                  href={`/dashboard?date=${formatLocalDate(nextDate)}`}
+                  className="hidden rounded-lg border px-3 py-2 text-sm font-medium transition hover:opacity-70 md:block"
+                  style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)", color: "var(--ink-500)" }}
                 >
-                  Paramètres
+                  →
                 </Link>
+                {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
           </header>
 
-          <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 md:px-8 md:py-8">
-            {/* HERO RESUME */}
-            <section className="rounded-[32px] border border-[#dcfce7] bg-gradient-to-r from-[#f0fdf4] to-white p-6 shadow-sm md:p-8">
-              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-                <div className="max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#15803d]">
-                      Période active
-                    </span>
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-                      {period.label}
-                    </span>
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                      {frequency === "monthly" ? "Déclaration mensuelle" : "Déclaration trimestrielle"}
+          <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">
+
+            {/* ── HERO DARK CARD ── */}
+            <section
+              className="relative overflow-hidden p-8 md:p-10"
+              style={{ background: "var(--ink-900)", borderRadius: "var(--r-xl)" }}
+            >
+              {/* Radial lime glow */}
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ background: "radial-gradient(ellipse 55% 50% at 85% 10%, rgba(196, 181, 253, 0.16) 0%, transparent 70%)" }}
+              />
+
+              <div className="relative grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+                {/* Left */}
+                <div>
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--violet-500)" }} />
+                    <span className="text-[11px] uppercase tracking-[0.12em]" style={{ color: "var(--cream-200)" }}>
+                      Disponible réel · {period.label}
                     </span>
                   </div>
-
-                  <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-                    Voici ce qu’il te reste vraiment sur la période.
-                  </h2>
-
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
-                    Tu visualises ici ton chiffre d’affaires, tes charges estimées,
-                    tes dépenses et ton disponible réel, pour piloter ton activité
-                    sans te perdre dans les calculs.
+                  <p className="mb-4 text-sm" style={{ color: "var(--cream-300)" }}>
+                    Voici ce qu'il te reste vraiment, après tout.
+                  </p>
+                  <div
+                    className="font-mono font-light"
+                    style={{ fontSize: "clamp(48px, 7vw, 76px)", letterSpacing: "-0.05em", color: "var(--violet-500)", lineHeight: 1.05 }}
+                  >
+                    {realNet.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}&nbsp;€
+                  </div>
+                  <p className="mt-4 max-w-sm text-xs leading-relaxed" style={{ color: "var(--cream-300)" }}>
+                    Tu peux dépenser ce montant sans toucher à ce que tu dois à l'URSSAF, aux impôts ou à tes charges fixes.
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <Link
-                    href={`/dashboard?date=${formatLocalDate(prevDate)}`}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                  >
-                    ← Période précédente
-                  </Link>
-
-                  <Link
-                    href={`/dashboard?date=${formatLocalDate(nextDate)}`}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                  >
-                    Période suivante →
-                  </Link>
-
-                  {isPremium && (
-                    <ExportPeriodButton date={formatLocalDate(baseDate)} />
-                    )}
+                {/* Right — waterfall */}
+                <div className="flex flex-col justify-center">
+                  {[
+                    {
+                      label: "Chiffre d'affaires",
+                      tag: "brut",
+                      tagStyle: { background: "rgba(196, 181, 253, 0.15)", color: "var(--lime-500)" },
+                      value: `+${totalRevenue.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
+                      valueColor: "var(--lime-500)",
+                    },
+                    {
+                      label: "Charges URSSAF",
+                      tag: `${(result.socialRate * 100).toFixed(1)}%`,
+                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--cream-200)" },
+                      value: `−${result.charges.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
+                      valueColor: "var(--rose-500)",
+                    },
+                    {
+                      label: "Impôt libératoire",
+                      tag: `${(result.taxRate * 100).toFixed(1)}%`,
+                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--cream-200)" },
+                      value: `−${result.tax.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
+                      valueColor: "var(--rose-500)",
+                    },
+                    {
+                      label: "Dépenses période",
+                      value: `−${totalExpenses.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
+                      valueColor: "var(--rose-500)",
+                    },
+                  ].map((row, i) => (
+                    <div
+                      key={i}
+                      className="water-row flex items-center justify-between py-3"
+                      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      <span className="flex items-center gap-2 text-sm" style={{ color: "var(--cream-200)" }}>
+                        {row.label}
+                        {row.tag && (
+                          <span className="rounded px-1.5 py-0.5 text-[10px]" style={row.tagStyle}>
+                            {row.tag}
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-mono text-sm" style={{ color: row.valueColor }}>{row.value}</span>
+                    </div>
+                  ))}
+                  <div className="water-row flex items-center justify-between py-3">
+                    <span className="text-sm font-medium" style={{ color: "var(--cream-50)" }}>= Disponible réel</span>
+                    <span className="font-mono font-medium" style={{ fontSize: 17, color: "var(--lime-500)" }}>
+                      {realNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
+                    </span>
+                  </div>
                 </div>
               </div>
             </section>
 
-            {/* THRESHOLD ALERT */}
-            <section>
-              <ThresholdAlert
-                totalRevenue={yearRevenue}
-                threshold={threshold}
-                ratio={ratio}
-                status={thresholdInfo.status as "safe" | "warning" | "exceeded"}
-                message={thresholdInfo.message}
-              />
+            {/* ── URSSAF QUOTA ── */}
+            {(() => {
+              const pct = Math.min(100, (yearRevenue / threshold) * 100)
+              const fillColor = pct > 90 ? "var(--rose-500)" : pct > 70 ? "var(--amber-500)" : "var(--lime-600)"
+              const textColor = pct > 90 ? "var(--rose-500)" : pct > 70 ? "var(--amber-500)" : "var(--lime-700)"
+              return (
+                <section
+                  className="px-5 py-4"
+                  style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)" }}
+                >
+                  <div className="mb-2.5 flex items-center justify-between">
+                    <span className="text-sm font-medium" style={{ color: "var(--ink-900)" }}>
+                      Plafond micro-entreprise BNC
+                    </span>
+                    <span className="font-mono text-sm font-medium" style={{ color: textColor }}>
+                      {Math.round(pct)}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--cream-200)" }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%`, background: fillColor }}
+                    />
+                  </div>
+                  <p className="mt-2.5 font-mono text-xs" style={{ color: "var(--cream-300)" }}>
+                    {yearRevenue.toLocaleString("fr-FR")} € / {threshold.toLocaleString("fr-FR")} € — il te reste{" "}
+                    {Math.max(0, threshold - yearRevenue).toLocaleString("fr-FR")} € avant le seuil
+                  </p>
+                </section>
+              )
+            })()}
+
+            {/* ── STAT GRID ── */}
+            <section className="grid gap-3 grid-cols-2 xl:grid-cols-4">
+              {[
+                { label: "Chiffre d'affaires", value: totalRevenue, sub: `Période ${period.label}` },
+                { label: "À mettre de côté",   value: reserveAmount, sub: "Charges + impôt" },
+                { label: "Dépenses période",   value: totalExpenses,  sub: "Fixes + ponctuelles" },
+                { label: "Disponible réel",    value: realNet,        sub: "Après tout", dark: true },
+              ].map((stat, i) => (
+                <div
+                  key={i}
+                  className="rounded-[14px] p-5 transition hover:-translate-y-0.5"
+                  style={{ background: stat.dark ? "var(--violet-500)" : "var(--cream-50)", boxShadow: "var(--shadow-md)" }}
+                >
+                  <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: stat.dark ? "var(--cream-200)" : "var(--cream-300)" }}>
+                    {stat.label}
+                  </p>
+                  <p
+                    className="mt-3 font-mono font-normal"
+                    style={{ fontSize: 26, letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
+                  >
+                    {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                    <span className="text-base font-light"> €</span>
+                  </p>
+                  <p className="mt-2 text-xs" style={{ color: "var(--cream-300)" }}>{stat.sub}</p>
+                </div>
+              ))}
             </section>
 
-            {/* QUICK KPIS */}
-            <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Chiffre d’affaires</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  {totalRevenue.toFixed(2)} €
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  Période {period.label.toLowerCase()}
-                </p>
-              </div>
-
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Charges + impôt</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  {reserveAmount.toFixed(2)} €
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  À mettre de côté
-                </p>
-              </div>
-
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Dépenses période</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  {totalExpenses.toFixed(2)} €
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  Fixes + ponctuelles
-                </p>
-              </div>
-
-              <div className="rounded-[28px] bg-[#0f172a] p-6 shadow-[0_20px_50px_rgba(15,23,42,0.15)]">
-                <p className="text-sm text-slate-300">Disponible réel</p>
-                <p className="mt-3 text-3xl font-black tracking-tight text-[#4ade80]">
-                  {realNet.toFixed(2)} €
-                </p>
-                <p className="mt-2 text-sm text-slate-300">
-                  Après charges, impôt et dépenses
-                </p>
-              </div>
-            </section>
-
-            {/* PREMIUM BLOCK */}
+            {/* ── PREMIUM BLOCK ── */}
             <section>
               <DashboardPremiumShell
                 isPremium={isPremium}
@@ -454,134 +420,98 @@ export default async function DashboardPage({
               />
             </section>
 
-            {/* DECLARATION STATS */}
-            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-black tracking-tight text-slate-950">
-                  À déclarer sur cette période
-                </h2>
-                <p className="mt-2 text-sm leading-7 text-slate-500">
-                  Les montants estimés pour t’aider à anticiper simplement ta déclaration actuelle.
-                </p>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-3">
-                <StatCard
-                  title="Chiffre d'affaires"
-                  value={`${totalRevenue.toFixed(2)} €`}
-                  accent="blue"
-                />
-
-                <StatCard
-                  title="Charges"
-                  value={`${result.charges.toFixed(2)} €`}
-                  subtitle={`${(result.socialRate * 100)
-                    .toFixed(2)
-                    .replace(".", ",")} %`}
-                />
-
-                <StatCard
-                  title="Impôt"
-                  value={`${result.tax.toFixed(2)} €`}
-                  subtitle={`${(result.taxRate * 100)
-                    .toFixed(2)
-                    .replace(".", ",")} %`}
-                />
-              </div>
-            </section>
-
-            {/* CASH PILOTING */}
-            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-black tracking-tight text-slate-950">
-                  Pilotage de ta trésorerie
-                </h2>
-                <p className="mt-2 text-sm leading-7 text-slate-500">
-                  Ce que tu dois sécuriser, ce que tu dépenses et ce qu’il te reste réellement.
-                </p>
-              </div>
-
-              <div className="grid gap-5 lg:grid-cols-3">
-                <StatCard
-                  title="Dépenses période"
-                  value={`${totalExpenses.toFixed(2)} €`}
-                  accent="red"
-                />
-
-                <div className="rounded-[28px] border border-[#fed7aa] bg-gradient-to-br from-orange-50 to-white p-6 shadow-[0_12px_30px_rgba(249,115,22,0.08)]">
-                  <p className="text-sm font-semibold text-orange-700">
-                    À mettre de côté
-                  </p>
-                  <p className="mt-3 text-4xl font-black tracking-tight text-slate-950">
-                    {reserveAmount.toFixed(2)} €
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-slate-600">
-                    Pour couvrir tes charges sociales et ton impôt.
-                  </p>
-                </div>
-
-                <div className="rounded-[28px] bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 shadow-[0_20px_40px_rgba(15,23,42,0.18)]">
-                  <p className="text-sm font-semibold text-slate-300">
-                    Disponible maintenant
-                  </p>
-                  <p className="mt-3 text-4xl font-black tracking-tight text-[#4ade80]">
-                    {realNet.toFixed(2)} €
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-slate-300">
-                    Ce que tu peux considérer comme réellement disponible.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* QUICK ACTIONS */}
-            <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-black tracking-tight text-slate-950">
+            {/* ── ACTIONS RAPIDES ── */}
+            <section
+              className="p-6 md:p-8"
+              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+            >
+              <div className="mb-5">
+                <h2 className="text-lg font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
                   Actions rapides
                 </h2>
-                <p className="mt-2 text-sm leading-7 text-slate-500">
-                  Ajoute rapidement une entrée ou une sortie pour garder tes chiffres à jour.
+                <p className="mt-1 text-sm" style={{ color: "var(--cream-300)" }}>
+                  Ajoute rapidement une entrée ou une sortie.
                 </p>
               </div>
-
               <div className="grid gap-6 xl:grid-cols-2">
-                <div className="rounded-[28px] bg-[#f8fafc] p-2">
+                <div className="rounded-[14px] p-2" style={{ background: "var(--cream-100)" }}>
                   <AddRevenue />
                 </div>
-
-                <div className="rounded-[28px] bg-[#f8fafc] p-2">
+                <div className="rounded-[14px] p-2" style={{ background: "var(--cream-100)" }}>
                   <AddExpense />
                 </div>
               </div>
             </section>
 
-            {/* LISTS */}
-            <section className="grid gap-6 xl:grid-cols-2">
-              <div className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
+            {/* ── LISTES ── */}
+            <section className="grid gap-4 xl:grid-cols-2">
+              <div
+                className="overflow-hidden"
+                style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+              >
                 <RevenueList revenues={revenues || []} />
               </div>
-
-              <div className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
+              <div
+                className="overflow-hidden"
+                style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+              >
                 <ExpenseList expenses={expensesWithPeriodInfo} showPeriodInfo />
               </div>
             </section>
 
-            {/* CHART */}
-            <section className="rounded-[32px] border border-slate-200 bg-white p-2 shadow-sm">
+            {/* ── GRAPHIQUE ── */}
+            <section
+              className="overflow-hidden"
+              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+            >
               <RevenueChart revenues={yearRevenues || []} />
             </section>
 
-            {/* DEV SWITCHER */}
-            <section className="rounded-[32px] border border-dashed border-slate-300 bg-white/70 p-4">
-              <DevPlanSwitcher
-                currentPlan={profile.plan}
-                profileId={profile.id}
-              />
+            {/* ── À DÉCLARER ── */}
+            <section
+              className="p-6 md:p-8"
+              style={{ background: "var(--cream-50)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-md)" }}
+            >
+              <div className="mb-5">
+                <h2 className="text-lg font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
+                  À déclarer sur cette période
+                </h2>
+                <p className="mt-1 text-sm" style={{ color: "var(--cream-300)" }}>
+                  Montants estimés pour anticiper ta déclaration.
+                </p>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {[
+                  { label: "Chiffre d'affaires", value: totalRevenue },
+                  { label: "Charges sociales", value: result.charges, sub: `${(result.socialRate * 100).toFixed(2)}%` },
+                  { label: "Impôt libératoire", value: result.tax, sub: `${(result.taxRate * 100).toFixed(2)}%` },
+                ].map((item, i) => (
+                  <div key={i} className="rounded-[14px] p-4" style={{ background: "var(--cream-100)" }}>
+                    <p className="text-xs uppercase tracking-[0.06em]" style={{ color: "var(--cream-300)" }}>{item.label}</p>
+                    <p
+                      className="mt-2 font-mono text-xl font-normal"
+                      style={{ letterSpacing: "-0.03em", color: "var(--ink-900)" }}
+                    >
+                      {item.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
+                    </p>
+                    {item.sub && <p className="mt-1 text-xs" style={{ color: "var(--cream-300)" }}>{item.sub}</p>}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── DEV SWITCHER ── */}
+            <section
+              className="rounded-[14px] border border-dashed p-4"
+              style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)" }}
+            >
+              <DevPlanSwitcher currentPlan={profile.plan} profileId={profile.id} />
             </section>
           </div>
         </section>
       </div>
+
+      <MobileNav />
     </main>
   )
 }

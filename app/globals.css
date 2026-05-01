@@ -1,26 +1,129 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Surfaces ── */
+  --cream-50:  #FFFFFF;
+  --cream-100: #F8F7FC;      /* page background */
+  --cream-200: #F1F5F2;      /* card/surface */
+  --cream-300: #E5E4EB;      /* hierarchy text / borders */
+  --cream-400: #C5C3D4;      /* muted borders */
+
+  /* ── Deep Purple Ink ── */
+  --ink-900: #25034E;        /* darkest — hero bg, nav active */
+  --ink-800: #2D0B5C;
+  --ink-700: #3A1470;
+  --ink-600: #4E2882;
+  --ink-500: #6B489A;        /* body text secondary */
+  --ink-400: #9178BB;        /* muted text */
+  --ink-300: #B8A5D5;        /* placeholder / disabled */
+
+  /* ── Violet Accent ── */
+  --violet-500: #C4B5FD;     /* primary accent — CTAs, amounts, highlights */
+  --violet-400: #DDD6FE;     /* soft tints */
+  --violet-600: #A78BFA;     /* deeper accent */
+  --violet-700: #7C3AED;     /* text on light surfaces */
+
+  /* ── Aliases (backward-compat with existing --lime-* refs) ── */
+  --lime-500: #C4B5FD;
+  --lime-400: #DDD6FE;
+  --lime-600: #A78BFA;
+  --lime-700: #7C3AED;
+
+  /* ── Semantic ── */
+  --rose-500: #E5654B;
+  --rose-100: #FBE7E0;
+  --amber-500: #E8A93B;
+  --amber-100: #FBEFD4;
+
+  /* ── Radii ── */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  /* ── Shadows ── */
+  --shadow-md: 0 4px 16px rgba(37, 3, 78, 0.07);
+  --shadow-lg: 0 12px 40px rgba(37, 3, 78, 0.10);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  /* Surfaces */
+  --color-cream-50:  #FFFFFF;
+  --color-cream-100: #F8F7FC;
+  --color-cream-200: #F1F5F2;
+  --color-cream-300: #E5E4EB;
+  --color-cream-400: #C5C3D4;
+
+  /* Deep purple ink */
+  --color-ink-900: #25034E;
+  --color-ink-800: #2D0B5C;
+  --color-ink-700: #3A1470;
+  --color-ink-600: #4E2882;
+  --color-ink-500: #6B489A;
+  --color-ink-400: #9178BB;
+  --color-ink-300: #B8A5D5;
+
+  /* Violet */
+  --color-violet-500: #C4B5FD;
+  --color-violet-400: #DDD6FE;
+  --color-violet-600: #A78BFA;
+  --color-violet-700: #7C3AED;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cream-100);
+  color: var(--ink-900);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* ── Animations ── */
+@keyframes wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10%, 30%      { transform: rotate(-10deg); }
+  20%           { transform: rotate(12deg); }
+  40%           { transform: rotate(8deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 181, 253, 0.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(196, 181, 253, 0); }
+}
+
+@keyframes waterfall-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.wave-emoji {
+  display: inline-block;
+  animation: wave 2.4s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
+.pulsing-dot {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.water-row {
+  opacity: 0;
+  animation: waterfall-in 0.4s ease-out forwards;
+}
+.water-row:nth-child(1) { animation-delay: 0.1s; }
+.water-row:nth-child(2) { animation-delay: 0.2s; }
+.water-row:nth-child(3) { animation-delay: 0.3s; }
+.water-row:nth-child(4) { animation-delay: 0.4s; }
+.water-row:nth-child(5) { animation-delay: 0.5s; }
+
+.page-enter {
+  animation: fade-up 0.3s ease-out both;
 }

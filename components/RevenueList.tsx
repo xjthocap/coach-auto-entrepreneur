@@ -1,50 +1,140 @@
 import DeleteRevenueButton from "@/components/DeleteRevenueButton"
+import GenerateInvoiceButton from "@/components/GenerateInvoiceButton"
+
+type Invoice = { id: string }
 
 type Revenue = {
   id: string
   amount: number
   date: string
   label: string | null
+  client_name?: string | null
+  invoices?: Invoice[] | null
 }
 
 export default function RevenueList({ revenues }: { revenues: Revenue[] }) {
   return (
-    <div className="rounded-[28px] border border-white/80 bg-white/80 p-6 shadow-[0_10px_30px_rgba(15,23,42,0.06)]">
-      <h2 className="mb-6 text-3xl font-semibold tracking-tight text-slate-900">
-  Mes revenus
-  <p className="mt-2 text-sm text-slate-500">
-    Cette liste affiche uniquement les revenus pris en compte dans la période actuelle.
-  </p>
-</h2>
-
-      <div className="space-y-3">
-        {revenues.length === 0 ? (
-          <div className="rounded-2xl bg-[#f8f9fd] p-4 text-slate-500">
-            Aucun revenu ajouté pour le moment.
-          </div>
-        ) : (
-          revenues.map((rev) => (
-            <div
-              key={rev.id}
-              className="flex items-center justify-between rounded-2xl border border-slate-100 bg-[#fbfcff] px-4 py-4"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-xl font-medium text-slate-900">
-                  {rev.label?.trim() ? rev.label : "Sans libellé"}
-                </p>
-                <p className="mt-1 text-sm text-slate-500">
-                {new Date(rev.date).toLocaleDateString("fr-FR")} —{" "}
-                <span className="font-semibold text-green-600">
-                    + {Number(rev.amount).toFixed(2)} €
-                </span>
-                </p>
-              </div>
-
-              <DeleteRevenueButton revenueId={rev.id} />
-            </div>
-          ))
-        )}
+    <div className="p-5 md:p-6">
+      {/* ── Header ── */}
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
+          Tes revenus
+        </h2>
+        <p className="mt-0.5 text-sm" style={{ color: "var(--ink-400)" }}>
+          Liste des encaissements sur la période active.
+        </p>
       </div>
+
+      {/* ── Liste ── */}
+      {revenues.length === 0 ? (
+        <div className="py-10 text-center text-sm" style={{ color: "var(--ink-300)" }}>
+          Aucun revenu sur cette période.
+        </div>
+      ) : (
+        <div>
+          {revenues.map((rev, i) => {
+            const invoiceId = rev.invoices?.[0]?.id ?? null
+            const dateStr = new Date(rev.date + "T00:00:00").toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+            const name = rev.client_name?.trim() || rev.label?.trim() || "Sans libellé"
+            const sublabel = rev.client_name?.trim() && rev.label?.trim() ? rev.label : null
+
+            return (
+              <div
+                key={rev.id}
+                className="flex items-center gap-3 py-3.5"
+                style={{
+                  borderBottom:
+                    i < revenues.length - 1 ? "1px solid var(--cream-200)" : "none",
+                }}
+              >
+                {/* Icône */}
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  style={{ background: "rgba(196, 181, 253, 0.2)" }}
+                >
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--lime-700)"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 19V5M5 12l7-7 7 7" />
+                  </svg>
+                </div>
+
+                {/* Texte */}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm" style={{ color: "var(--ink-900)" }}>
+                    <span className="font-semibold">{name}</span>
+                    {sublabel && (
+                      <span style={{ color: "var(--ink-400)" }}> · {sublabel}</span>
+                    )}
+                  </p>
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <p className="font-mono text-xs" style={{ color: "var(--ink-400)" }}>
+                      {dateStr}
+                    </p>
+                    {invoiceId && (
+                      <span
+                        className="rounded px-1.5 py-0.5 text-[10px] font-medium"
+                        style={{ background: "rgba(196, 181, 253, 0.25)", color: "var(--lime-700)" }}
+                      >
+                        facture
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Montant */}
+                <p
+                  className="shrink-0 font-mono text-sm font-medium"
+                  style={{ color: "var(--lime-700)" }}
+                >
+                  +{Number(rev.amount).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
+                </p>
+
+                {/* Actions */}
+                <div className="flex shrink-0 items-center gap-0.5">
+                  {invoiceId ? (
+                    <a
+                      href={`/api/invoices/${invoiceId}/pdf`}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Télécharger la facture PDF"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70"
+                      style={{ color: "var(--ink-300)" }}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <GenerateInvoiceButton revenueId={rev.id} />
+                  )}
+                  <DeleteRevenueButton revenueId={rev.id} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

@@ -2,40 +2,39 @@
 
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { useState } from "react"
 
-type Props = {
-  expenseId: string
-  active: boolean
-}
-
-export default function ToggleExpenseActiveButton({
-  expenseId,
-  active,
-}: Props) {
+export default function ToggleExpenseActiveButton({ expenseId, active }: { expenseId: string; active: boolean }) {
   const supabase = createClient()
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   async function handleToggle() {
-    const { error } = await supabase
-      .from("expenses")
-      .update({ active: !active })
-      .eq("id", expenseId)
-
-    if (error) {
-      console.error("Erreur mise à jour dépense :", error.message)
-      return
-    }
-
+    setLoading(true)
+    const { error } = await supabase.from("expenses").update({ active: !active }).eq("id", expenseId)
+    if (error) { console.error(error.message); setLoading(false); return }
     router.refresh()
   }
 
   return (
     <button
       onClick={handleToggle}
-      style={{ cursor: "pointer" }}
-      className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+      disabled={loading}
+      title={active ? "Désactiver" : "Réactiver"}
+      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70 disabled:opacity-30"
+      style={{ color: active ? "var(--lime-700)" : "var(--ink-300)" }}
     >
-      {active ? "Désactiver" : "Réactiver"}
+      {loading ? (
+        <span className="text-xs">…</span>
+      ) : active ? (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      ) : (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>
+        </svg>
+      )}
     </button>
   )
 }
