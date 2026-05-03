@@ -1,5 +1,6 @@
 import Link from "next/link"
 import LogoutButton from "@/components/LogoutButton"
+import PricingTrigger from "@/components/PricingTrigger"
 
 type AppSidebarProps = {
   activePage: "dashboard" | "revenues" | "expenses" | "history" | "settings"
@@ -174,14 +175,13 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
           })}
 
           {!isPremium && (
-            <Link
-              href="/settings"
-              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150"
+            <PricingTrigger
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150 w-full border-none bg-transparent cursor-pointer"
               style={{ borderRadius: "var(--r-sm)", color: "var(--lime-700)" }}
             >
               <NavIcon name="sparkle" />
               <span>Passer Premium</span>
-            </Link>
+            </PricingTrigger>
           )}
         </nav>
 
@@ -223,13 +223,12 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
               : "Débloque le coach IA, l'historique et la génération de factures."}
           </p>
           {!isPremium && (
-            <Link
-              href="/settings"
-              className="block w-full text-center text-xs font-semibold py-2 transition hover:opacity-90"
+            <PricingTrigger
+              className="block w-full text-center text-xs font-semibold py-2 transition hover:opacity-90 border-none cursor-pointer"
               style={{ borderRadius: "var(--r-sm)", background: "var(--ink-900)", color: "var(--violet-500)" }}
             >
               Passer en Premium →
-            </Link>
+            </PricingTrigger>
           )}
         </div>
 

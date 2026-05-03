@@ -9,25 +9,43 @@ type Props = {
   projection?: React.ReactNode
 }
 
+const PREMIUM_PILLS = ["🧠 Coach IA", "📈 Projection", "🧾 Factures PDF", "📤 Export Excel"]
+
 function UpgradeNudge({ onUpgradeClick }: { onUpgradeClick: () => void }) {
   return (
     <div
       style={{
         borderRadius: "var(--r-md)",
-        border: "1px solid rgba(196,181,253,0.35)",
-        background: "rgba(196,181,253,0.08)",
-        padding: "12px 16px",
+        border: "1px solid rgba(196,181,253,0.3)",
+        background: "rgba(196,181,253,0.07)",
+        padding: "10px 14px",
         display: "flex",
         alignItems: "center",
         flexWrap: "wrap",
-        gap: 10,
+        gap: 8,
       }}
     >
-      <span style={{ fontSize: 14 }}>🔒</span>
-      <p style={{ flex: 1, minWidth: 200, fontSize: 13, color: "var(--ink-600)", lineHeight: 1.5 }}>
-        <span style={{ fontWeight: 600, color: "var(--ink-900)" }}>Coach IA · Projection · Factures PDF · Export Excel</span>
-        {" "}— débloque tout pour 19,90€/mois.
-      </p>
+      <span style={{ fontSize: 13, flexShrink: 0 }}>🔒</span>
+      <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6, flex: 1 }}>
+        {PREMIUM_PILLS.map((pill) => (
+          <span
+            key={pill}
+            style={{
+              borderRadius: 999,
+              background: "rgba(196,181,253,0.18)",
+              border: "1px solid rgba(196,181,253,0.3)",
+              padding: "3px 10px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--violet-700)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {pill}
+          </span>
+        ))}
+        <span style={{ fontSize: 12, color: "var(--ink-400)", whiteSpace: "nowrap" }}>19,90€/mois</span>
+      </div>
       <button
         onClick={onUpgradeClick}
         style={{
@@ -35,8 +53,8 @@ function UpgradeNudge({ onUpgradeClick }: { onUpgradeClick: () => void }) {
           border: "none",
           background: "var(--ink-900)",
           color: "var(--violet-500)",
-          padding: "8px 18px",
-          fontSize: 13,
+          padding: "7px 16px",
+          fontSize: 12,
           fontWeight: 700,
           cursor: "pointer",
           whiteSpace: "nowrap",
