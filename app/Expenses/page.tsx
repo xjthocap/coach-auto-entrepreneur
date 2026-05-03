@@ -102,6 +102,24 @@ export default async function ExpensesPage({
   const totalPeriod = monthlyRecurringTotal + periodOneTimeTotal
   const isPremium = profile.plan === "premium" || !!profile.founder_number
 
+  // ── Alertes déclaration ──
+  const realToday = new Date()
+  const realCurrentPeriod = getPeriodRange(frequency, realToday)
+  const realCurrentEnd = new Date(realCurrentPeriod.end + "T00:00:00")
+  const daysUntilCurrentEnd = Math.ceil((realCurrentEnd.getTime() - realToday.getTime()) / (1000 * 60 * 60 * 24))
+  const realPrevDateDecl = new Date(realToday)
+  realPrevDateDecl.setMonth(realPrevDateDecl.getMonth() - step)
+  const realPrevPeriod = getPeriodRange(frequency, realPrevDateDecl)
+  const realPrevEnd = new Date(realPrevPeriod.end + "T00:00:00")
+  const deadlineDate = new Date(realPrevEnd.getFullYear(), realPrevEnd.getMonth() + 2, 0)
+  const daysUntilDeadline = Math.ceil((deadlineDate.getTime() - realToday.getTime()) / (1000 * 60 * 60 * 24))
+  const isInDeclarationWindow = realPrevEnd < realToday && daysUntilDeadline >= 0
+  const isApproachingEnd = !isInDeclarationWindow && daysUntilCurrentEnd >= 0 && daysUntilCurrentEnd <= 7
+  const alertCount = (isInDeclarationWindow ? 1 : 0) + (isApproachingEnd ? 1 : 0)
+  function formatDeadline(d: Date) {
+    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+  }
+
   return (
     <main
       className="min-h-screen"
@@ -143,6 +161,7 @@ export default async function ExpensesPage({
                   basePath="/Expenses"
                   currentDate={formatLocalDate(baseDate)}
                   addAnchor="add-expense"
+                  alertCount={alertCount}
                 />
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
@@ -160,6 +179,32 @@ export default async function ExpensesPage({
           </header>
 
           <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">
+            <div id="declarations" />
+            {isInDeclarationWindow && (
+              <section className="flex items-start gap-3 px-5 py-4" style={{ background: "var(--rose-100)", borderRadius: "var(--r-md)", border: "1px solid rgba(251,113,133,0.35)" }}>
+                <span style={{ flexShrink: 0, width: 32, height: 32, borderRadius: "var(--r-sm)", background: "var(--rose-500)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "var(--rose-500)" }}>Période {realPrevPeriod.label} — déclaration en cours</p>
+                  <p className="mt-0.5 text-sm" style={{ color: "var(--rose-500)" }}>
+                    Soumets ton CA sur autoentrepreneur.urssaf.fr avant le <strong>{formatDeadline(deadlineDate)}</strong>
+                    {daysUntilDeadline <= 5 && <span style={{ marginLeft: 8, borderRadius: 999, background: "var(--rose-500)", padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "white" }}>{daysUntilDeadline === 0 ? "Dernier jour !" : `J-${daysUntilDeadline}`}</span>}.
+                  </p>
+                </div>
+              </section>
+            )}
+            {isApproachingEnd && (
+              <section className="flex items-start gap-3 px-5 py-4" style={{ background: "#FFFBEB", borderRadius: "var(--r-md)", border: "1px solid rgba(245,158,11,0.35)" }}>
+                <span style={{ flexShrink: 0, width: 32, height: 32, borderRadius: "var(--r-sm)", background: "#F59E0B", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "#92400E" }}>Période {realCurrentPeriod.label} — encore {daysUntilCurrentEnd} jour{daysUntilCurrentEnd > 1 ? "s" : ""}</p>
+                  <p className="mt-0.5 text-sm" style={{ color: "#B45309" }}>Vérifie que toutes tes dépenses sont bien enregistrées avant la clôture.</p>
+                </div>
+              </section>
+            )}
             {/* HERO + FORM */}
             <section className="grid items-stretch gap-6 xl:grid-cols-[420px_1fr]">
               <div className="h-full">

@@ -309,6 +309,7 @@ export default async function DashboardPage({
                   basePath="/dashboard"
                   currentDate={formatLocalDate(baseDate)}
                   addAnchor="quick-add"
+                  alertCount={(isInDeclarationWindow ? 1 : 0) + (isApproachingEnd ? 1 : 0)}
                 />
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
@@ -523,6 +524,7 @@ export default async function DashboardPage({
             })()}
 
             {/* ── DECLARATION ALERTS ── */}
+            <div id="declarations" />
             {isInDeclarationWindow && (
               <section
                 className="flex items-start gap-3 px-5 py-4"

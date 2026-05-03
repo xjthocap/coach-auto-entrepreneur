@@ -16,6 +16,8 @@ type Props = {
   addAnchor?: string
   /** Mode compact : affiche seulement la pill période, sans cloche ni bouton Ajouter */
   compact?: boolean
+  /** Nombre d'alertes actives (déclaration / fin de période) */
+  alertCount?: number
 }
 
 function pad(n: number) {
@@ -29,6 +31,7 @@ export default function TopbarPeriod({
   currentDate,
   addAnchor = "quick-add",
   compact = false,
+  alertCount = 0,
 }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -287,21 +290,38 @@ export default function TopbarPeriod({
 
       {/* ── Bell ── */}
       <button
-        title="Notifications"
+        title={alertCount > 0 ? `${alertCount} alerte${alertCount > 1 ? "s" : ""} — cliquer pour voir` : "Aucune alerte"}
+        onClick={() => {
+          const el = document.getElementById("declarations")
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
+        }}
         style={{
+          position: "relative",
           display: "flex", alignItems: "center", justifyContent: "center",
           width: 36, height: 36,
           borderRadius: 999,
-          border: "1px solid var(--cream-300)",
-          background: "var(--cream-50)",
-          color: "var(--ink-500)",
+          border: `1px solid ${alertCount > 0 ? "rgba(251,113,133,0.5)" : "var(--cream-300)"}`,
+          background: alertCount > 0 ? "rgba(251,113,133,0.08)" : "var(--cream-50)",
+          color: alertCount > 0 ? "var(--rose-500)" : "var(--ink-500)",
           cursor: "pointer", flexShrink: 0,
+          transition: "all 0.15s",
         }}
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
+        {alertCount > 0 && (
+          <span style={{
+            position: "absolute", top: -3, right: -3,
+            width: 14, height: 14, borderRadius: 999,
+            background: "var(--rose-500)", border: "2px solid var(--cream-50)",
+            fontSize: 8, fontWeight: 700, color: "white",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            {alertCount}
+          </span>
+        )}
       </button>
 
       {/* ── + Ajouter ── */}

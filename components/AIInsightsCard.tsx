@@ -77,7 +77,25 @@ export default function AIInsightsCard(props: Props) {
     }
   }, [props.totalRevenue, props.expenses, props.periodLabel])
 
+  const cacheKey = `ai:${props.periodLabel}:${Math.round(props.totalRevenue)}:${Math.round(props.expenses)}`
+
   async function loadInsights(isManual = false) {
+    // Check localStorage cache (2h TTL) unless manual refresh
+    if (!isManual) {
+      try {
+        const cached = localStorage.getItem(cacheKey)
+        if (cached) {
+          const { data: cachedData, ts } = JSON.parse(cached)
+          if (Date.now() - ts < 2 * 60 * 60 * 1000) {
+            setData(cachedData)
+            setUpdatedAt(new Date(ts))
+            setLoading(false)
+            return
+          }
+        }
+      } catch { /* ignore localStorage errors */ }
+    }
+
     try {
       if (isManual) setRefreshing(true)
       else setLoading(true)
@@ -91,6 +109,7 @@ export default function AIInsightsCard(props: Props) {
       const json = await res.json()
       setData(json)
       setUpdatedAt(new Date())
+      try { localStorage.setItem(cacheKey, JSON.stringify({ data: json, ts: Date.now() })) } catch { /* ignore */ }
     } catch {
       setData({
         score: 50,
