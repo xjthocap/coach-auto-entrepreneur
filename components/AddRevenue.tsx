@@ -174,6 +174,8 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         padding: 20,
         boxShadow: "var(--shadow-md)",
         height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {/* Header */}
@@ -198,7 +200,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
         {/* Libellé */}
         <input
           type="text"
@@ -458,6 +460,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         )}
 
         {/* Submit */}
+        <div style={{ flex: 1 }} />
         <button
           onClick={handleAdd}
           disabled={loading}
