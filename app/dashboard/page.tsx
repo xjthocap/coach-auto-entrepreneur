@@ -15,7 +15,7 @@ import AIInsightsCard from "@/components/AIInsightsCard"
 import DashboardPremiumShell from "@/components/DashboardPremiumShell"
 import DevPlanSwitcher from "@/components/DevPlanSwitcher"
 import CheckoutBanner from "@/components/CheckoutBanner"
-import { calculateMicro } from "@/lib/calculations"
+import { calculateMicro, estimateIRProvision } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
@@ -218,8 +218,15 @@ export default async function DashboardPage({
       return { ...exp, isInPeriod }
     }) || []
 
-  const realNet = result.net - totalExpenses
-  const reserveAmount = result.charges + result.tax
+  // ===== PROVISION IR (barème progressif quand pas de versement libératoire) =====
+  const periodsPerYear = frequency === "quarterly" ? 4 : 12
+  const useIREstimate  = !profile.versement_liberatoire
+  const irEstimate     = useIREstimate
+    ? estimateIRProvision(totalRevenue, profile.activity_type, periodsPerYear)
+    : 0
+
+  const realNet       = result.net - totalExpenses - irEstimate
+  const reserveAmount = result.charges + result.tax + irEstimate
 
   // ===== PÉRIODE PRÉCÉDENTE (pour comparatifs) =====
   const prevPeriod = getPeriodRange(frequency, prevDate)
@@ -254,8 +261,11 @@ export default async function DashboardPage({
     acre: profile.acre,
     versementLiberatoire: profile.versement_liberatoire,
   })
-  const prevReserveAmount = prevResult.charges + prevResult.tax
-  const prevRealNet = prevResult.net - prevTotalExpenses
+  const prevIrEstimate    = useIREstimate
+    ? estimateIRProvision(prevTotalRevenue, profile.activity_type, periodsPerYear)
+    : 0
+  const prevReserveAmount = prevResult.charges + prevResult.tax + prevIrEstimate
+  const prevRealNet       = prevResult.net - prevTotalExpenses - prevIrEstimate
 
   // ===== PROJECTION =====
   const projection = calculateProjection({
@@ -457,13 +467,21 @@ export default async function DashboardPage({
                       value: `−${result.charges.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
                       valueColor: "var(--rose-500)",
                     },
-                    {
-                      label: "Impôt libératoire",
-                      tag: `${(result.taxRate * 100).toFixed(1)}%`,
-                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" },
-                      value: `−${result.tax.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                      valueColor: "var(--rose-500)",
-                    },
+                    useIREstimate
+                      ? {
+                          label: "Provision IR (barème)",
+                          tag: "estimée",
+                          tagStyle: { background: "rgba(245,158,11,0.18)", color: "#F59E0B" },
+                          value: `−${irEstimate.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
+                          valueColor: "var(--rose-500)",
+                        }
+                      : {
+                          label: "Impôt libératoire",
+                          tag: `${(result.taxRate * 100).toFixed(1)}%`,
+                          tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" },
+                          value: `−${result.tax.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
+                          valueColor: "var(--rose-500)",
+                        },
                     {
                       label: "Dépenses période",
                       value: `−${totalExpenses.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
@@ -492,6 +510,12 @@ export default async function DashboardPage({
                       {realNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
                     </span>
                   </div>
+
+                  {useIREstimate && (
+                    <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-500)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                      ⚠️ Provision IR calculée sur le barème 2025 · hypothèse : foyer 1 part, aucun autre revenu. Ajuste en fonction de ta situation réelle.
+                    </p>
+                  )}
                 </div>
               </div>
             </section>
@@ -682,7 +706,7 @@ export default async function DashboardPage({
                     <AIInsightsCard
                       totalRevenue={totalRevenue}
                       charges={result.charges}
-                      tax={result.tax}
+                      tax={useIREstimate ? irEstimate : result.tax}
                       expenses={totalExpenses}
                       realNet={realNet}
                       reserveAmount={reserveAmount}
@@ -766,8 +790,10 @@ export default async function DashboardPage({
               <div className="grid gap-3 md:grid-cols-3">
                 {[
                   { label: "Chiffre d'affaires", value: totalRevenue },
-                  { label: "Charges sociales", value: result.charges, sub: `${(result.socialRate * 100).toFixed(2)}%` },
-                  { label: "Impôt libératoire", value: result.tax, sub: `${(result.taxRate * 100).toFixed(2)}%` },
+                  { label: "Charges sociales",  value: result.charges, sub: `${(result.socialRate * 100).toFixed(2)}%` },
+                  useIREstimate
+                    ? { label: "Provision IR (estimée)", value: irEstimate, sub: "Barème progressif · 1 part" }
+                    : { label: "Impôt libératoire",      value: result.tax, sub: `${(result.taxRate * 100).toFixed(2)}%` },
                 ].map((item, i) => (
                   <div key={i} className="rounded-[14px] p-4" style={{ background: "var(--cream-100)" }}>
                     <p className="text-xs uppercase tracking-[0.06em]" style={{ color: "var(--ink-400)" }}>{item.label}</p>
