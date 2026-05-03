@@ -40,13 +40,13 @@ export default function LogoUpload({ userId, initialLogoUrl, onUpdate }: Props) 
 
       // Upload (upsert = remplace si déjà existant)
       const { error: uploadErr } = await supabase.storage
-        .from("logos")
+        .from("Logos")
         .upload(path, file, { upsert: true, contentType: file.type })
 
       if (uploadErr) throw uploadErr
 
       // URL publique
-      const { data } = supabase.storage.from("logos").getPublicUrl(path)
+      const { data } = supabase.storage.from("Logos").getPublicUrl(path)
       // Cache-bust pour forcer le rechargement de l'image
       const url = `${data.publicUrl}?t=${Date.now()}`
 
@@ -74,12 +74,12 @@ export default function LogoUpload({ userId, initialLogoUrl, onUpdate }: Props) 
     try {
       // On liste les fichiers du dossier utilisateur pour trouver le logo
       const { data: files } = await supabase.storage
-        .from("logos")
+        .from("Logos")
         .list(userId)
 
       if (files && files.length > 0) {
         const paths = files.map((f) => `${userId}/${f.name}`)
-        await supabase.storage.from("logos").remove(paths)
+        await supabase.storage.from("Logos").remove(paths)
       }
 
       await supabase
