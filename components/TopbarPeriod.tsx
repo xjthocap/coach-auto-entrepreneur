@@ -14,6 +14,8 @@ type Props = {
   /** date courante au format "YYYY-MM-DD" */
   currentDate: string
   addAnchor?: string
+  /** Mode compact : affiche seulement la pill période, sans cloche ni bouton Ajouter */
+  compact?: boolean
 }
 
 function pad(n: number) {
@@ -26,6 +28,7 @@ export default function TopbarPeriod({
   basePath,
   currentDate,
   addAnchor = "quick-add",
+  compact = false,
 }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -65,6 +68,84 @@ export default function TopbarPeriod({
   const isCurrentPeriod = (year: number, month0: number) => {
     if (frequency === "monthly") return year === currentYear && month0 === currentMonth
     return year === currentYear && Math.floor(month0 / 3) === currentQuarter
+  }
+
+  if (compact) {
+    return (
+      <div ref={ref} style={{ position: "relative" }}>
+        <button
+          onClick={() => setOpen(v => !v)}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            borderRadius: 999,
+            border: "1px solid var(--cream-300)",
+            background: "var(--cream-50)",
+            padding: "6px 12px",
+            fontSize: 13, fontWeight: 500,
+            color: "var(--ink-700)",
+            cursor: "pointer", whiteSpace: "nowrap",
+          }}
+        >
+          <span className="pulsing-dot inline-block h-1.5 w-1.5 rounded-full shrink-0" style={{ background: "var(--lime-500)" }} />
+          {label}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ flexShrink: 0, transition: "transform 0.15s", transform: open ? "rotate(180deg)" : "rotate(0deg)", color: "var(--ink-400)" }}>
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+
+        {open && (
+          <div style={{
+            position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 50,
+            borderRadius: "var(--r-md)", border: "1px solid var(--cream-200)",
+            background: "var(--cream-50)", boxShadow: "var(--shadow-lg)",
+            width: frequency === "monthly" ? 252 : 220, padding: 12,
+            animation: "fade-up 0.15s ease-out both",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <button onClick={() => setPickerYear(y => y - 1)} style={{ width: 28, height: 28, borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)", background: "var(--cream-100)", color: "var(--ink-500)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-900)" }}>{pickerYear}</span>
+              <button onClick={() => setPickerYear(y => y + 1)} style={{ width: 28, height: 28, borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)", background: "var(--cream-100)", color: "var(--ink-500)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            {frequency === "monthly" && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                {MONTHS_SHORT.map((m, i) => {
+                  const active = isCurrentPeriod(pickerYear, i)
+                  return (
+                    <button key={m} onClick={() => navigate(pickerYear, i)}
+                      style={{ padding: "7px 0", borderRadius: "var(--r-sm)", border: "none", background: active ? "var(--ink-900)" : "transparent", color: active ? "var(--violet-500)" : "var(--ink-600)", fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer" }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "var(--cream-100)" }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent" }}>
+                      {m}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+            {frequency === "quarterly" && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                {QUARTERS.map((q, i) => {
+                  const month0 = i * 3
+                  const active = isCurrentPeriod(pickerYear, month0)
+                  return (
+                    <button key={q} onClick={() => navigate(pickerYear, month0)}
+                      style={{ padding: "10px 0", borderRadius: "var(--r-sm)", border: "none", background: active ? "var(--ink-900)" : "transparent", color: active ? "var(--violet-500)" : "var(--ink-600)", fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer" }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "var(--cream-100)" }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent" }}>
+                      {q}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (

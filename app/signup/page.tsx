@@ -6,29 +6,29 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 
 function getErrorMessage(error: string) {
-  if (error.includes("User already registered")) {
-    return "Cet email est déjà utilisé"
-  }
-
-  if (error.includes("Password should be")) {
-    return "Mot de passe trop faible"
-  }
-
-  if (error.includes("Email rate limit exceeded")) {
-    return "Trop de tentatives. Réessaie dans quelques minutes."
-  }
-
-  if (error.includes("Signup is disabled")) {
-    return "La création de compte est désactivée."
-  }
-
+  if (error.includes("User already registered")) return "Cet email est déjà utilisé"
+  if (error.includes("Password should be")) return "Mot de passe trop faible (8 caractères minimum)"
+  if (error.includes("Email rate limit exceeded")) return "Trop de tentatives. Réessaie dans quelques minutes."
+  if (error.includes("Signup is disabled")) return "La création de compte est désactivée."
   return error || "Une erreur est survenue"
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  borderRadius: "var(--r-md)",
+  border: "1px solid var(--cream-300)",
+  background: "var(--cream-100)",
+  padding: "13px 16px",
+  fontSize: 15,
+  color: "var(--ink-900)",
+  outline: "none",
+  transition: "border-color 0.15s",
+  boxSizing: "border-box",
 }
 
 export default function SignupPage() {
   const supabase = createClient()
   const router = useRouter()
-
   const [firstName, setFirstName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -39,55 +39,21 @@ export default function SignupPage() {
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
     if (loading) return
-
     setMessage("")
-
-    if (!email || !password) {
-      setMessage("Remplis ton email et ton mot de passe.")
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setMessage("Les mots de passe ne correspondent pas.")
-      return
-    }
-
+    if (!email || !password) { setMessage("Remplis ton email et ton mot de passe."); return }
+    if (password !== confirmPassword) { setMessage("Les mots de passe ne correspondent pas."); return }
     setLoading(true)
-
     try {
-      const emailRedirectTo =
-        typeof window !== "undefined"
-          ? `${window.location.origin}/dashboard`
-          : undefined
-
+      const emailRedirectTo = typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo,
-          data: {
-            first_name: firstName.trim(),
-          },
-        },
+        options: { emailRedirectTo, data: { first_name: firstName.trim() } },
       })
-
-      if (error) {
-        console.error("Erreur signup :", error.message)
-        setMessage(getErrorMessage(error.message))
-        return
-      }
-
-      if (data.user && data.session) {
-        router.push("/onboarding")
-        router.refresh()
-        return
-      }
-
-      setMessage(
-        "Compte créé. Vérifie tes emails si une confirmation est demandée."
-      )
-    } catch (err) {
-      console.error("Erreur inattendue signup :", err)
+      if (error) { setMessage(getErrorMessage(error.message)); return }
+      if (data.user && data.session) { router.push("/onboarding"); router.refresh(); return }
+      setMessage("Compte créé ! Vérifie tes emails si une confirmation est demandée.")
+    } catch {
       setMessage("Une erreur est survenue lors de la création du compte.")
     } finally {
       setLoading(false)
@@ -95,167 +61,279 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f8f4] text-[#0f172a]">
-      <div className="mx-auto grid min-h-screen max-w-7xl grid-cols-1 lg:grid-cols-2">
-        {/* LEFT SIDE */}
-        <section className="flex flex-col justify-between px-6 py-8 md:px-10 lg:px-12 lg:py-10">
-          <div>
-            <Link href="/" className="inline-block">
-              <div className="text-3xl font-extrabold tracking-tight text-slate-950">
-                KeskiReste<span className="text-[#22c55e]">.</span>
-              </div>
-            </Link>
+    <main style={{ minHeight: "100vh", background: "var(--cream-100)", display: "flex" }}>
+      {/* ── LEFT PANEL ── */}
+      <aside
+        className="hidden lg:flex"
+        style={{
+          width: 480,
+          flexShrink: 0,
+          background: "var(--ink-900)",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "48px 52px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background: "radial-gradient(ellipse 70% 50% at 90% 20%, rgba(196,181,253,0.18) 0%, transparent 70%)",
+          }}
+        />
 
-            <div className="mt-16 max-w-xl">
-              <div className="inline-flex items-center rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#15803d]">
-                Création de compte
-              </div>
-
-              <h1 className="mt-6 text-5xl font-black leading-[0.98] tracking-tight text-slate-950 md:text-6xl">
-                Commence à voir
-                <br />
-                ce qu’il te reste
-                <br />
-                vraiment.
-              </h1>
-
-              <p className="mt-6 text-lg leading-8 text-slate-600">
-                Crée ton compte pour suivre tes revenus, tes dépenses, tes
-                charges estimées et ton disponible réel dans une interface simple
-                et claire.
-              </p>
+        <div style={{ position: "relative" }}>
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--cream-50)" }}>
+              KeskiReste<span style={{ color: "var(--violet-500)" }}>.</span>
             </div>
+          </Link>
 
-            <div className="mt-10 grid max-w-xl gap-4 sm:grid-cols-3">
-              <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">Installation</p>
-                <p className="mt-2 text-xl font-black text-slate-950">Rapide</p>
-              </div>
+          <div style={{ marginTop: 64 }}>
+            <span
+              style={{
+                display: "inline-block",
+                borderRadius: 999,
+                border: "1px solid rgba(196,181,253,0.3)",
+                padding: "4px 14px",
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--violet-500)",
+                marginBottom: 20,
+              }}
+            >
+              Gratuit pour commencer
+            </span>
 
-              <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">Lecture</p>
-                <p className="mt-2 text-xl font-black text-slate-950">Claire</p>
-              </div>
+            <h1
+              style={{
+                fontSize: "clamp(32px, 3.5vw, 48px)",
+                fontWeight: 800,
+                letterSpacing: "-0.05em",
+                color: "var(--cream-50)",
+                lineHeight: 1.08,
+                marginBottom: 20,
+              }}
+            >
+              Commence à voir
+              <br />
+              ce qu'il te reste
+              <br />
+              <span style={{ color: "var(--violet-500)" }}>vraiment.</span>
+            </h1>
 
-              <div className="rounded-[24px] border border-slate-200 bg-[#0f172a] p-5 shadow-sm">
-                <p className="text-sm text-slate-300">Objectif</p>
-                <p className="mt-2 text-xl font-black text-[#4ade80]">
-                  Sérénité
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 hidden rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm lg:block">
-            <p className="text-sm text-slate-500">Pourquoi créer un compte ?</p>
-            <p className="mt-3 text-base leading-7 text-slate-700">
-              Parce que ton chiffre d’affaires seul ne suffit pas. KeskiReste
-              t’aide à comprendre ce que tu peux réellement considérer comme
-              disponible après charges, impôts et dépenses.
+            <p style={{ fontSize: 15, lineHeight: 1.75, color: "var(--ink-300)", maxWidth: 340 }}>
+              En 2 minutes, configure ton espace et obtiens ton disponible réel automatiquement.
             </p>
           </div>
-        </section>
 
-        {/* RIGHT SIDE */}
-        <section className="flex items-center justify-center px-6 py-8 md:px-10 lg:px-12">
-          <div className="w-full max-w-xl rounded-[36px] border border-slate-200 bg-white p-8 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:p-10">
-            <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-wide text-[#16a34a]">
-                Espace utilisateur
-              </p>
-              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-                Créer un compte
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                Quelques infos suffisent pour commencer à piloter ton activité.
-              </p>
-            </div>
+          {/* 3 stats */}
+          <div style={{ marginTop: 48, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {[
+              { label: "Configuration", value: "2 min" },
+              { label: "Interface", value: "Simple" },
+              { label: "Seuil URSSAF", value: "Surveillé" },
+              { label: "Sérénité", value: "Incluse" },
+            ].map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  borderRadius: "var(--r-sm)",
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  padding: "14px 16px",
+                }}
+              >
+                <p style={{ fontSize: 11, color: "var(--ink-400)", marginBottom: 4 }}>{s.label}</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: "var(--cream-50)", letterSpacing: "-0.02em" }}>{s.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
-            <form onSubmit={handleSignUp} className="space-y-5">
+        {/* Premium nudge */}
+        <div
+          style={{
+            position: "relative",
+            borderRadius: "var(--r-md)",
+            background: "rgba(196,181,253,0.12)",
+            border: "1px solid rgba(196,181,253,0.2)",
+            padding: "18px 22px",
+          }}
+        >
+          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--violet-500)", marginBottom: 4 }}>
+            Version Premium disponible
+          </p>
+          <p style={{ fontSize: 13, color: "var(--ink-300)", lineHeight: 1.6 }}>
+            Coach IA, projections de fin de période, historique complet et export Excel — à 19,90€/mois.
+          </p>
+        </div>
+      </aside>
+
+      {/* ── RIGHT PANEL ── */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "32px 24px",
+          overflowY: "auto",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 460 }}>
+          {/* Mobile logo */}
+          <div className="lg:hidden" style={{ textAlign: "center", marginBottom: 36 }}>
+            <Link href="/" style={{ textDecoration: "none" }}>
+              <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--ink-900)" }}>
+                KeskiReste<span style={{ color: "var(--violet-500)" }}>.</span>
+              </div>
+            </Link>
+          </div>
+
+          <div
+            style={{
+              background: "var(--cream-50)",
+              borderRadius: "var(--r-xl)",
+              border: "1px solid var(--cream-200)",
+              boxShadow: "var(--shadow-lg)",
+              padding: "36px 36px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--violet-700)",
+                marginBottom: 8,
+              }}
+            >
+              Créer un compte
+            </p>
+            <h2
+              style={{
+                fontSize: "clamp(24px, 3.5vw, 32px)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                color: "var(--ink-900)",
+                marginBottom: 6,
+              }}
+            >
+              Bienvenue 🎉
+            </h2>
+            <p style={{ fontSize: 14, color: "var(--ink-400)", marginBottom: 28 }}>
+              Quelques infos suffisent pour commencer.
+            </p>
+
+            <form onSubmit={handleSignUp} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Prénom
-                </label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--ink-700)", marginBottom: 6 }}>Prénom</label>
                 <input
                   type="text"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
+                  onChange={e => setFirstName(e.target.value)}
                   placeholder="Ton prénom"
                   autoComplete="given-name"
+                  style={inputStyle}
+                  onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Email
-                </label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--ink-700)", marginBottom: 6 }}>Email</label>
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
+                  onChange={e => setEmail(e.target.value)}
                   placeholder="ton@email.com"
                   autoComplete="email"
+                  style={inputStyle}
+                  onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Mot de passe
-                </label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--ink-700)", marginBottom: 6 }}>Mot de passe</label>
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="new-password"
+                  style={inputStyle}
+                  onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Confirmer le mot de passe
-                </label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--ink-700)", marginBottom: 6 }}>Confirmer</label>
                 <input
                   type="password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3.5 text-slate-900 outline-none transition focus:border-[#86efac] focus:bg-white"
+                  onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="new-password"
+                  style={inputStyle}
+                  onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
                 />
               </div>
 
+              {message && (
+                <div
+                  style={{
+                    borderRadius: "var(--r-sm)",
+                    background: message.includes("créé") ? "rgba(196,181,253,0.12)" : "rgba(251,113,133,0.1)",
+                    border: `1px solid ${message.includes("créé") ? "rgba(196,181,253,0.3)" : "rgba(251,113,133,0.3)"}`,
+                    padding: "10px 14px",
+                  }}
+                >
+                  <p style={{ fontSize: 13, color: message.includes("créé") ? "var(--violet-700)" : "var(--rose-500)" }}>{message}</p>
+                </div>
+              )}
+
               <button
-                disabled={loading}
                 type="submit"
-                className="w-full rounded-2xl bg-[#0f172a] px-5 py-3.5 font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] transition hover:opacity-90 disabled:opacity-50"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  borderRadius: "var(--r-md)",
+                  border: "none",
+                  background: "var(--ink-900)",
+                  color: "var(--lime-500)",
+                  padding: "14px 20px",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: loading ? "default" : "pointer",
+                  opacity: loading ? 0.7 : 1,
+                  letterSpacing: "-0.01em",
+                  marginTop: 4,
+                }}
               >
-                {loading ? "Création..." : "Créer mon compte"}
+                {loading ? "Création…" : "Créer mon compte →"}
               </button>
             </form>
 
-            {message && (
-              <div className="mt-5 rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-3">
-                <p className="text-sm text-slate-600">{message}</p>
-              </div>
-            )}
-
-            <div className="mt-8 border-t border-slate-200 pt-6">
-              <p className="text-sm leading-6 text-slate-500">
-                Tu as déjà un compte ?{" "}
-                <Link
-                  href="/login"
-                  className="font-semibold text-slate-900 underline underline-offset-4"
-                >
-                  Connecte-toi
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--cream-200)", textAlign: "center" }}>
+              <p style={{ fontSize: 14, color: "var(--ink-400)" }}>
+                Déjà un compte ?{" "}
+                <Link href="/login" style={{ fontWeight: 700, color: "var(--ink-900)", textDecoration: "none" }}>
+                  Se connecter
                 </Link>
               </p>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   )

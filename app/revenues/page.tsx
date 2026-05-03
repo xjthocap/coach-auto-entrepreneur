@@ -143,6 +143,15 @@ export default async function RevenuesPage({
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
+            <div className="md:hidden flex items-center px-4 pb-2.5" style={{ borderTop: "1px solid var(--cream-300)" }}>
+              <TopbarPeriod
+                compact
+                label={buildPeriodLabel(frequency, period)}
+                frequency={frequency}
+                basePath="/revenues"
+                currentDate={formatLocalDate(baseDate)}
+              />
+            </div>
           </header>
 
           <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">

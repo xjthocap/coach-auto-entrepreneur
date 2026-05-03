@@ -6,25 +6,28 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
 function getErrorMessage(error: string) {
-  if (error.includes("Invalid login credentials")) {
-    return "Email ou mot de passe incorrect"
-  }
-
-  if (error.includes("Email not confirmed")) {
-    return "Ton email n’est pas encore confirmé."
-  }
-
-  if (error.includes("Email rate limit exceeded")) {
-    return "Trop de tentatives. Réessaie dans quelques minutes."
-  }
-
+  if (error.includes("Invalid login credentials")) return "Email ou mot de passe incorrect"
+  if (error.includes("Email not confirmed")) return "Ton email n'est pas encore confirmé."
+  if (error.includes("Email rate limit exceeded")) return "Trop de tentatives. Réessaie dans quelques minutes."
   return error || "Une erreur est survenue"
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  borderRadius: "var(--r-md)",
+  border: "1px solid var(--cream-300)",
+  background: "var(--cream-100)",
+  padding: "13px 16px",
+  fontSize: 15,
+  color: "var(--ink-900)",
+  outline: "none",
+  transition: "border-color 0.15s",
+  boxSizing: "border-box",
 }
 
 export default function LoginPage() {
   const supabase = createClient()
   const router = useRouter()
-
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -33,21 +36,11 @@ export default function LoginPage() {
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault()
     if (loading) return
-
     setLoading(true)
     setMessage("")
-
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        setMessage(getErrorMessage(error.message))
-        return
-      }
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) { setMessage(getErrorMessage(error.message)); return }
       router.push("/dashboard")
       router.refresh()
     } catch {
@@ -58,182 +51,275 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f7f3] text-[#0f172a]">
-      <div className="mx-auto grid min-h-screen max-w-7xl items-center gap-12 px-6 py-10 md:grid-cols-2 lg:grid-cols-[1.05fr_520px] lg:px-10">
-        {/* LEFT */}
-        <section className="md:pr-8">
-          <Link href="/" className="inline-block">
-            <div className="text-[42px] font-extrabold tracking-[-0.04em] text-[#0b132d]">
-              KeskiReste<span className="text-[#22c55e]">.</span>
-            </div>
-          </Link>
+    <main style={{ minHeight: "100vh", background: "var(--cream-100)", display: "flex" }}>
+      {/* ── LEFT PANEL (desktop only) ── */}
+      <aside
+        className="hidden lg:flex"
+        style={{
+          width: 480,
+          flexShrink: 0,
+          background: "var(--ink-900)",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "48px 52px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background: "radial-gradient(ellipse 70% 50% at 80% 15%, rgba(196,181,253,0.18) 0%, transparent 70%)",
+          }}
+        />
 
-          <div className="mt-6 inline-flex rounded-full bg-[#eaf7ea] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#15803d]">
-            Connexion à ton espace
+        <div style={{ position: "relative" }}>
+          {/* Logo */}
+          <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--cream-50)" }}>
+            KeskiReste<span style={{ color: "var(--violet-500)" }}>.</span>
           </div>
 
-          <h1 className="mt-8 text-5xl font-black leading-[0.92] tracking-[-0.05em] text-[#0b132d] md:text-6xl lg:text-[80px]">
-            Retrouve enfin
-            <br />
-            ton <span className="text-[#22c55e]">vrai solde.</span>
-          </h1>
+          <div style={{ marginTop: 64 }}>
+            <span
+              style={{
+                display: "inline-block",
+                borderRadius: 999,
+                border: "1px solid rgba(196,181,253,0.3)",
+                padding: "4px 14px",
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--violet-500)",
+                marginBottom: 20,
+              }}
+            >
+              Pour les auto-entrepreneurs
+            </span>
 
-          <p className="mt-8 max-w-[720px] text-lg leading-8 text-slate-600">
-            Connecte-toi pour suivre tes revenus, tes dépenses, tes charges
-            estimées et ce qu’il te reste vraiment, dans une interface simple et
-            claire.
+            <h1
+              style={{
+                fontSize: "clamp(36px, 4vw, 52px)",
+                fontWeight: 800,
+                letterSpacing: "-0.05em",
+                color: "var(--cream-50)",
+                lineHeight: 1.05,
+                marginBottom: 20,
+              }}
+            >
+              Ton vrai solde.
+              <br />
+              <span style={{ color: "var(--violet-500)" }}>Sans prise de tête.</span>
+            </h1>
+
+            <p style={{ fontSize: 15, lineHeight: 1.75, color: "var(--ink-300)", maxWidth: 340 }}>
+              Connecte-toi pour voir ce qu'il te reste vraiment — après charges, impôts et dépenses.
+            </p>
+          </div>
+
+          {/* Features */}
+          <div style={{ marginTop: 48, display: "flex", flexDirection: "column", gap: 14 }}>
+            {[
+              { icon: "→", text: "Disponible réel calculé automatiquement" },
+              { icon: "→", text: "Charges URSSAF estimées en temps réel" },
+              { icon: "→", text: "Alertes seuil auto-entrepreneur" },
+            ].map((f, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "var(--r-sm)",
+                    background: "rgba(196,181,253,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 12,
+                    color: "var(--violet-500)",
+                    flexShrink: 0,
+                  }}
+                >
+                  {f.icon}
+                </span>
+                <span style={{ fontSize: 14, color: "var(--ink-300)" }}>{f.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom preview card */}
+        <div
+          style={{
+            position: "relative",
+            borderRadius: "var(--r-md)",
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            padding: "20px 24px",
+          }}
+        >
+          <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-400)", marginBottom: 6 }}>
+            Disponible réel · Mai 2026
           </p>
+          <p
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 36,
+              fontWeight: 300,
+              letterSpacing: "-0.05em",
+              color: "var(--violet-500)",
+              lineHeight: 1,
+            }}
+          >
+            1&nbsp;847,32&nbsp;€
+          </p>
+          <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 6 }}>
+            Après URSSAF, impôt et dépenses
+          </p>
+        </div>
+      </aside>
 
-          <div className="mt-12 flex flex-wrap gap-6">
-            <div className="min-w-[92px]">
-              <div className="flex h-20 w-20 items-center justify-center rounded-[24px] border border-slate-200 bg-white text-3xl shadow-sm">
-                👁️
-              </div>
-              <p className="mt-4 text-sm text-slate-500">Vision</p>
-              <p className="text-[22px] font-bold tracking-[-0.03em] text-[#0b132d]">
-                Claire
-              </p>
-            </div>
-
-            <div className="min-w-[92px]">
-              <div className="flex h-20 w-20 items-center justify-center rounded-[24px] border border-slate-200 bg-white text-3xl shadow-sm">
-                ⚡
-              </div>
-              <p className="mt-4 text-sm text-slate-500">Pilotage</p>
-              <p className="text-[22px] font-bold tracking-[-0.03em] text-[#0b132d]">
-                Simple
-              </p>
-            </div>
-
-            <div className="min-w-[92px]">
-              <div className="flex h-20 w-20 items-center justify-center rounded-[24px] border border-slate-200 bg-white text-3xl shadow-sm">
-                🛡️
-              </div>
-              <p className="mt-4 text-sm text-slate-500">Objectif</p>
-              <p className="text-[22px] font-bold tracking-[-0.03em] text-[#0b132d]">
-                Sérénité
-              </p>
+      {/* ── RIGHT PANEL (form) ── */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "32px 24px",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 440 }}>
+          {/* Mobile logo */}
+          <div className="lg:hidden" style={{ textAlign: "center", marginBottom: 40 }}>
+            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--ink-900)" }}>
+              KeskiReste<span style={{ color: "var(--violet-500)" }}>.</span>
             </div>
           </div>
 
-          <div className="mt-14 max-w-[760px] rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#eef8ef] text-2xl">
-                📊
+          <div
+            style={{
+              background: "var(--cream-50)",
+              borderRadius: "var(--r-xl)",
+              border: "1px solid var(--cream-200)",
+              boxShadow: "var(--shadow-lg)",
+              padding: "36px 36px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--violet-700)",
+                marginBottom: 8,
+              }}
+            >
+              Connexion
+            </p>
+            <h2
+              style={{
+                fontSize: "clamp(26px, 4vw, 34px)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                color: "var(--ink-900)",
+                marginBottom: 6,
+              }}
+            >
+              Bon retour 👋
+            </h2>
+            <p style={{ fontSize: 14, color: "var(--ink-400)", marginBottom: 32 }}>
+              Accède à ton dashboard en quelques secondes.
+            </p>
+
+            <form onSubmit={handleSignIn} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--ink-700)", marginBottom: 6 }}>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="ton@email.com"
+                  autoComplete="email"
+                  style={inputStyle}
+                  onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
+                />
               </div>
 
               <div>
-                <p className="text-[26px] font-bold tracking-[-0.03em] text-[#0b132d]">
-                  Pourquoi KeskiReste ?
-                </p>
-                <p className="mt-3 text-[17px] leading-8 text-slate-600">
-                  Parce que ton chiffre d’affaires ne dit pas toute la vérité.
-                  On t’aide à comprendre ce que tu peux vraiment considérer comme
-                  disponible.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* RIGHT */}
-        <section className="md:pl-8">
-          <div className="relative">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[36px] bg-[#e6eee5]" />
-
-            <div className="relative rounded-[36px] border border-slate-200 bg-white px-8 py-10 shadow-[0_24px_70px_rgba(15,23,42,0.08)] md:px-10">
-              <div className="mb-8 flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#eef8ef] text-3xl">
-                👤
-              </div>
-
-              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#16a34a]">
-                Espace utilisateur
-              </p>
-
-              <h2 className="mt-3 text-4xl font-black tracking-[-0.05em] text-[#0b132d] md:text-[54px]">
-                Connexion
-              </h2>
-
-              <p className="mt-4 text-[18px] leading-8 text-slate-500">
-                Accède à ton dashboard en quelques secondes.
-              </p>
-
-              <form onSubmit={handleSignIn} className="mt-10 space-y-6">
-                <div>
-                  <label className="mb-3 block text-[15px] font-semibold text-[#0b132d]">
-                    Email
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-700)" }}>
+                    Mot de passe
                   </label>
-
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ton@email.com"
-                    autoComplete="email"
-                    className="w-full rounded-2xl border border-slate-200 bg-[#fbfcfa] px-4 py-4 text-[18px] text-[#0b132d] outline-none transition focus:border-[#86efac]"
-                  />
+                  <Link
+                    href="/forgot-password"
+                    style={{ fontSize: 13, color: "var(--violet-700)", textDecoration: "none" }}
+                  >
+                    Oublié ?
+                  </Link>
                 </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  style={inputStyle}
+                  onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
+                />
+              </div>
 
-                <div>
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <label className="block text-[15px] font-semibold text-[#0b132d]">
-                      Mot de passe
-                    </label>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  borderRadius: "var(--r-md)",
+                  border: "none",
+                  background: "var(--ink-900)",
+                  color: "var(--lime-500)",
+                  padding: "14px 20px",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: loading ? "default" : "pointer",
+                  opacity: loading ? 0.7 : 1,
+                  letterSpacing: "-0.01em",
+                  marginTop: 4,
+                }}
+              >
+                {loading ? "Connexion…" : "Se connecter →"}
+              </button>
 
-                    <Link
-                      href="/forgot-password"
-                      className="text-[15px] font-medium text-[#22c55e] transition hover:opacity-80"
-                    >
-                      Mot de passe oublié ?
-                    </Link>
-                  </div>
-
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    className="w-full rounded-2xl border border-slate-200 bg-[#fbfcfa] px-4 py-4 text-[18px] text-[#0b132d] outline-none transition focus:border-[#86efac]"
-                  />
+              {message && (
+                <div
+                  style={{
+                    borderRadius: "var(--r-sm)",
+                    background: "rgba(251,113,133,0.1)",
+                    border: "1px solid rgba(251,113,133,0.3)",
+                    padding: "10px 14px",
+                  }}
+                >
+                  <p style={{ fontSize: 13, color: "var(--rose-500)" }}>{message}</p>
                 </div>
+              )}
+            </form>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded-2xl bg-[#07122f] px-6 py-4 text-[18px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                >
-                  {loading ? "Chargement..." : "Se connecter"}
-                </button>
-
-                <Link
-                  href="/signup"
-                  className="block w-full rounded-2xl border border-[#dce9dc] bg-[#f4faf3] px-6 py-4 text-center text-[18px] font-semibold text-[#15803d] transition hover:bg-[#ebf7ea]"
-                >
+            <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid var(--cream-200)", textAlign: "center" }}>
+              <p style={{ fontSize: 14, color: "var(--ink-400)" }}>
+                Pas encore de compte ?{" "}
+                <Link href="/signup" style={{ fontWeight: 700, color: "var(--ink-900)", textDecoration: "none" }}>
                   Créer un compte
                 </Link>
-
-                {message && (
-                  <div className="rounded-2xl border border-slate-200 bg-[#f8fafc] px-4 py-4">
-                    <p className="text-sm text-slate-600">{message}</p>
-                  </div>
-                )}
-              </form>
-
-              <div className="mt-8 border-t border-slate-200 pt-8 text-center">
-                <p className="text-[16px] text-slate-500">
-                  Pas encore de compte ?{" "}
-                  <Link
-                    href="/signup"
-                    className="font-semibold text-[#22c55e] transition hover:opacity-80"
-                  >
-                    Créer un compte
-                  </Link>
-                </p>
-              </div>
+              </p>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   )

@@ -313,7 +313,88 @@ export default async function DashboardPage({
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
+            {/* Mobile period row */}
+            <div
+              className="md:hidden flex items-center justify-between px-4 pb-2.5"
+              style={{ borderTop: "1px solid var(--cream-300)" }}
+            >
+              <TopbarPeriod
+                compact
+                label={buildPeriodLabel(frequency, period)}
+                frequency={frequency}
+                basePath="/dashboard"
+                currentDate={formatLocalDate(baseDate)}
+              />
+              {!isPremium && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "var(--violet-700)",
+                    background: "rgba(196,181,253,0.15)",
+                    borderRadius: 999,
+                    padding: "3px 10px",
+                  }}
+                >
+                  Version gratuite
+                </span>
+              )}
+            </div>
           </header>
+
+          {/* ── FREE TIER BANNER ── */}
+          {!isPremium && (
+            <div
+              style={{
+                background: "var(--ink-900)",
+                padding: "10px 24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span
+                  style={{
+                    borderRadius: 999,
+                    background: "rgba(196,181,253,0.18)",
+                    border: "1px solid rgba(196,181,253,0.3)",
+                    padding: "3px 10px",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--violet-500)",
+                  }}
+                >
+                  Gratuit
+                </span>
+                <p style={{ fontSize: 13, color: "var(--ink-300)" }}>
+                  Coach IA, projections, historique complet et export Excel sont réservés à la version Premium.
+                </p>
+              </div>
+              <a
+                href="#premium"
+                style={{
+                  borderRadius: 999,
+                  border: "none",
+                  background: "var(--violet-500)",
+                  color: "var(--ink-900)",
+                  padding: "7px 16px",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Passer Premium →
+              </a>
+            </div>
+          )}
 
           <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">
 
@@ -584,7 +665,7 @@ export default async function DashboardPage({
             </section>
 
             {/* ── PREMIUM BLOCK ── */}
-            <section>
+            <section id="premium">
               <DashboardPremiumShell
                 isPremium={isPremium}
                 ai={

@@ -78,172 +78,129 @@ function LockedPreviewCard({
   )
 }
 
+const LOCKED_FEATURES = [
+  {
+    icon: "🧠",
+    title: "Coach IA",
+    desc: "Score de santé, conseils personnalisés et alertes actionnables sur ta situation financière.",
+    preview: "Score : ??/100 · Statut : ???",
+  },
+  {
+    icon: "📈",
+    title: "Projection fin de période",
+    desc: "Si ton rythme continue, voici ton atterrissage estimé — disponible réel inclus.",
+    preview: "Projeté : ?  ???,?? €",
+  },
+  {
+    icon: "📚",
+    title: "Historique complet",
+    desc: "Compare tes périodes, identifie tes tendances, visualise ta progression mensuelle.",
+    preview: "12 mois d'historique bloqués",
+  },
+  {
+    icon: "📤",
+    title: "Export Excel",
+    desc: "Exporte tes revenus, dépenses et récapitulatifs en un clic pour ta compta.",
+    preview: "Export disponible en Premium",
+  },
+]
+
 function PremiumTeaser({ onUpgradeClick }: { onUpgradeClick: () => void }) {
   return (
     <div
       style={{
         borderRadius: "var(--r-xl)",
-        border: "1px solid var(--cream-200)",
-        background: "var(--cream-50)",
-        padding: 28,
+        background: "var(--ink-900)",
         boxShadow: "var(--shadow-md)",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Subtle violet glow */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(ellipse 60% 50% at 100% 0%, rgba(196, 181, 253, 0.12) 0%, transparent 70%)",
-        }}
-      />
+      {/* Glow */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 55% 45% at 90% 5%, rgba(196,181,253,0.2) 0%, transparent 65%)" }} />
 
-      <div style={{ position: "relative" }}>
-        {/* Header row */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-            alignItems: "flex-start",
-          }}
-          className="xl:flex-row xl:items-start xl:justify-between"
-        >
-          <div style={{ maxWidth: 480 }}>
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--violet-700)",
-                marginBottom: 8,
-              }}
-            >
-              Premium
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(22px, 3vw, 30px)",
-                fontWeight: 600,
-                letterSpacing: "-0.03em",
-                color: "var(--ink-900)",
-                marginBottom: 10,
-                lineHeight: 1.2,
-              }}
-            >
-              Débloque le vrai copilote financier
+      <div style={{ position: "relative", padding: "28px 28px 0" }}>
+        {/* Header */}
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: 20, marginBottom: 28 }}>
+          <div style={{ maxWidth: 420 }}>
+            <span style={{ display: "inline-block", borderRadius: 999, background: "rgba(196,181,253,0.18)", border: "1px solid rgba(196,181,253,0.3)", padding: "4px 12px", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--violet-500)", marginBottom: 12 }}>
+              Premium · 19,90€/mois
+            </span>
+            <h2 style={{ fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--cream-50)", lineHeight: 1.2, marginBottom: 10 }}>
+              Tu pilotes à l'aveugle.<br />
+              <span style={{ color: "var(--violet-500)" }}>Premium te donne la vue complète.</span>
             </h2>
-            <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink-500)", marginBottom: 16 }}>
-              Passe en Premium pour obtenir une analyse IA de ta situation,
-              des projections de fin de période et des recommandations actionnables.
+            <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink-300)" }}>
+              Score IA, projection de fin de période, historique sur 12 mois et export Excel — tout ce qu'il te faut pour vraiment piloter.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {["Score de santé", "Conseils IA", "Projection fin de période", "Export Excel"].map((tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    borderRadius: 999,
-                    border: "1px solid var(--cream-300)",
-                    background: "var(--cream-100)",
-                    padding: "4px 12px",
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: "var(--ink-700)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
           </div>
 
-          {/* CTA card */}
-          <div
+          <button
+            onClick={onUpgradeClick}
             style={{
               borderRadius: "var(--r-md)",
-              border: "1px solid var(--cream-200)",
-              background: "var(--ink-900)",
-              padding: 20,
-              minWidth: 240,
-              width: "100%",
-              maxWidth: 300,
+              border: "none",
+              background: "var(--violet-500)",
+              color: "var(--ink-900)",
+              padding: "13px 24px",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
-            <p style={{ fontSize: 13, color: "var(--ink-300)", marginBottom: 6 }}>KeskiReste Premium</p>
-            <p
-              style={{
-                fontFamily: "monospace",
-                fontSize: 36,
-                fontWeight: 300,
-                letterSpacing: "-0.04em",
-                color: "var(--cream-50)",
-                lineHeight: 1,
-                marginBottom: 4,
-              }}
-            >
-              19,90€
-              <span style={{ fontSize: 14, fontWeight: 400, color: "var(--ink-300)" }}> / mois</span>
-            </p>
-            <p style={{ fontSize: 13, color: "var(--ink-400)", marginBottom: 18 }}>
-              Pour piloter ton activité avec plus de clarté.
-            </p>
-            <button
-              onClick={onUpgradeClick}
-              style={{
-                width: "100%",
-                borderRadius: "var(--r-sm)",
-                border: "none",
-                background: "var(--violet-500)",
-                color: "var(--ink-900)",
-                padding: "12px 16px",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Voir les offres →
-            </button>
-          </div>
+            Passer Premium →
+          </button>
         </div>
 
-        {/* Blurred previews */}
-        <div
-          style={{
-            marginTop: 24,
-            display: "grid",
-            gap: 16,
-          }}
-          className="xl:grid-cols-2"
-        >
-          <div style={{ opacity: 0.65, filter: "blur(2px)", pointerEvents: "none", userSelect: "none" }}>
-            <LockedPreviewCard
-              eyebrow="Coach IA"
-              title="Analyse intelligente"
-              subtitle="Une lecture simple et utile de ta situation avec des conseils concrets."
-              features={[
-                "Score de santé financier",
-                "Conseils intelligents personnalisés",
-                "Alertes si tu dépasses les seuils",
-              ]}
-            />
-          </div>
-          <div style={{ opacity: 0.65, filter: "blur(2px)", pointerEvents: "none", userSelect: "none" }}>
-            <LockedPreviewCard
-              eyebrow="Projection"
-              title="Fin de période"
-              subtitle="Anticipe ton atterrissage avant la fin du mois."
-              features={[
-                "Projection du chiffre d'affaires",
-                "Projection charges et impôts",
-                "Solde disponible estimé",
-              ]}
-            />
-          </div>
+        {/* Locked feature cards */}
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(2, 1fr)" }} className="xl:grid-cols-4">
+          {LOCKED_FEATURES.map((f) => (
+            <div
+              key={f.title}
+              style={{
+                borderRadius: "var(--r-md)",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                padding: "16px 16px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              {/* Lock badge */}
+              <span style={{ position: "absolute", top: 10, right: 10, fontSize: 12 }}>🔒</span>
+
+              <p style={{ fontSize: 18, marginBottom: 8 }}>{f.icon}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--cream-100)", marginBottom: 6 }}>{f.title}</p>
+              <p style={{ fontSize: 12, lineHeight: 1.6, color: "var(--ink-400)", marginBottom: 10 }}>{f.desc}</p>
+
+              {/* Fake preview */}
+              <div style={{ borderRadius: "var(--r-sm)", background: "rgba(255,255,255,0.06)", padding: "8px 10px", filter: "blur(4px)", userSelect: "none", pointerEvents: "none" }}>
+                <p style={{ fontSize: 12, fontFamily: "var(--font-mono, monospace)", color: "var(--violet-500)" }}>{f.preview}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div style={{ marginTop: 20, padding: "16px 0", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+          <p style={{ fontSize: 13, color: "var(--ink-400)" }}>
+            Sans engagement · Résiliable à tout moment · 19,90€/mois
+          </p>
+          <button
+            onClick={onUpgradeClick}
+            style={{
+              fontSize: 13,
+              color: "var(--violet-500)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            Voir les offres →
+          </button>
         </div>
       </div>
     </div>
