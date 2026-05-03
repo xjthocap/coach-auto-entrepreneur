@@ -20,6 +20,7 @@ import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
+import IRDetailButton from "@/components/IRDetailButton"
 import ExportYearButton from "@/components/ExportYearButton"
 import TopbarPeriod from "@/components/TopbarPeriod"
 
@@ -48,6 +49,41 @@ function buildPeriodLabel(frequency: "monthly" | "quarterly", period: { label: s
   const startMonth = startDate.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")
   const endMonth = endDate.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")
   return `${period.label} · ${startMonth}. → ${endMonth}.`
+}
+
+// ─── WaterfallRow helper (server component) ──────────────────────────────
+function WaterfallRow({
+  label,
+  tag,
+  tagStyle,
+  value,
+  valueColor,
+  action,
+}: {
+  label: string
+  tag?: string
+  tagStyle?: React.CSSProperties
+  value: string
+  valueColor: string
+  action?: React.ReactNode
+}) {
+  return (
+    <div
+      className="water-row flex items-center justify-between py-3"
+      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      <span className="flex items-center gap-2 text-sm" style={{ color: "var(--ink-300)" }}>
+        {label}
+        {tag && (
+          <span className="rounded px-1.5 py-0.5 text-[10px]" style={tagStyle}>
+            {tag}
+          </span>
+        )}
+        {action}
+      </span>
+      <span className="font-mono text-sm" style={{ color: valueColor }}>{value}</span>
+    </div>
+  )
 }
 
 export default async function DashboardPage({
@@ -452,58 +488,54 @@ export default async function DashboardPage({
 
                 {/* Right — waterfall */}
                 <div className="flex flex-col justify-center">
-                  {[
-                    {
-                      label: "Chiffre d'affaires",
-                      tag: "brut",
-                      tagStyle: { background: "rgba(196, 181, 253, 0.15)", color: "var(--violet-500)" },
-                      value: `+${totalRevenue.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                      valueColor: "var(--violet-500)",
-                    },
-                    {
-                      label: "Charges URSSAF",
-                      tag: `${(result.socialRate * 100).toFixed(1)}%`,
-                      tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" },
-                      value: `−${result.charges.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                      valueColor: "var(--rose-500)",
-                    },
-                    useIREstimate
-                      ? {
-                          label: "Provision IR (barème)",
-                          tag: "estimée",
-                          tagStyle: { background: "rgba(245,158,11,0.18)", color: "#F59E0B" },
-                          value: `−${irEstimate.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                          valueColor: "var(--rose-500)",
-                        }
-                      : {
-                          label: "Impôt libératoire",
-                          tag: `${(result.taxRate * 100).toFixed(1)}%`,
-                          tagStyle: { background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" },
-                          value: `−${result.tax.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                          valueColor: "var(--rose-500)",
-                        },
-                    {
-                      label: "Dépenses période",
-                      value: `−${totalExpenses.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`,
-                      valueColor: "var(--rose-500)",
-                    },
-                  ].map((row, i) => (
-                    <div
-                      key={i}
-                      className="water-row flex items-center justify-between py-3"
-                      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-                    >
-                      <span className="flex items-center gap-2 text-sm" style={{ color: "var(--ink-300)" }}>
-                        {row.label}
-                        {row.tag && (
-                          <span className="rounded px-1.5 py-0.5 text-[10px]" style={row.tagStyle}>
-                            {row.tag}
-                          </span>
-                        )}
-                      </span>
-                      <span className="font-mono text-sm" style={{ color: row.valueColor }}>{row.value}</span>
-                    </div>
-                  ))}
+                  {/* CA brut */}
+                  <WaterfallRow
+                    label="Chiffre d'affaires"
+                    tag="brut"
+                    tagStyle={{ background: "rgba(196, 181, 253, 0.15)", color: "var(--violet-500)" }}
+                    value={`+${totalRevenue.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
+                    valueColor="var(--violet-500)"
+                  />
+                  {/* Charges URSSAF */}
+                  <WaterfallRow
+                    label="Charges URSSAF"
+                    tag={`${(result.socialRate * 100).toFixed(1)}%`}
+                    tagStyle={{ background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" }}
+                    value={`−${result.charges.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
+                    valueColor="var(--rose-500)"
+                  />
+                  {/* Impôt — avec bouton détail si estimation barème */}
+                  {useIREstimate ? (
+                    <WaterfallRow
+                      label="Provision IR"
+                      tag="estimée"
+                      tagStyle={{ background: "rgba(245,158,11,0.18)", color: "#F59E0B" }}
+                      value={`−${irEstimate.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
+                      valueColor="var(--rose-500)"
+                      action={
+                        <IRDetailButton
+                          periodRevenue={totalRevenue}
+                          activityType={profile.activity_type}
+                          periodsPerYear={periodsPerYear}
+                          irEstimate={irEstimate}
+                        />
+                      }
+                    />
+                  ) : (
+                    <WaterfallRow
+                      label="Impôt libératoire"
+                      tag={`${(result.taxRate * 100).toFixed(1)}%`}
+                      tagStyle={{ background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" }}
+                      value={`−${result.tax.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
+                      valueColor="var(--rose-500)"
+                    />
+                  )}
+                  {/* Dépenses */}
+                  <WaterfallRow
+                    label="Dépenses période"
+                    value={`−${totalExpenses.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
+                    valueColor="var(--rose-500)"
+                  />
                   <div className="water-row flex items-center justify-between py-3">
                     <span className="text-sm font-medium" style={{ color: "var(--cream-50)" }}>= Disponible réel</span>
                     <span className="font-mono font-medium" style={{ fontSize: 17, color: "var(--lime-500)" }}>
