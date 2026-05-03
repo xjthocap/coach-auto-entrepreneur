@@ -209,15 +209,6 @@ export default function DashboardPremiumShell({ isPremium, ai, projection }: Pro
   return (
     <>
       <UpgradeNudge onUpgradeClick={() => setOpen(true)} />
-
-      <LockedCard onUpgradeClick={() => setOpen(true)} icon="🧠" title="Coach IA · Score & conseils">
-        <FakeAICard />
-      </LockedCard>
-
-      <LockedCard onUpgradeClick={() => setOpen(true)} icon="📈" title="Projection fin de période">
-        <FakeProjectionCard />
-      </LockedCard>
-
       <PricingModal open={open} onClose={() => setOpen(false)} />
     </>
   )
