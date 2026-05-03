@@ -173,6 +173,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         background: "var(--cream-50)",
         padding: 20,
         boxShadow: "var(--shadow-md)",
+        height: "100%",
       }}
     >
       {/* Header */}

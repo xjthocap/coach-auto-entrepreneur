@@ -76,6 +76,7 @@ export default function AddExpense() {
         background: "var(--cream-50)",
         padding: 20,
         boxShadow: "var(--shadow-md)",
+        height: "100%",
       }}
     >
       {/* Header */}
