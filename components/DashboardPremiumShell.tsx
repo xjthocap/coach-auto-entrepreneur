@@ -46,23 +46,6 @@ function UpgradeNudge({ onUpgradeClick }: { onUpgradeClick: () => void }) {
         ))}
         <span style={{ fontSize: 12, color: "var(--ink-400)", whiteSpace: "nowrap" }}>19,90€/mois</span>
       </div>
-      <button
-        onClick={onUpgradeClick}
-        style={{
-          borderRadius: "var(--r-sm)",
-          border: "none",
-          background: "var(--ink-900)",
-          color: "var(--violet-500)",
-          padding: "7px 16px",
-          fontSize: 12,
-          fontWeight: 700,
-          cursor: "pointer",
-          whiteSpace: "nowrap",
-          flexShrink: 0,
-        }}
-      >
-        Passer Premium →
-      </button>
     </div>
   )
 }
