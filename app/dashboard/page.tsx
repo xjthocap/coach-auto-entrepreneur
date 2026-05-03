@@ -20,6 +20,7 @@ import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
+import ExportYearButton from "@/components/ExportYearButton"
 import TopbarPeriod from "@/components/TopbarPeriod"
 
 function parseLocalDate(value: string) {
@@ -311,6 +312,7 @@ export default async function DashboardPage({
                   addAnchor="quick-add"
                   alertCount={(isInDeclarationWindow ? 1 : 0) + (isApproachingEnd ? 1 : 0)}
                 />
+                {isPremium && <ExportYearButton year={selectedYear} />}
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
@@ -327,7 +329,10 @@ export default async function DashboardPage({
                 currentDate={formatLocalDate(baseDate)}
               />
               {isPremium ? (
-                <ExportPeriodButton date={formatLocalDate(baseDate)} />
+                <div style={{ display: "flex", gap: 6 }}>
+                  <ExportYearButton year={selectedYear} />
+                  <ExportPeriodButton date={formatLocalDate(baseDate)} />
+                </div>
               ) : (
                 <span
                   style={{
