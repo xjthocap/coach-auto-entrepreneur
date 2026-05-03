@@ -27,6 +27,7 @@ type Props = {
   revenues: Revenue[]
   expenses: Expense[]
   limit?: number
+  isPremium?: boolean
 }
 
 type Movement =
@@ -41,7 +42,7 @@ function formatDate(dateStr: string) {
   })
 }
 
-export default function RecentMovements({ revenues, expenses, limit = 10 }: Props) {
+export default function RecentMovements({ revenues, expenses, limit = 10, isPremium = false }: Props) {
   const movements: Movement[] = [
     ...revenues.map((r) => ({ kind: "revenue" as const, data: r })),
     ...expenses
@@ -238,8 +239,16 @@ export default function RecentMovements({ revenues, expenses, limit = 10 }: Prop
                               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
                             </svg>
                           </a>
-                        ) : (
+                        ) : isPremium ? (
                           <GenerateInvoiceButton revenueId={rev!.id} />
+                        ) : (
+                          <span
+                            title="Générer une facture PDF (Premium)"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg"
+                            style={{ fontSize: 12, cursor: "default", opacity: 0.45 }}
+                          >
+                            🔒
+                          </span>
                         )}
                         <DeleteRevenueButton revenueId={rev!.id} />
                       </>

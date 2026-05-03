@@ -147,7 +147,7 @@ export default async function ExpensesPage({
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
-            <div className="md:hidden flex items-center px-4 pb-2.5" style={{ borderTop: "1px solid var(--cream-300)" }}>
+            <div className="md:hidden flex items-center justify-between px-4 pb-2.5" style={{ borderTop: "1px solid var(--cream-300)" }}>
               <TopbarPeriod
                 compact
                 label={buildPeriodLabel(frequency, period)}
@@ -155,6 +155,7 @@ export default async function ExpensesPage({
                 basePath="/Expenses"
                 currentDate={formatLocalDate(baseDate)}
               />
+              {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
             </div>
           </header>
 

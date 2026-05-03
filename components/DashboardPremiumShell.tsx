@@ -98,6 +98,12 @@ const LOCKED_FEATURES = [
     preview: "12 mois d'historique bloqués",
   },
   {
+    icon: "🧾",
+    title: "Factures PDF",
+    desc: "Génère des factures PDF pro en un clic depuis tes revenus, avec tes infos société.",
+    preview: "FAC-2025-XXXX.pdf · bloqué",
+  },
+  {
     icon: "📤",
     title: "Export Excel",
     desc: "Exporte tes revenus, dépenses et récapitulatifs en un clic pour ta compta.",
@@ -131,7 +137,7 @@ function PremiumTeaser({ onUpgradeClick }: { onUpgradeClick: () => void }) {
               <span style={{ color: "var(--violet-500)" }}>Premium te donne la vue complète.</span>
             </h2>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink-300)" }}>
-              Score IA, projection de fin de période, historique sur 12 mois et export Excel — tout ce qu'il te faut pour vraiment piloter.
+              Score IA, projection, factures PDF, historique 12 mois et export Excel — tout ce qu'il te faut pour vraiment piloter.
             </p>
           </div>
 
@@ -155,7 +161,7 @@ function PremiumTeaser({ onUpgradeClick }: { onUpgradeClick: () => void }) {
         </div>
 
         {/* Locked feature cards */}
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(2, 1fr)" }} className="xl:grid-cols-4">
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(2, 1fr)" }} className="md:grid-cols-3 xl:grid-cols-5">
           {LOCKED_FEATURES.map((f) => (
             <div
               key={f.title}

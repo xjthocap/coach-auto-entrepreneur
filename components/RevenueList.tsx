@@ -12,7 +12,7 @@ type Revenue = {
   invoices?: Invoice[] | null
 }
 
-export default function RevenueList({ revenues }: { revenues: Revenue[] }) {
+export default function RevenueList({ revenues, isPremium = false }: { revenues: Revenue[]; isPremium?: boolean }) {
   return (
     <div className="p-5 md:p-6">
       {/* ── Header ── */}
@@ -126,8 +126,16 @@ export default function RevenueList({ revenues }: { revenues: Revenue[] }) {
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
                       </svg>
                     </a>
-                  ) : (
+                  ) : isPremium ? (
                     <GenerateInvoiceButton revenueId={rev.id} />
+                  ) : (
+                    <span
+                      title="Générer une facture PDF (Premium)"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg"
+                      style={{ color: "var(--ink-300)", cursor: "default", opacity: 0.5 }}
+                    >
+                      🔒
+                    </span>
                   )}
                   <DeleteRevenueButton revenueId={rev.id} />
                 </div>

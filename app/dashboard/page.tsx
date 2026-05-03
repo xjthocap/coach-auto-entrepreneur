@@ -325,7 +325,9 @@ export default async function DashboardPage({
                 basePath="/dashboard"
                 currentDate={formatLocalDate(baseDate)}
               />
-              {!isPremium && (
+              {isPremium ? (
+                <ExportPeriodButton date={formatLocalDate(baseDate)} />
+              ) : (
                 <span
                   style={{
                     fontSize: 11,
@@ -730,6 +732,7 @@ export default async function DashboardPage({
               revenues={revenuesWithInvoices}
               expenses={expensesWithPeriodInfo}
               limit={10}
+              isPremium={isPremium}
             />
 
             {/* ── GRAPHIQUE ── */}
