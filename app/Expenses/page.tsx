@@ -209,10 +209,11 @@ export default async function ExpensesPage({
             <section className="grid items-stretch gap-6 xl:grid-cols-[420px_1fr]">
               <div className="h-full">
                 <section
-                  className="relative h-full overflow-hidden p-8 md:p-10"
+                  className="relative h-full p-8 md:p-10"
                   style={{
                     background: "var(--rose-100)",
                     borderRadius: "var(--r-xl)",
+                    overflow: "clip",
                   }}
                 >
                   <div className="mb-3 flex items-center gap-2">
@@ -227,17 +228,20 @@ export default async function ExpensesPage({
                   <div
                     className="font-mono font-light"
                     style={{
-                      fontSize: "clamp(42px, 6vw, 64px)",
-                      letterSpacing: "-0.05em",
-                      color: "var(--rose-500)",
+                      display: "flex",
+                      alignItems: "baseline",
+                      flexWrap: "wrap",
+                      gap: "0.2em",
                       lineHeight: 1.05,
                     }}
                   >
-                    {totalPeriod.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    &nbsp;€
+                    <span style={{ fontSize: "clamp(36px, 5vw, 60px)", letterSpacing: "-0.05em", color: "var(--rose-500)" }}>
+                      {totalPeriod.toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <span style={{ fontSize: "clamp(22px, 3vw, 32px)", letterSpacing: "-0.02em", color: "var(--rose-500)", flexShrink: 0 }}>€</span>
                   </div>
 
                   <p className="mt-3 text-sm" style={{ color: "var(--ink-500)" }}>

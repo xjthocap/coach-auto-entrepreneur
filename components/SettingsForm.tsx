@@ -23,6 +23,43 @@ type Profile = {
   vat_rate?: number | null
 }
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  borderRadius: "var(--r-sm)",
+  border: "1px solid var(--cream-300)",
+  background: "var(--cream-100)",
+  color: "var(--ink-900)",
+  padding: "11px 14px",
+  outline: "none",
+  fontSize: 14,
+  transition: "border-color 0.15s",
+}
+
+const sectionTitle: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--ink-400)",
+  marginBottom: 14,
+  marginTop: 4,
+}
+
+const dividerStyle: React.CSSProperties = {
+  borderTop: "1px solid var(--cream-300)",
+  marginTop: 20,
+  marginBottom: 20,
+}
+
+function onFocus(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) {
+  e.currentTarget.style.borderColor = "var(--violet-400)"
+  e.currentTarget.style.background = "var(--cream-50)"
+}
+function onBlur(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) {
+  e.currentTarget.style.borderColor = "var(--cream-300)"
+  e.currentTarget.style.background = "var(--cream-100)"
+}
+
 export default function SettingsForm({ profile }: { profile: Profile }) {
   const supabase = createClient()
   const router = useRouter()
@@ -82,37 +119,34 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       return
     }
 
-    setMessage("Profil mis à jour ✅")
+    setMessage("✅ Profil mis à jour")
     setLoading(false)
     router.refresh()
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-slate-900">
-          Informations principales
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          Ces informations servent au dashboard et aux calculs.
-        </p>
-      </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+      {/* ── Informations principales ── */}
+      <p style={sectionTitle}>Informations principales</p>
 
       <input
         type="text"
         value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
         placeholder="Prénom"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        style={inputStyle}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
         <select
           value={activityType}
-          onChange={(e) =>
-            setActivityType(e.target.value as "vente" | "service" | "liberal")
-          }
-          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+          onChange={(e) => setActivityType(e.target.value as "vente" | "service" | "liberal")}
+          style={inputStyle}
+          onFocus={onFocus}
+          onBlur={onBlur}
         >
           <option value="vente">Vente</option>
           <option value="service">Service</option>
@@ -121,51 +155,84 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
 
         <select
           value={declarationFrequency}
-          onChange={(e) =>
-            setDeclarationFrequency(e.target.value as "monthly" | "quarterly")
-          }
-          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+          onChange={(e) => setDeclarationFrequency(e.target.value as "monthly" | "quarterly")}
+          style={inputStyle}
+          onFocus={onFocus}
+          onBlur={onBlur}
         >
           <option value="monthly">Mensuelle</option>
           <option value="quarterly">Trimestrielle</option>
         </select>
       </div>
 
-      <label className="flex items-center gap-3 rounded-2xl bg-[#f8f9fd] px-4 py-4 transition hover:bg-[#f1f3f9]">
+      {/* Toggle ACRE */}
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          borderRadius: "var(--r-sm)",
+          background: "var(--cream-100)",
+          border: "1px solid var(--cream-300)",
+          padding: "12px 14px",
+          cursor: "pointer",
+          transition: "background 0.15s",
+        }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--cream-200)" }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--cream-100)" }}
+      >
         <input
           type="checkbox"
           checked={acre}
           onChange={() => setAcre(!acre)}
-          className="h-4 w-4 accent-blue-500"
+          style={{ width: 16, height: 16, accentColor: "var(--violet-500)", cursor: "pointer", flexShrink: 0 }}
         />
-        <span className="font-medium text-slate-700">ACRE</span>
+        <div>
+          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-900)" }}>ACRE</p>
+          <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 1 }}>Réduction des cotisations sociales la 1ère année</p>
+        </div>
       </label>
 
-      <label className="flex items-center gap-3 rounded-2xl bg-[#f8f9fd] px-4 py-4 transition hover:bg-[#f1f3f9]">
+      {/* Toggle Versement libératoire */}
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          borderRadius: "var(--r-sm)",
+          background: "var(--cream-100)",
+          border: "1px solid var(--cream-300)",
+          padding: "12px 14px",
+          cursor: "pointer",
+          transition: "background 0.15s",
+        }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--cream-200)" }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--cream-100)" }}
+      >
         <input
           type="checkbox"
           checked={versement}
           onChange={() => setVersement(!versement)}
-          className="h-4 w-4 accent-blue-500"
+          style={{ width: 16, height: 16, accentColor: "var(--violet-500)", cursor: "pointer", flexShrink: 0 }}
         />
-        <span className="font-medium text-slate-700">Versement libératoire</span>
+        <div>
+          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-900)" }}>Versement libératoire</p>
+          <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 1 }}>L&apos;impôt est prélevé directement sur ton CA déclaré</p>
+        </div>
       </label>
 
-      <div className="border-t border-slate-200 pt-6">
-        <h3 className="text-lg font-semibold text-slate-900">
-          Informations de facturation
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          Ces informations apparaîtront sur tes factures PDF.
-        </p>
-      </div>
+      {/* ── Informations de facturation ── */}
+      <div style={dividerStyle} />
+      <p style={sectionTitle}>Informations de facturation</p>
 
       <input
         type="text"
         value={companyName}
         onChange={(e) => setCompanyName(e.target.value)}
-        placeholder="Nom entreprise"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        placeholder="Nom entreprise / Raison sociale"
+        style={inputStyle}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
       <input
@@ -173,24 +240,29 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         placeholder="Adresse"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        style={inputStyle}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
         <input
           type="text"
           value={postalCity}
           onChange={(e) => setPostalCity(e.target.value)}
           placeholder="Code postal + ville"
-          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+          style={inputStyle}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
-
         <input
           type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Téléphone"
-          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+          style={inputStyle}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
       </div>
 
@@ -199,23 +271,37 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         value={siret}
         onChange={(e) => setSiret(e.target.value)}
         placeholder="SIRET"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        style={inputStyle}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
-      <label className="flex items-center justify-between gap-3 rounded-2xl bg-[#f8f9fd] px-4 py-4 transition hover:bg-[#f1f3f9]">
-        <div>
-          <span className="font-medium text-slate-700">TVA applicable</span>
-          <p className="mt-1 text-xs text-slate-500">
-            Active cette option uniquement si tu es assujetti à la TVA.
-          </p>
-        </div>
-
+      {/* Toggle TVA */}
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          borderRadius: "var(--r-sm)",
+          background: "var(--cream-100)",
+          border: "1px solid var(--cream-300)",
+          padding: "12px 14px",
+          cursor: "pointer",
+          transition: "background 0.15s",
+        }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--cream-200)" }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--cream-100)" }}
+      >
         <input
           type="checkbox"
           checked={vatApplicable}
           onChange={(e) => setVatApplicable(e.target.checked)}
-          className="h-4 w-4 accent-blue-500"
+          style={{ width: 16, height: 16, accentColor: "var(--violet-500)", cursor: "pointer", flexShrink: 0 }}
         />
+        <div>
+          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-900)" }}>TVA applicable</p>
+          <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 1 }}>Active uniquement si tu es assujetti à la TVA</p>
+        </div>
       </label>
 
       {vatApplicable && (
@@ -223,23 +309,25 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           type="number"
           value={vatRate}
           onChange={(e) => setVatRate(Number(e.target.value))}
-          placeholder="Taux de TVA"
-          className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+          placeholder="Taux de TVA (%)"
+          style={inputStyle}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
       )}
 
-      <div className="border-t border-slate-200 pt-6">
-        <h3 className="text-lg font-semibold text-slate-900">
-          Informations bancaires
-        </h3>
-      </div>
+      {/* ── Informations bancaires ── */}
+      <div style={dividerStyle} />
+      <p style={sectionTitle}>Informations bancaires</p>
 
       <input
         type="text"
         value={bankHolder}
         onChange={(e) => setBankHolder(e.target.value)}
         placeholder="Titulaire du compte"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        style={inputStyle}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
       <input
@@ -247,7 +335,9 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         value={iban}
         onChange={(e) => setIban(e.target.value)}
         placeholder="IBAN"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        style={{ ...inputStyle, fontFamily: "var(--font-mono, monospace)", letterSpacing: "0.05em" }}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
       <input
@@ -255,23 +345,51 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         value={bic}
         onChange={(e) => setBic(e.target.value)}
         placeholder="BIC"
-        className="w-full rounded-2xl border border-slate-200 bg-[#f8f9fd] px-4 py-3 text-slate-900 outline-none transition focus:border-blue-300"
+        style={{ ...inputStyle, fontFamily: "var(--font-mono, monospace)", letterSpacing: "0.05em" }}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
-      <button
-        onClick={handleSave}
-        disabled={loading}
-        style={{ cursor: "pointer" }}
-        className="w-full rounded-2xl bg-[#4f7df3] px-5 py-3 font-semibold text-white shadow-[0_10px_20px_rgba(79,125,243,0.25)] transition hover:bg-[#3e6eea] disabled:opacity-50"
-      >
-        {loading ? "Sauvegarde..." : "Enregistrer"}
-      </button>
+      {/* ── Save ── */}
+      <div style={{ marginTop: 6 }}>
+        <button
+          onClick={handleSave}
+          disabled={loading}
+          style={{
+            width: "100%",
+            borderRadius: "var(--r-sm)",
+            border: "none",
+            background: loading ? "var(--ink-700)" : "var(--ink-900)",
+            color: "var(--violet-400)",
+            padding: "13px 20px",
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: loading ? "default" : "pointer",
+            transition: "background 0.15s",
+            letterSpacing: "0.02em",
+          }}
+          onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = "var(--ink-800, #1e293b)" }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = loading ? "var(--ink-700)" : "var(--ink-900)" }}
+        >
+          {loading ? "Sauvegarde en cours…" : "Enregistrer les modifications"}
+        </button>
 
-      {message && (
-        <p className="rounded-2xl bg-[#f8f9fd] px-4 py-3 text-sm text-slate-600">
-          {message}
-        </p>
-      )}
+        {message && (
+          <div
+            style={{
+              marginTop: 10,
+              borderRadius: "var(--r-sm)",
+              background: message.startsWith("✅") ? "rgba(132,204,22,0.08)" : "rgba(251,113,133,0.08)",
+              border: `1px solid ${message.startsWith("✅") ? "rgba(132,204,22,0.25)" : "rgba(251,113,133,0.25)"}`,
+              padding: "10px 14px",
+              fontSize: 13,
+              color: message.startsWith("✅") ? "var(--lime-700, #4d7c0f)" : "var(--rose-600, #e11d48)",
+            }}
+          >
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
