@@ -274,7 +274,7 @@ export default async function DashboardPage({
   const projectedRealNet =
     projectedResult.net - projection.projectedExpenses
 
-  const isPremium = profile.plan === "premium"
+  const isPremium = profile.plan === "premium" || !!profile.founder_number
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -722,7 +722,7 @@ export default async function DashboardPage({
                 </p>
               </div>
               <div className="grid gap-6 xl:grid-cols-2">
-                  <AddRevenue />
+                  <AddRevenue isPremium={isPremium} />
                   <AddExpense />
               </div>
             </section>

@@ -97,7 +97,7 @@ export default async function RevenuesPage({
   const revenuesWithInvoice = revenuesWithInvoices.filter(
     (r) => r.invoices.length > 0
   ).length
-  const isPremium = profile.plan === "premium"
+  const isPremium = profile.plan === "premium" || !!profile.founder_number
 
   return (
     <main

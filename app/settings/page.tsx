@@ -27,7 +27,7 @@ export default async function SettingsPage() {
     redirect("/onboarding")
   }
 
-  const isPremium = profile.plan === "premium"
+  const isPremium = profile.plan === "premium" || !!profile.founder_number
   const isFounder = !!(profile.founder_number)
 
   return (

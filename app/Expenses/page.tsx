@@ -100,7 +100,7 @@ export default async function ExpensesPage({
       .reduce((sum, e) => sum + Number(e.amount), 0) || 0
 
   const totalPeriod = monthlyRecurringTotal + periodOneTimeTotal
-  const isPremium = profile.plan === "premium"
+  const isPremium = profile.plan === "premium" || !!profile.founder_number
 
   return (
     <main
