@@ -15,7 +15,7 @@ import AIInsightsCard from "@/components/AIInsightsCard"
 import DashboardPremiumShell from "@/components/DashboardPremiumShell"
 import DevPlanSwitcher from "@/components/DevPlanSwitcher"
 import CheckoutBanner from "@/components/CheckoutBanner"
-import { calculateMicro, estimateIRProvision } from "@/lib/calculations"
+import { calculateMicro, estimateIRProvision, buildAnnualProjection } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
 import { getThreshold, getThresholdStatus } from "@/lib/threshold"
@@ -257,8 +257,21 @@ export default async function DashboardPage({
   // ===== PROVISION IR (barème progressif quand pas de versement libératoire) =====
   const periodsPerYear = frequency === "quarterly" ? 4 : 12
   const useIREstimate  = !profile.versement_liberatoire
-  const irEstimate     = useIREstimate
-    ? estimateIRProvision(totalRevenue, profile.activity_type, periodsPerYear)
+
+  // Nombre de périodes écoulées dans l'année affichée (basé sur la date réelle)
+  const currentRealYear = new Date().getFullYear()
+  const periodsElapsedYTD = selectedYear < currentRealYear
+    ? periodsPerYear // année passée → 12 ou 4 périodes complètes
+    : frequency === "quarterly"
+      ? Math.max(1, Math.ceil((new Date().getMonth() + 1) / 3))
+      : Math.max(1, new Date().getMonth() + 1)
+
+  // Projection annuelle : données réelles YTD si disponibles, sinon simulation période × N
+  const { annualRevenue: irAnnualRevenue, isSimulation: irIsSimulation, periodsUsed: irPeriodsUsed } =
+    buildAnnualProjection(yearRevenue, periodsElapsedYTD, periodsPerYear, totalRevenue)
+
+  const irEstimate = useIREstimate
+    ? estimateIRProvision(totalRevenue, profile.activity_type, periodsPerYear, irAnnualRevenue)
     : 0
 
   const realNet       = result.net - totalExpenses - irEstimate
@@ -518,6 +531,10 @@ export default async function DashboardPage({
                           activityType={profile.activity_type}
                           periodsPerYear={periodsPerYear}
                           irEstimate={irEstimate}
+                          yearRevenue={yearRevenue}
+                          periodsElapsed={irPeriodsUsed}
+                          annualRevenue={irAnnualRevenue}
+                          isSimulation={irIsSimulation}
                         />
                       }
                     />

@@ -27,20 +27,47 @@ function computeBaremeIR(taxableIncome: number): number {
 
 /**
  * Estime la provision IR à mettre de côté sur une période.
- * Hypothèse : foyer monoparental 1 part, aucun autre revenu.
- * @param periodRevenue  CA encaissé sur la période
- * @param activityType   type d'activité (abattement forfaitaire)
- * @param periodsPerYear 12 (mensuel) ou 4 (trimestriel)
+ * Hypothèse : foyer 1 part, aucun autre revenu.
+ *
+ * @param periodRevenue        CA de la période courante
+ * @param activityType         type d'activité (abattement forfaitaire)
+ * @param periodsPerYear       12 (mensuel) ou 4 (trimestriel)
+ * @param annualRevenueOverride si fourni, utilise ce CA annuel au lieu d'extrapoler la période
  */
 export function estimateIRProvision(
   periodRevenue: number,
   activityType: ActivityType,
   periodsPerYear: number,
+  annualRevenueOverride?: number,
 ): number {
-  const annualRevenue   = periodRevenue * periodsPerYear
-  const taxableIncome   = Math.max(0, annualRevenue * (1 - abattementMicro(activityType)))
-  const annualIR        = computeBaremeIR(taxableIncome)
+  const annualRevenue = annualRevenueOverride ?? periodRevenue * periodsPerYear
+  const taxableIncome = Math.max(0, annualRevenue * (1 - abattementMicro(activityType)))
+  const annualIR      = computeBaremeIR(taxableIncome)
   return annualIR / periodsPerYear
+}
+
+/**
+ * Calcule le CA annuel projeté à partir des données réelles YTD.
+ * Retourne aussi le nombre de périodes utilisées et si c'est une simulation.
+ */
+export function buildAnnualProjection(
+  yearRevenue: number,
+  periodsElapsed: number,
+  periodsPerYear: number,
+  fallbackPeriodRevenue: number,
+): { annualRevenue: number; isSimulation: boolean; periodsUsed: number } {
+  if (yearRevenue > 0 && periodsElapsed > 0) {
+    return {
+      annualRevenue: (yearRevenue / periodsElapsed) * periodsPerYear,
+      isSimulation: false,
+      periodsUsed: periodsElapsed,
+    }
+  }
+  return {
+    annualRevenue: fallbackPeriodRevenue * periodsPerYear,
+    isSimulation: true,
+    periodsUsed: 0,
+  }
 }
 
 type CalculationInput = {

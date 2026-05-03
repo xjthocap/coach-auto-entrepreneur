@@ -10,13 +10,18 @@ type Props = {
   activityType: ActivityType
   periodsPerYear: number
   irEstimate: number
+  // Données réelles YTD
+  yearRevenue?: number
+  periodsElapsed?: number
+  annualRevenue?: number      // CA annuel projeté final (réel ou simulé)
+  isSimulation?: boolean      // true = extrapolation depuis période seule
 }
 
 const BAREME = [
-  { min: 0,       max: 11_497,  rate: 0    },
-  { min: 11_497,  max: 29_315,  rate: 0.11 },
-  { min: 29_315,  max: 83_823,  rate: 0.30 },
-  { min: 83_823,  max: 180_294, rate: 0.41 },
+  { min: 0,       max: 11_497,   rate: 0    },
+  { min: 11_497,  max: 29_315,   rate: 0.11 },
+  { min: 29_315,  max: 83_823,   rate: 0.30 },
+  { min: 83_823,  max: 180_294,  rate: 0.41 },
   { min: 180_294, max: Infinity, rate: 0.45 },
 ]
 
@@ -36,12 +41,9 @@ function fmt(n: number) {
   return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-function buildSteps(periodRevenue: number, activityType: ActivityType, periodsPerYear: number) {
-  const annualRevenue   = periodRevenue * periodsPerYear
-  const abattement      = ABATTEMENT[activityType]
-  const deduction       = annualRevenue * abattement
-  const taxableIncome   = Math.max(0, annualRevenue - deduction)
-
+function buildBrackets(annualCA: number, activityType: ActivityType) {
+  const deduction     = annualCA * ABATTEMENT[activityType]
+  const taxableIncome = Math.max(0, annualCA - deduction)
   const brackets: { label: string; amount: number; tax: number }[] = []
   let annualIR = 0
   for (const { min, max, rate } of BAREME) {
@@ -56,98 +58,143 @@ function buildSteps(periodRevenue: number, activityType: ActivityType, periodsPe
       })
     }
   }
-
-  return { annualRevenue, deduction, taxableIncome, annualIR, brackets }
+  return { deduction, taxableIncome, annualIR, brackets }
 }
 
-export default function IRDetailButton({ periodRevenue, activityType, periodsPerYear, irEstimate }: Props) {
+export default function IRDetailButton({
+  periodRevenue, activityType, periodsPerYear, irEstimate,
+  yearRevenue = 0, periodsElapsed = 0, annualRevenue, isSimulation = true,
+}: Props) {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const { annualRevenue, deduction, taxableIncome, annualIR, brackets } = buildSteps(periodRevenue, activityType, periodsPerYear)
-  const periodLabel = periodsPerYear === 12 ? "mois" : "trimestre"
 
-  // Portal needs document — only available client-side
   useEffect(() => { setMounted(true) }, [])
-
-  // Close on Escape
   useEffect(() => {
     if (!open) return
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false) }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false) }
+    window.addEventListener("keydown", h)
+    return () => window.removeEventListener("keydown", h)
   }, [open])
+
+  // CA annuel utilisé pour le calcul
+  const finalAnnualRevenue = annualRevenue ?? periodRevenue * periodsPerYear
+  const { deduction, taxableIncome, annualIR, brackets } = buildBrackets(finalAnnualRevenue, activityType)
+  const periodLabel = periodsPerYear === 12 ? "mois" : "trimestre"
+  const periodShort = periodsPerYear === 12 ? "mois" : "trim."
 
   const modal = open && mounted ? createPortal(
     <div
       onClick={() => setOpen(false)}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        background: "rgba(15,23,42,0.65)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        backdropFilter: "blur(3px)",
-      }}
+      style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(15,23,42,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(3px)" }}
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{
-          background: "var(--cream-50)",
-          borderRadius: "var(--r-xl)",
-          width: "100%",
-          maxWidth: 460,
-          boxShadow: "0 24px 64px rgba(15,23,42,0.3)",
-          overflow: "hidden",
-        }}
+        style={{ background: "var(--cream-50)", borderRadius: "var(--r-xl)", width: "100%", maxWidth: 480, boxShadow: "0 24px 64px rgba(15,23,42,0.3)", overflow: "hidden" }}
       >
-        {/* Header */}
+        {/* ── Header ── */}
         <div style={{ background: "var(--ink-900)", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-400)" }}>
-              Estimation IR
-            </p>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--cream-50)", marginTop: 2 }}>
-              Détail du calcul
-            </h2>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-400)" }}>Estimation IR</p>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--cream-50)", marginTop: 2 }}>Détail du calcul</h2>
           </div>
-          <button
-            onClick={() => setOpen(false)}
-            style={{ border: "none", background: "transparent", color: "var(--ink-400)", cursor: "pointer", fontSize: 22, lineHeight: 1, padding: "4px 8px" }}
-          >
-            ×
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Badge méthode */}
+            <span style={{
+              borderRadius: 999,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+              background: isSimulation ? "rgba(245,158,11,0.18)" : "rgba(132,204,22,0.15)",
+              color: isSimulation ? "#F59E0B" : "var(--lime-500)",
+            }}>
+              {isSimulation ? "Simulation" : `${periodsElapsed} ${periodShort}${periodsElapsed > 1 ? "s" : ""} réels`}
+            </span>
+            <button onClick={() => setOpen(false)} style={{ border: "none", background: "transparent", color: "var(--ink-400)", cursor: "pointer", fontSize: 22, lineHeight: 1, padding: "4px 8px" }}>×</button>
+          </div>
         </div>
 
-        {/* Body */}
+        {/* ── Body ── */}
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16, maxHeight: "80vh", overflowY: "auto" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Row label="CA de la période" value={`${fmt(periodRevenue)} €`} />
-            <Row label={`× ${periodsPerYear} ${periodLabel}s → CA annualisé`} value={`${fmt(annualRevenue)} €`} highlight />
-            <Spacer />
-            <Row label={`Abattement micro · ${LABEL_ACTIVITE[activityType]}`} value={`− ${fmt(deduction)} €`} sub="Déduction forfaitaire sur charges" />
-            <Row label="Revenu net imposable" value={`${fmt(taxableIncome)} €`} highlight />
-            <Spacer />
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-400)", paddingTop: 4 }}>
-              Barème 2025 appliqué
-            </p>
-            {brackets.length === 0 ? (
-              <Row label="Sous le seuil imposable (0%)" value="0,00 €" />
-            ) : (
-              brackets.map((b, i) => (
-                <Row key={i} label={b.label} sub={`sur ${fmt(b.amount)} €`} value={`${fmt(b.tax)} €`} />
-              ))
-            )}
-            <Spacer />
-            <Row label="Total IR annuel estimé" value={`${fmt(annualIR)} €`} bold />
-            <Row label={`÷ ${periodsPerYear} → provision / ${periodLabel}`} value={`${fmt(irEstimate)} €`} bold highlight accent />
+
+          {/* ── 1. Base de calcul ── */}
+          <div>
+            <SectionLabel>1 · Base de calcul annuelle</SectionLabel>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {isSimulation ? (
+                <>
+                  <Row label={`CA période en cours`} value={`${fmt(periodRevenue)} €`} />
+                  <Row
+                    label={`× ${periodsPerYear} (simulation sur ${periodsPerYear} ${periodLabel}s)`}
+                    value={`${fmt(finalAnnualRevenue)} €`}
+                    highlight
+                    sub="Aucune donnée YTD disponible — extrapolation depuis la période courante"
+                  />
+                </>
+              ) : (
+                <>
+                  <Row label={`CA réel encaissé (${periodsElapsed} ${periodLabel}${periodsElapsed > 1 ? "s" : ""})`} value={`${fmt(yearRevenue)} €`} />
+                  <Row
+                    label={`÷ ${periodsElapsed} × ${periodsPerYear} → projection annuelle`}
+                    value={`${fmt(finalAnnualRevenue)} €`}
+                    highlight
+                    sub={`Moyenne ${fmt(yearRevenue / periodsElapsed)} € / ${periodLabel} × ${periodsPerYear}`}
+                  />
+                </>
+              )}
+            </div>
           </div>
 
+          <Divider />
+
+          {/* ── 2. Abattement ── */}
+          <div>
+            <SectionLabel>2 · Abattement forfaitaire micro</SectionLabel>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Row label={`Abattement · ${LABEL_ACTIVITE[activityType]}`} value={`− ${fmt(deduction)} €`} sub="Déduction forfaitaire sur charges professionnelles" />
+              <Row label="Revenu net imposable" value={`${fmt(taxableIncome)} €`} highlight />
+            </div>
+          </div>
+
+          <Divider />
+
+          {/* ── 3. Barème ── */}
+          <div>
+            <SectionLabel>3 · Barème progressif 2025</SectionLabel>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {brackets.length === 0 ? (
+                <Row label="Sous le seuil d'imposition (0%)" value="0,00 €" />
+              ) : (
+                <>
+                  <Row label="Tranche 0% (sous 11 497 €)" value="0,00 €" />
+                  {brackets.map((b, i) => (
+                    <Row key={i} label={b.label} sub={`sur ${fmt(b.amount)} €`} value={`${fmt(b.tax)} €`} />
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+
+          <Divider />
+
+          {/* ── 4. Résultat ── */}
+          <div>
+            <SectionLabel>4 · Provision</SectionLabel>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Row label="Total IR annuel estimé" value={`${fmt(annualIR)} €`} bold />
+              <Row
+                label={`÷ ${periodsPerYear} → provision / ${periodLabel}`}
+                value={`${fmt(irEstimate)} €`}
+                bold highlight accent
+              />
+            </div>
+          </div>
+
+          {/* ── Disclaimer ── */}
           <div style={{ borderRadius: "var(--r-sm)", background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.25)", padding: "10px 14px" }}>
             <p style={{ fontSize: 12, color: "#92400E", lineHeight: 1.6 }}>
-              <strong>Hypothèses :</strong> foyer fiscal d&apos;1 part, aucun autre revenu, abattement forfaitaire micro. Cette estimation peut différer de ton impôt final — consulte un comptable pour ta situation précise.
+              <strong>Hypothèses :</strong> foyer fiscal 1 part, aucun autre revenu, abattement forfaitaire micro.{" "}
+              {isSimulation && <span>Basé sur la période courante — <strong>les données passées amélioreront la précision</strong> au fil de l&apos;année. </span>}
+              Cette estimation peut différer de ton impôt final.
             </p>
           </div>
 
@@ -165,23 +212,17 @@ export default function IRDetailButton({ periodRevenue, activityType, periodsPer
 
   return (
     <>
-      {/* Trigger */}
       <button
         onClick={() => setOpen(true)}
         title="Voir le détail du calcul IR"
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
+          display: "inline-flex", alignItems: "center", gap: 4,
           borderRadius: 999,
           border: "1px solid rgba(245,158,11,0.35)",
           background: "rgba(245,158,11,0.1)",
           color: "#F59E0B",
           padding: "2px 8px",
-          fontSize: 11,
-          fontWeight: 600,
-          cursor: "pointer",
-          lineHeight: 1.4,
+          fontSize: 11, fontWeight: 600, cursor: "pointer", lineHeight: 1.4,
         }}
       >
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -189,52 +230,48 @@ export default function IRDetailButton({ periodRevenue, activityType, periodsPer
         </svg>
         Détail
       </button>
-
       {modal}
     </>
   )
 }
 
-// ─── Sub-components ────────────────────────────────────────────────────────
+// ─── Micro components ────────────────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-400)", marginBottom: 8 }}>
+      {children}
+    </p>
+  )
+}
+
+function Divider() {
+  return <div style={{ height: 1, background: "var(--cream-200)", margin: "4px 0" }} />
+}
 
 function Row({ label, sub, value, highlight, bold, accent }: {
-  label: string
-  sub?: string
-  value: string
-  highlight?: boolean
-  bold?: boolean
-  accent?: boolean
+  label: string; sub?: string; value: string
+  highlight?: boolean; bold?: boolean; accent?: boolean
 }) {
   return (
     <div style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 12,
-      padding: "7px 10px",
-      borderRadius: "var(--r-sm)",
+      display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+      padding: "7px 10px", borderRadius: "var(--r-sm)",
       background: highlight ? (accent ? "rgba(132,204,22,0.08)" : "var(--cream-100)") : "transparent",
     }}>
-      <div>
-        <p style={{ fontSize: 13, color: bold ? "var(--ink-900)" : "var(--ink-600)", fontWeight: bold ? 700 : 400 }}>
+      <div style={{ minWidth: 0 }}>
+        <p style={{ fontSize: 13, color: bold ? "var(--ink-900)" : "var(--ink-600)", fontWeight: bold ? 700 : 400, wordBreak: "break-word" }}>
           {label}
         </p>
-        {sub && <p style={{ fontSize: 11, color: "var(--ink-400)", marginTop: 1 }}>{sub}</p>}
+        {sub && <p style={{ fontSize: 11, color: "var(--ink-400)", marginTop: 2 }}>{sub}</p>}
       </div>
       <span style={{
-        fontSize: 13,
-        fontFamily: "var(--font-mono, monospace)",
-        fontWeight: bold ? 700 : 500,
+        fontSize: 13, fontFamily: "var(--font-mono, monospace)", fontWeight: bold ? 700 : 500,
         color: accent ? "var(--lime-700, #4d7c0f)" : bold ? "var(--ink-900)" : "var(--ink-700)",
-        whiteSpace: "nowrap",
-        flexShrink: 0,
+        whiteSpace: "nowrap", flexShrink: 0,
       }}>
         {value}
       </span>
     </div>
   )
-}
-
-function Spacer() {
-  return <div style={{ height: 1, background: "var(--cream-200)", margin: "4px 0" }} />
 }
