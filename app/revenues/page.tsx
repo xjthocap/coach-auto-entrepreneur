@@ -214,7 +214,7 @@ export default async function RevenuesPage({
               </div>
 
               <div id="add-revenue" className="h-full min-w-0">
-                <AddRevenue />
+                <AddRevenue isPremium={isPremium} />
               </div>
             </section>
 

@@ -19,7 +19,7 @@ const inputProps = {
   style: inputStyle,
 }
 
-export default function AddRevenue() {
+export default function AddRevenue({ isPremium = false }: { isPremium?: boolean }) {
   const supabase = createClient()
   const router = useRouter()
 
@@ -252,29 +252,68 @@ export default function AddRevenue() {
         </div>
 
         {/* Toggle facture */}
-        <label
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            borderRadius: "var(--r-sm)",
-            border: "1px solid var(--cream-200)",
-            background: "var(--cream-100)",
-            padding: "12px 16px",
-            fontSize: 14,
-            fontWeight: 500,
-            color: "var(--ink-700)",
-            cursor: "pointer",
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={generateInvoice}
-            onChange={() => setGenerateInvoice(!generateInvoice)}
-            style={{ width: 16, height: 16, accentColor: "var(--violet-700)" }}
-          />
-          Générer une facture PDF pour cette entrée
-        </label>
+        {isPremium ? (
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              borderRadius: "var(--r-sm)",
+              border: "1px solid var(--cream-200)",
+              background: "var(--cream-100)",
+              padding: "12px 16px",
+              fontSize: 14,
+              fontWeight: 500,
+              color: "var(--ink-700)",
+              cursor: "pointer",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={generateInvoice}
+              onChange={() => setGenerateInvoice(!generateInvoice)}
+              style={{ width: 16, height: 16, accentColor: "var(--violet-700)" }}
+            />
+            Générer une facture PDF pour cette entrée
+          </label>
+        ) : (
+          <a
+            href="/dashboard#premium"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              borderRadius: "var(--r-sm)",
+              border: "1px solid var(--cream-200)",
+              background: "var(--cream-100)",
+              padding: "12px 16px",
+              fontSize: 14,
+              fontWeight: 500,
+              color: "var(--ink-400)",
+              textDecoration: "none",
+              cursor: "pointer",
+              opacity: 0.75,
+            }}
+          >
+            <span style={{ fontSize: 15 }}>🔒</span>
+            Générer une facture PDF pour cette entrée
+            <span
+              style={{
+                marginLeft: "auto",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--violet-700)",
+                background: "rgba(196,181,253,0.2)",
+                borderRadius: 999,
+                padding: "2px 8px",
+              }}
+            >
+              Premium
+            </span>
+          </a>
+        )}
 
         {/* Détails facture */}
         {generateInvoice && (
