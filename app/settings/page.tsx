@@ -6,6 +6,7 @@ import SettingsForm from "@/components/SettingsForm"
 import ManageSubscriptionButton from "@/components/ManageSubscriptionButton"
 import UpgradeButton from "@/components/UpgradeButton"
 import DeleteAccountButton from "@/components/DeleteAccountButton"
+import LogoUpload from "@/components/LogoUpload"
 import Link from "next/link"
 
 export default async function SettingsPage() {
@@ -73,6 +74,20 @@ export default async function SettingsPage() {
                     Modifie ici les informations utilisées dans tes calculs personnalisés.
                   </p>
                 </div>
+                {/* Logo */}
+                <div className="rounded-[14px] p-4 mb-4" style={{ background: "var(--cream-100)" }}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-3" style={{ color: "var(--ink-400)" }}>
+                    Logo entreprise
+                  </p>
+                  <p className="text-xs mb-4" style={{ color: "var(--ink-400)", lineHeight: 1.6 }}>
+                    Il apparaîtra en haut de tes factures PDF. Recommandé : fond transparent, ratio carré ou paysage.
+                  </p>
+                  <LogoUpload
+                    userId={user.id}
+                    initialLogoUrl={(profile as { logo_url?: string | null }).logo_url}
+                  />
+                </div>
+
                 <div className="rounded-[14px] p-3" style={{ background: "var(--cream-100)" }}>
                   <SettingsForm profile={profile} />
                 </div>

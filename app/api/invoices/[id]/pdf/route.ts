@@ -53,6 +53,32 @@ export async function GET(
   const blue = rgb(0.2, 0.5, 0.9)
   const line = rgb(0.65, 0.68, 0.72)
 
+  // ── Logo (optionnel) ──────────────────────────────────────────────────────
+  type EmbeddedImage = Awaited<ReturnType<typeof pdfDoc.embedPng>>
+  let logoImage: EmbeddedImage | null = null
+  const rawLogoUrl = (profile as { logo_url?: string | null })?.logo_url
+  if (rawLogoUrl) {
+    try {
+      // Nettoyer l'URL (enlever cache-bust si présent)
+      const cleanUrl = rawLogoUrl.split("?")[0]
+      const logoRes = await fetch(cleanUrl)
+      if (logoRes.ok) {
+        const logoBytes = await logoRes.arrayBuffer()
+        const ct = logoRes.headers.get("content-type") ?? ""
+        if (ct.includes("png") || ct.includes("svg") || cleanUrl.endsWith(".png")) {
+          logoImage = await pdfDoc.embedPng(logoBytes)
+        } else if (ct.includes("jpg") || ct.includes("jpeg") || cleanUrl.endsWith(".jpg") || cleanUrl.endsWith(".jpeg")) {
+          logoImage = await pdfDoc.embedJpg(logoBytes)
+        } else {
+          // WebP — essayer en PNG, échoue silencieusement
+          try { logoImage = await pdfDoc.embedPng(logoBytes) } catch { /* ignore */ }
+        }
+      }
+    } catch {
+      // Logo non disponible → on continue sans
+    }
+  }
+
   type InvoiceItem = {
     description?: string
     quantity?: number | string
@@ -96,29 +122,58 @@ export async function GET(
   const invoiceNumber = safe(invoice.invoice_number)
   const invoiceDate = safe(invoice.issued_at)
 
-  page.drawRectangle({
-    x: 50,
-    y: 765,
-    width: 34,
-    height: 34,
-    color: blue,
-  })
+  if (logoImage) {
+    // ── Logo image ──────────────────────────────────────────────────────────
+    const logoMaxW = 120
+    const logoMaxH = 48
+    const { width: imgW, height: imgH } = logoImage.size()
+    const scale = Math.min(logoMaxW / imgW, logoMaxH / imgH, 1)
+    const drawW = imgW * scale
+    const drawH = imgH * scale
+    // Centrer verticalement dans la zone header (y ≈ 765..799)
+    const logoY = 765 + (logoMaxH - drawH) / 2
 
-  page.drawText("K", {
-    x: 61,
-    y: 774,
-    size: 22,
-    font: bold,
-    color: rgb(1, 1, 1),
-  })
+    page.drawImage(logoImage, {
+      x: 50,
+      y: logoY,
+      width: drawW,
+      height: drawH,
+    })
 
-  page.drawText(issuerName, {
-    x: 92,
-    y: 784,
-    size: 22,
-    font: bold,
-    color: blue,
-  })
+    // Nom entreprise à droite du logo
+    page.drawText(issuerName, {
+      x: 50 + drawW + 12,
+      y: 784,
+      size: 18,
+      font: bold,
+      color: black,
+    })
+  } else {
+    // ── Fallback : carré violet + "K" ────────────────────────────────────────
+    page.drawRectangle({
+      x: 50,
+      y: 765,
+      width: 34,
+      height: 34,
+      color: blue,
+    })
+
+    page.drawText("K", {
+      x: 61,
+      y: 774,
+      size: 22,
+      font: bold,
+      color: rgb(1, 1, 1),
+    })
+
+    page.drawText(issuerName, {
+      x: 92,
+      y: 784,
+      size: 22,
+      font: bold,
+      color: blue,
+    })
+  }
 
   page.drawText("Facture", {
     x: 430,
