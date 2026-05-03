@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 
 type ActivityType = "vente" | "service" | "liberal"
 
@@ -61,8 +62,106 @@ function buildSteps(periodRevenue: number, activityType: ActivityType, periodsPe
 
 export default function IRDetailButton({ periodRevenue, activityType, periodsPerYear, irEstimate }: Props) {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { annualRevenue, deduction, taxableIncome, annualIR, brackets } = buildSteps(periodRevenue, activityType, periodsPerYear)
   const periodLabel = periodsPerYear === 12 ? "mois" : "trimestre"
+
+  // Portal needs document — only available client-side
+  useEffect(() => { setMounted(true) }, [])
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false) }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [open])
+
+  const modal = open && mounted ? createPortal(
+    <div
+      onClick={() => setOpen(false)}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "rgba(15,23,42,0.65)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        backdropFilter: "blur(3px)",
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: "var(--cream-50)",
+          borderRadius: "var(--r-xl)",
+          width: "100%",
+          maxWidth: 460,
+          boxShadow: "0 24px 64px rgba(15,23,42,0.3)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Header */}
+        <div style={{ background: "var(--ink-900)", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-400)" }}>
+              Estimation IR
+            </p>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--cream-50)", marginTop: 2 }}>
+              Détail du calcul
+            </h2>
+          </div>
+          <button
+            onClick={() => setOpen(false)}
+            style={{ border: "none", background: "transparent", color: "var(--ink-400)", cursor: "pointer", fontSize: 22, lineHeight: 1, padding: "4px 8px" }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16, maxHeight: "80vh", overflowY: "auto" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Row label="CA de la période" value={`${fmt(periodRevenue)} €`} />
+            <Row label={`× ${periodsPerYear} ${periodLabel}s → CA annualisé`} value={`${fmt(annualRevenue)} €`} highlight />
+            <Spacer />
+            <Row label={`Abattement micro · ${LABEL_ACTIVITE[activityType]}`} value={`− ${fmt(deduction)} €`} sub="Déduction forfaitaire sur charges" />
+            <Row label="Revenu net imposable" value={`${fmt(taxableIncome)} €`} highlight />
+            <Spacer />
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-400)", paddingTop: 4 }}>
+              Barème 2025 appliqué
+            </p>
+            {brackets.length === 0 ? (
+              <Row label="Sous le seuil imposable (0%)" value="0,00 €" />
+            ) : (
+              brackets.map((b, i) => (
+                <Row key={i} label={b.label} sub={`sur ${fmt(b.amount)} €`} value={`${fmt(b.tax)} €`} />
+              ))
+            )}
+            <Spacer />
+            <Row label="Total IR annuel estimé" value={`${fmt(annualIR)} €`} bold />
+            <Row label={`÷ ${periodsPerYear} → provision / ${periodLabel}`} value={`${fmt(irEstimate)} €`} bold highlight accent />
+          </div>
+
+          <div style={{ borderRadius: "var(--r-sm)", background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.25)", padding: "10px 14px" }}>
+            <p style={{ fontSize: 12, color: "#92400E", lineHeight: 1.6 }}>
+              <strong>Hypothèses :</strong> foyer fiscal d&apos;1 part, aucun autre revenu, abattement forfaitaire micro. Cette estimation peut différer de ton impôt final — consulte un comptable pour ta situation précise.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setOpen(false)}
+            style={{ borderRadius: "var(--r-sm)", border: "none", background: "var(--ink-900)", color: "var(--cream-200)", padding: "11px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer", width: "100%" }}
+          >
+            Compris
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  ) : null
 
   return (
     <>
@@ -91,144 +190,7 @@ export default function IRDetailButton({ periodRevenue, activityType, periodsPer
         Détail
       </button>
 
-      {/* Backdrop + Modal */}
-      {open && (
-        <div
-          onClick={() => setOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 50,
-            background: "rgba(15,23,42,0.6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 20,
-            backdropFilter: "blur(2px)",
-          }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              background: "var(--cream-50)",
-              borderRadius: "var(--r-xl)",
-              width: "100%",
-              maxWidth: 460,
-              boxShadow: "0 24px 64px rgba(15,23,42,0.25)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Header */}
-            <div style={{ background: "var(--ink-900)", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-400)" }}>
-                  Estimation IR
-                </p>
-                <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--cream-50)", marginTop: 2 }}>
-                  Détail du calcul
-                </h2>
-              </div>
-              <button
-                onClick={() => setOpen(false)}
-                style={{ border: "none", background: "transparent", color: "var(--ink-400)", cursor: "pointer", fontSize: 20, lineHeight: 1, padding: 4 }}
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Body */}
-            <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
-
-              {/* Steps */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-
-                {/* CA période */}
-                <Row label={`CA de la période`} value={`${fmt(periodRevenue)} €`} />
-                <Row
-                  label={`× ${periodsPerYear} ${periodLabel}s → CA annualisé`}
-                  value={`${fmt(annualRevenue)} €`}
-                  highlight
-                />
-
-                <Spacer />
-
-                {/* Abattement */}
-                <Row
-                  label={`Abattement micro · ${LABEL_ACTIVITE[activityType]}`}
-                  value={`− ${fmt(deduction)} €`}
-                  sub="Déduction forfaitaire sur charges"
-                />
-                <Row
-                  label="Revenu net imposable"
-                  value={`${fmt(taxableIncome)} €`}
-                  highlight
-                />
-
-                <Spacer />
-
-                {/* Barème */}
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-400)", paddingTop: 4 }}>
-                  Barème 2025 appliqué
-                </p>
-                {brackets.length === 0 ? (
-                  <Row label="0% · en dessous du seuil imposable" value="0,00 €" />
-                ) : (
-                  brackets.map((b, i) => (
-                    <Row
-                      key={i}
-                      label={b.label}
-                      sub={`sur ${fmt(b.amount)} €`}
-                      value={`${fmt(b.tax)} €`}
-                    />
-                  ))
-                )}
-
-                <Spacer />
-
-                {/* Totaux */}
-                <Row label="Total IR annuel estimé" value={`${fmt(annualIR)} €`} bold />
-                <Row
-                  label={`÷ ${periodsPerYear} → provision / ${periodLabel}`}
-                  value={`${fmt(irEstimate)} €`}
-                  bold
-                  highlight
-                  accent
-                />
-              </div>
-
-              {/* Disclaimer */}
-              <div style={{
-                borderRadius: "var(--r-sm)",
-                background: "rgba(245,158,11,0.07)",
-                border: "1px solid rgba(245,158,11,0.25)",
-                padding: "10px 14px",
-              }}>
-                <p style={{ fontSize: 12, color: "#92400E", lineHeight: 1.6 }}>
-                  <strong>Hypothèses :</strong> foyer fiscal d&apos;1 part, aucun autre revenu, abattement forfaitaire micro sans autres charges réelles. Cette estimation peut différer de votre impôt final — consultez un comptable pour votre situation précise.
-                </p>
-              </div>
-
-              {/* CTA fermer */}
-              <button
-                onClick={() => setOpen(false)}
-                style={{
-                  borderRadius: "var(--r-sm)",
-                  border: "none",
-                  background: "var(--ink-900)",
-                  color: "var(--cream-200)",
-                  padding: "11px 20px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                Compris
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {modal}
     </>
   )
 }

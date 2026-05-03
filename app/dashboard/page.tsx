@@ -720,7 +720,7 @@ export default async function DashboardPage({
                       className="mt-3 font-mono font-normal"
                       style={{ fontSize: 26, letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
                     >
-                      {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                      {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       <span className="text-base font-light"> €</span>
                     </p>
                     <p className="mt-2 text-xs" style={{ color: stat.dark ? "rgba(255,255,255,0.4)" : "var(--ink-400)" }}>{stat.sub}</p>

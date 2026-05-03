@@ -5,6 +5,8 @@ import MobileNav from "@/components/MobileNav"
 import SettingsForm from "@/components/SettingsForm"
 import ManageSubscriptionButton from "@/components/ManageSubscriptionButton"
 import UpgradeButton from "@/components/UpgradeButton"
+import DeleteAccountButton from "@/components/DeleteAccountButton"
+import Link from "next/link"
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -171,6 +173,54 @@ export default async function SettingsPage() {
                     <p className="mt-1.5 text-xs leading-5" style={{ color: "var(--ink-400)" }}>{item.desc}</p>
                   </div>
                 ))}
+              </div>
+            </section>
+
+            {/* ── ZONE DANGER + LEGAL ── */}
+            <section className="grid gap-4 sm:grid-cols-2">
+
+              {/* Suppression compte */}
+              <div
+                className="p-5"
+                style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)", border: "1px solid rgba(251,113,133,0.15)" }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--rose-500)" }}>
+                  Zone danger
+                </p>
+                <h3 className="mt-2 text-sm font-semibold" style={{ color: "var(--ink-900)" }}>
+                  Supprimer le compte
+                </h3>
+                <p className="mt-1.5 text-xs leading-5" style={{ color: "var(--ink-400)" }}>
+                  Efface définitivement ton compte et toutes tes données. Action irréversible.
+                </p>
+                <div className="mt-4">
+                  <DeleteAccountButton />
+                </div>
+              </div>
+
+              {/* Liens légaux */}
+              <div
+                className="p-5"
+                style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)" }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
+                  Informations légales
+                </p>
+                <div className="mt-3 flex flex-col gap-2">
+                  {[
+                    { label: "Politique de confidentialité", href: "/legal/privacy" },
+                    { label: "Conditions Générales d'Utilisation", href: "/legal/terms" },
+                    { label: "contact@keskireste.fr", href: "mailto:contact@keskireste.fr" },
+                  ].map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      style={{ fontSize: 13, color: "var(--violet-700)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}
+                    >
+                      <span style={{ fontSize: 10 }}>→</span> {link.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </section>
           </div>
