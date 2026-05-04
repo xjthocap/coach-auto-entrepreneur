@@ -378,27 +378,12 @@ export default async function DashboardPage({
                     const isPatron = !!(profile.is_patron)
                     if (isPatron) return (
                       <>
-                        <style>{`
-                          @keyframes patronShimmer {
-                            0%   { background-position: -200% center; }
-                            100% { background-position:  200% center; }
-                          }
-                          .patron-topbar {
-                            background: linear-gradient(90deg, #7C3AED, #ec4899, #f59e0b, #7C3AED);
-                            background-size: 200% auto;
-                            -webkit-background-clip: text;
-                            background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            animation: patronShimmer 3s linear infinite;
-                          }
-                        `}</style>
-                        <span className="patron-topbar" style={{
+                        <span style={{
                           fontSize: 11, fontWeight: 800, borderRadius: 999, padding: "3px 10px",
                           whiteSpace: "nowrap", flexShrink: 0,
-                          border: "1px solid rgba(124,58,237,0.3)",
-                          background: "rgba(124,58,237,0.08)",
-                          WebkitTextFillColor: "unset",
-                        }}>⚡ Le Patron</span>
+                          background: "linear-gradient(90deg, #7C3AED, #ec4899, #f59e0b)",
+                          color: "white",
+                        }}>⚡ El Patron</span>
                       </>
                     )
                     if (isBetaPioneer) return (

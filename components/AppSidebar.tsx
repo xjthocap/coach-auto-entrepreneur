@@ -202,33 +202,18 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
             overflow: "hidden",
           }}
         >
-          {isPatron && (
-            <style>{`
-              @keyframes patronShimmer {
-                0%   { background-position: -200% center; }
-                100% { background-position:  200% center; }
-              }
-              .patron-badge {
-                background: linear-gradient(90deg, #7C3AED, #ec4899, #f59e0b, #7C3AED);
-                background-size: 200% auto;
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-                animation: patronShimmer 3s linear infinite;
-              }
-            `}</style>
-          )}
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium" style={{ color: (isPremium || isPatron) ? "var(--ink-300)" : "var(--ink-500)" }}>
               Ton plan
             </span>
             {isPatron ? (
-              <span className="text-xs px-2 py-0.5 rounded-full font-bold patron-badge" style={{
-                border: "1px solid rgba(124,58,237,0.4)",
-                background: "rgba(124,58,237,0.15)",
-                WebkitTextFillColor: "unset",
+              <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{
+                background: "linear-gradient(90deg, #7C3AED, #ec4899, #f59e0b)",
+                color: "white",
+                border: "none",
+                letterSpacing: "0.01em",
               }}>
-                ⚡ Le Patron
+                ⚡ El Patron
               </span>
             ) : isBetaPioneer ? (
               <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{
