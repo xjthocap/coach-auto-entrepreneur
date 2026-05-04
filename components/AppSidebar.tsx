@@ -174,6 +174,16 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
             )
           })}
 
+          {!isPremium && (
+            <PricingTrigger
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150 w-full border-none bg-transparent cursor-pointer"
+              style={{ borderRadius: "var(--r-sm)", color: "var(--lime-700)" }}
+            >
+              <NavIcon name="sparkle" />
+              <span>Passer Premium</span>
+            </PricingTrigger>
+          )}
+
         </nav>
 
         {/* ── Plan card ── */}
