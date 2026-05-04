@@ -18,7 +18,8 @@ import CheckoutBanner from "@/components/CheckoutBanner"
 import { calculateMicro, estimateIRProvision, buildAnnualProjection } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
-import { getThreshold, getThresholdStatus } from "@/lib/threshold"
+import { getThreshold, getThresholdStatus, getTVAStatus } from "@/lib/threshold"
+import TVAAlert from "@/components/TVAAlert"
 import ExportPeriodButton from "@/components/ExportPeriodButton"
 import IRDetailButton from "@/components/IRDetailButton"
 import ExportYearButton from "@/components/ExportYearButton"
@@ -211,10 +212,13 @@ export default async function DashboardPage({
   const yearRevenue =
     yearRevenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
 
-  // ===== SEUIL =====
+  // ===== SEUIL MICRO =====
   const threshold = getThreshold(profile.activity_type)
   const thresholdInfo = getThresholdStatus(yearRevenue, threshold)
   const ratio = yearRevenue / threshold
+
+  // ===== SEUIL TVA =====
+  const tvaStatus = getTVAStatus(yearRevenue, profile.activity_type)
 
   // ===== CALCULS MICRO =====
   const result = calculateMicro({
@@ -644,6 +648,19 @@ export default async function DashboardPage({
                   </p>
                 </div>
               </section>
+            )}
+
+            {/* ── ALERTE TVA ── */}
+            {tvaStatus.status !== "safe" && (
+              <TVAAlert
+                status={tvaStatus.status}
+                franchise={tvaStatus.franchise}
+                tolerance={tvaStatus.tolerance}
+                yearRevenue={yearRevenue}
+                remaining={tvaStatus.remaining}
+                ratio={tvaStatus.ratio}
+                activityType={profile.activity_type}
+              />
             )}
 
             {/* ── STAT GRID ── */}
