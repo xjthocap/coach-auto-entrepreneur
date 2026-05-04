@@ -10,7 +10,7 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid var(--cream-300)",
   background: "var(--cream-50)",
   color: "var(--ink-900)",
-  padding: "12px 16px",
+  padding: "10px 14px",
   outline: "none",
   fontSize: 14,
 }
@@ -69,52 +69,48 @@ export default function AddExpense() {
   }
 
   return (
-    <div
-      style={{
-        borderRadius: "var(--r-xl)",
-        border: "1px solid var(--cream-200)",
-        background: "var(--cream-50)",
-        padding: 20,
-        boxShadow: "var(--shadow-md)",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div style={{
+      borderRadius: "var(--r-xl)",
+      border: "1px solid var(--cream-200)",
+      background: "var(--cream-50)",
+      padding: 20,
+      boxShadow: "var(--shadow-md)",
+    }}>
       <style>{`
-        .ae-grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .ae-grid-3 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .ae-grid-2 { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .ae-grid-3 { display: grid; grid-template-columns: 1fr; gap: 8px; }
         @media (min-width: 400px) {
           .ae-grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 420px) {
           .ae-grid-3 { grid-template-columns: 1fr 1fr; }
         }
-        @media (min-width: 600px) {
+        @media (min-width: 640px) {
           .ae-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
         }
       `}</style>
 
       {/* Header */}
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 14 }}>
         <p style={{
-          marginBottom: 6, fontSize: 11, fontWeight: 600,
-          letterSpacing: "0.18em", textTransform: "uppercase",
+          marginBottom: 4, fontSize: 10, fontWeight: 700,
+          letterSpacing: "0.16em", textTransform: "uppercase",
           color: "var(--rose-500)",
-        }}>
-          Sortie d'argent
-        </p>
-        <h2 style={{ fontSize: 20, fontWeight: 600, color: "var(--ink-900)", marginBottom: 4 }}>
+        }}>Sortie d'argent</p>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: "var(--ink-900)", marginBottom: 2 }}>
           Ajouter une dépense
         </h2>
-        <p style={{ fontSize: 14, color: "var(--ink-500)" }}>
-          Ajoute une dépense ponctuelle ou récurrente.
+        <p style={{ fontSize: 13, color: "var(--ink-500)" }}>
+          Ponctuelle ou récurrente.
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
         {/* Libellé */}
         <input
           type="text"
-          placeholder="Libellé"
+          placeholder="Libellé (ex. Abonnement Figma)"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           style={inputStyle}
@@ -169,24 +165,24 @@ export default function AddExpense() {
             type="text"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
-            placeholder="Référence justificatif"
+            placeholder="Réf. justificatif"
             style={inputStyle}
           />
         </div>
 
         {/* Submit */}
-        <div style={{ flex: 1 }} />
         <button
           onClick={handleAdd}
           disabled={loading}
           style={{
+            marginTop: 6,
             width: "100%",
             borderRadius: "var(--r-sm)",
             border: "none",
             background: "var(--ink-900)",
             color: "var(--violet-500)",
-            padding: "14px 20px",
-            fontSize: 15,
+            padding: "13px 20px",
+            fontSize: 14,
             fontWeight: 600,
             cursor: loading ? "not-allowed" : "pointer",
             opacity: loading ? 0.5 : 1,

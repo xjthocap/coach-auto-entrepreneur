@@ -10,7 +10,7 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid var(--cream-300)",
   background: "var(--cream-50)",
   color: "var(--ink-900)",
-  padding: "12px 16px",
+  padding: "10px 14px",
   outline: "none",
   fontSize: 14,
 }
@@ -58,9 +58,9 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
   }
 
   function updateItem(index: number, field: string, value: string) {
-    const updatedItems = [...items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
-    setItems(updatedItems)
+    const updated = [...items]
+    updated[index] = { ...updated[index], [field]: value }
+    setItems(updated)
   }
 
   function addItem() {
@@ -72,9 +72,8 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
     setItems(items.filter((_, i) => i !== index))
   }
 
-  const invoiceTotal = items.reduce((total, item) => {
-    return total + Number(item.quantity || 0) * Number(item.unitPrice || 0)
-  }, 0)
+  const invoiceTotal = items.reduce((sum, item) =>
+    sum + Number(item.quantity || 0) * Number(item.unitPrice || 0), 0)
 
   async function handleAdd() {
     if (loading) return
@@ -117,10 +116,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
       let invoiceNumber = autoInvoiceNumber
       if (!invoiceNumber) {
         const res = await fetch("/api/invoices/next-number")
-        if (res.ok) {
-          const data = await res.json()
-          invoiceNumber = data.invoiceNumber
-        }
+        if (res.ok) invoiceNumber = (await res.json()).invoiceNumber
       }
 
       const { data: invoice, error: invoiceError } = await supabase
@@ -153,92 +149,70 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         setLoading(false)
         return
       }
-
       setLastInvoiceId(invoice.id)
     }
 
-    setClientName("")
-    setClientCompany("")
-    setClientEmail("")
-    setClientAddress("")
-    setPaymentMethod("")
-    setReference("")
-    setAutoInvoiceNumber("")
-    setDueAt("")
-    setGenerateInvoice(false)
-    setLabel("")
-    setAmount("")
-    setDate(today)
+    setClientName(""); setClientCompany(""); setClientEmail(""); setClientAddress("")
+    setPaymentMethod(""); setReference(""); setAutoInvoiceNumber(""); setDueAt("")
+    setGenerateInvoice(false); setLabel(""); setAmount(""); setDate(today)
     setItems([{ description: "", quantity: "1", unitPrice: "" }])
     setLoading(false)
-
     router.refresh()
   }
 
   return (
-    <div
-      style={{
-        borderRadius: "var(--r-xl)",
-        border: "1px solid var(--cream-200)",
-        background: "var(--cream-50)",
-        padding: 20,
-        boxShadow: "var(--shadow-md)",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div style={{
+      borderRadius: "var(--r-xl)",
+      border: "1px solid var(--cream-200)",
+      background: "var(--cream-50)",
+      padding: 20,
+      boxShadow: "var(--shadow-md)",
+    }}>
       <style>{`
-        /* Grilles responsives AddRevenue */
-        .ar-grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .ar-grid-2 { display: grid; grid-template-columns: 1fr; gap: 8px; }
         @media (min-width: 400px) {
           .ar-grid-2 { grid-template-columns: 1fr 1fr; }
         }
-
-        /* Lignes de facture : description pleine largeur sur mobile,
-           tout sur une ligne en dessus de 520px */
+        /* Lignes de facture : description pleine largeur sur mobile */
         .ar-invoice-line {
           display: grid;
           grid-template-columns: 1fr 1fr auto;
-          grid-template-areas:
-            "desc desc desc"
-            "qty  price remove";
+          grid-template-areas: "desc desc desc" "qty price rm";
           gap: 8px;
         }
-        .ar-invoice-line-desc  { grid-area: desc; }
-        .ar-invoice-line-qty   { grid-area: qty; }
-        .ar-invoice-line-price { grid-area: price; }
-        .ar-invoice-line-rm    { grid-area: remove; }
+        .ar-line-desc  { grid-area: desc; }
+        .ar-line-qty   { grid-area: qty; }
+        .ar-line-price { grid-area: price; }
+        .ar-line-rm    { grid-area: rm; }
         @media (min-width: 520px) {
           .ar-invoice-line {
             grid-template-columns: 2fr 1fr 1fr auto;
-            grid-template-areas: "desc qty price remove";
+            grid-template-areas: "desc qty price rm";
           }
         }
       `}</style>
 
       {/* Header */}
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 14 }}>
         <p style={{
-          marginBottom: 6, fontSize: 11, fontWeight: 600,
-          letterSpacing: "0.18em", textTransform: "uppercase",
+          marginBottom: 4, fontSize: 10, fontWeight: 700,
+          letterSpacing: "0.16em", textTransform: "uppercase",
           color: "var(--violet-700)",
-        }}>
-          Entrée d'argent
-        </p>
-        <h2 style={{ fontSize: 20, fontWeight: 600, color: "var(--ink-900)", marginBottom: 4 }}>
+        }}>Entrée d'argent</p>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: "var(--ink-900)", marginBottom: 2 }}>
           Ajouter un revenu
         </h2>
-        <p style={{ fontSize: 14, color: "var(--ink-500)" }}>
+        <p style={{ fontSize: 13, color: "var(--ink-500)" }}>
           Renseigne un revenu et génère une facture si besoin.
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
         {/* Libellé */}
         <input
           type="text"
-          placeholder="Libellé (ex. Mission UI design - Mairie Montpellier)"
+          placeholder="Libellé (ex. Mission UI design)"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           {...inputProps}
@@ -258,12 +232,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
               color: generateInvoice ? "var(--ink-400)" : "var(--ink-900)",
             }}
           />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            {...inputProps}
-          />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} {...inputProps} />
         </div>
 
         {/* Client + Paiement */}
@@ -287,10 +256,10 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         {/* Toggle facture */}
         {isPremium ? (
           <label style={{
-            display: "flex", alignItems: "center", gap: 12,
+            display: "flex", alignItems: "center", gap: 10,
             borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)",
-            background: "var(--cream-100)", padding: "12px 16px",
-            fontSize: 14, fontWeight: 500, color: "var(--ink-700)", cursor: "pointer",
+            background: "var(--cream-100)", padding: "10px 14px",
+            fontSize: 13, fontWeight: 500, color: "var(--ink-700)", cursor: "pointer",
           }}>
             <input
               type="checkbox"
@@ -300,28 +269,26 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
                 setGenerateInvoice(next)
                 if (next && !autoInvoiceNumber) fetchNextInvoiceNumber()
               }}
-              style={{ width: 16, height: 16, accentColor: "var(--violet-700)", flexShrink: 0 }}
+              style={{ width: 15, height: 15, accentColor: "var(--violet-700)", flexShrink: 0 }}
             />
-            Générer une facture PDF pour cette entrée
+            Générer une facture PDF
           </label>
         ) : (
           <a href="/dashboard#premium" style={{
-            display: "flex", alignItems: "center", gap: 12,
+            display: "flex", alignItems: "center", gap: 10,
             borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)",
-            background: "var(--cream-100)", padding: "12px 16px",
-            fontSize: 14, fontWeight: 500, color: "var(--ink-400)",
-            textDecoration: "none", cursor: "pointer", opacity: 0.75,
+            background: "var(--cream-100)", padding: "10px 14px",
+            fontSize: 13, fontWeight: 500, color: "var(--ink-400)",
+            textDecoration: "none", opacity: 0.75,
           }}>
-            <span style={{ fontSize: 15, flexShrink: 0 }}>🔒</span>
+            <span style={{ flexShrink: 0 }}>🔒</span>
             <span style={{ flex: 1 }}>Générer une facture PDF</span>
             <span style={{
               fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
               textTransform: "uppercase", color: "var(--violet-700)",
-              background: "rgba(196,181,253,0.2)", borderRadius: 999, padding: "2px 8px",
-              whiteSpace: "nowrap", flexShrink: 0,
-            }}>
-              Premium
-            </span>
+              background: "rgba(196,181,253,0.2)", borderRadius: 999,
+              padding: "2px 7px", whiteSpace: "nowrap", flexShrink: 0,
+            }}>Premium</span>
           </a>
         )}
 
@@ -329,85 +296,36 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         {generateInvoice && (
           <div style={{
             borderRadius: "var(--r-md)", border: "1px solid var(--cream-200)",
-            background: "var(--cream-100)", padding: 16,
-            display: "flex", flexDirection: "column", gap: 10,
+            background: "var(--cream-100)", padding: "12px 14px",
+            display: "flex", flexDirection: "column", gap: 8,
           }}>
-            {/* Société + Email */}
             <div className="ar-grid-2">
-              <input
-                type="text"
-                value={clientCompany}
-                onChange={(e) => setClientCompany(e.target.value)}
-                placeholder="Société du client"
-                {...inputProps}
-              />
-              <input
-                type="email"
-                value={clientEmail}
-                onChange={(e) => setClientEmail(e.target.value)}
-                placeholder="Email client"
-                {...inputProps}
-              />
+              <input type="text" value={clientCompany} onChange={(e) => setClientCompany(e.target.value)} placeholder="Société du client" {...inputProps} />
+              <input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="Email client" {...inputProps} />
             </div>
-
-            {/* Adresse + N° facture auto */}
             <div className="ar-grid-2">
-              <input
-                type="text"
-                value={clientAddress}
-                onChange={(e) => setClientAddress(e.target.value)}
-                placeholder="Adresse client"
-                {...inputProps}
-              />
+              <input type="text" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder="Adresse client" {...inputProps} />
               <input
                 type="text"
                 value={invoiceNumberLoading ? "Génération…" : autoInvoiceNumber}
                 onChange={(e) => setAutoInvoiceNumber(e.target.value)}
                 placeholder="N° facture (auto)"
-                style={{
-                  ...inputStyle,
-                  fontFamily: "var(--font-geist-mono, monospace)",
-                  fontWeight: 600,
-                }}
+                style={{ ...inputStyle, fontFamily: "var(--font-geist-mono, monospace)", fontWeight: 600 }}
               />
             </div>
+            <input type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} placeholder="Date d'échéance" {...inputProps} />
 
-            {/* Date d'échéance */}
-            <input type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} {...inputProps} />
-
-            {/* Lignes de facture */}
-            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-700)" }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-700)", marginTop: 2 }}>
               Lignes de facture
             </p>
 
             {items.map((item, index) => (
               <div key={index} className="ar-invoice-line">
-                <input
-                  className="ar-invoice-line-desc"
-                  type="text"
-                  value={item.description}
-                  onChange={(e) => updateItem(index, "description", e.target.value)}
-                  placeholder="Description"
-                  style={inputStyle}
-                />
-                <input
-                  className="ar-invoice-line-qty"
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => updateItem(index, "quantity", e.target.value)}
-                  placeholder="Qté"
-                  style={inputStyle}
-                />
-                <input
-                  className="ar-invoice-line-price"
-                  type="number"
-                  value={item.unitPrice}
-                  onChange={(e) => updateItem(index, "unitPrice", e.target.value)}
-                  placeholder="Prix HT"
-                  style={inputStyle}
-                />
+                <input className="ar-line-desc" type="text" value={item.description} onChange={(e) => updateItem(index, "description", e.target.value)} placeholder="Description" style={inputStyle} />
+                <input className="ar-line-qty" type="number" value={item.quantity} onChange={(e) => updateItem(index, "quantity", e.target.value)} placeholder="Qté" style={inputStyle} />
+                <input className="ar-line-price" type="number" value={item.unitPrice} onChange={(e) => updateItem(index, "unitPrice", e.target.value)} placeholder="Prix HT" style={inputStyle} />
                 <button
-                  className="ar-invoice-line-rm"
+                  className="ar-line-rm"
                   type="button"
                   onClick={() => removeItem(index)}
                   disabled={items.length === 1}
@@ -415,45 +333,41 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
                     borderRadius: "var(--r-sm)", border: "1px solid var(--cream-300)",
                     background: "var(--cream-50)",
                     color: items.length === 1 ? "var(--ink-300)" : "var(--rose-500)",
-                    padding: "12px 14px", fontSize: 13, fontWeight: 600,
+                    padding: "10px 12px", fontSize: 12, fontWeight: 700,
                     cursor: items.length === 1 ? "not-allowed" : "pointer",
                     opacity: items.length === 1 ? 0.4 : 1,
+                    alignSelf: "stretch",
                   }}
                 >✕</button>
               </div>
             ))}
 
-            <button
-              type="button"
-              onClick={addItem}
-              style={{
-                borderRadius: "var(--r-sm)", border: "1px solid var(--cream-300)",
-                background: "var(--cream-200)", color: "var(--ink-700)",
-                padding: "10px 16px", fontSize: 13, fontWeight: 600,
-                cursor: "pointer", alignSelf: "flex-start",
-              }}
-            >
-              + Ajouter une ligne
-            </button>
-
-            <p style={{
-              fontSize: 13, fontWeight: 700, color: "var(--ink-900)",
-              borderTop: "1px solid var(--cream-300)", paddingTop: 10,
-            }}>
-              Total HT : {invoiceTotal.toFixed(2).replace(".", ",")} €
-            </p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, flexWrap: "wrap", gap: 8 }}>
+              <button
+                type="button"
+                onClick={addItem}
+                style={{
+                  borderRadius: "var(--r-sm)", border: "1px solid var(--cream-300)",
+                  background: "var(--cream-200)", color: "var(--ink-700)",
+                  padding: "8px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer",
+                }}
+              >+ Ajouter une ligne</button>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-900)" }}>
+                Total HT : {invoiceTotal.toFixed(2).replace(".", ",")} €
+              </p>
+            </div>
           </div>
         )}
 
         {/* Submit */}
-        <div style={{ flex: 1 }} />
         <button
           onClick={handleAdd}
           disabled={loading}
           style={{
+            marginTop: 6,
             width: "100%", borderRadius: "var(--r-sm)", border: "none",
             background: "var(--ink-900)", color: "var(--violet-500)",
-            padding: "14px 20px", fontSize: 15, fontWeight: 600,
+            padding: "13px 20px", fontSize: 14, fontWeight: 600,
             cursor: loading ? "not-allowed" : "pointer",
             opacity: loading ? 0.5 : 1, boxShadow: "var(--shadow-md)",
           }}
@@ -469,12 +383,10 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             style={{
               display: "block", borderRadius: "var(--r-sm)",
               border: "1px solid var(--cream-300)", background: "var(--cream-200)",
-              color: "var(--violet-700)", padding: "12px 16px",
-              textAlign: "center", fontSize: 14, fontWeight: 600, textDecoration: "none",
+              color: "var(--violet-700)", padding: "11px 16px",
+              textAlign: "center", fontSize: 13, fontWeight: 600, textDecoration: "none",
             }}
-          >
-            ↓ Télécharger la facture PDF
-          </a>
+          >↓ Télécharger la facture PDF</a>
         )}
       </div>
     </div>
