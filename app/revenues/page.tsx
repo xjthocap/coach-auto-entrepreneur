@@ -162,7 +162,7 @@ export default async function RevenuesPage({
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
             </div>
-            <div className="md:hidden flex items-center justify-between px-4 pb-2.5" style={{ borderTop: "1px solid var(--cream-300)" }}>
+            <div className="md:hidden flex items-center justify-between px-4 pt-2.5 pb-2.5" style={{ borderTop: "1px solid var(--cream-300)" }}>
               <TopbarPeriod
                 compact
                 label={buildPeriodLabel(frequency, period)}
@@ -271,7 +271,6 @@ export default async function RevenuesPage({
 
             {/* LISTE */}
             <section
-              className="overflow-hidden"
               style={{
                 background: "var(--cream-50)",
                 borderRadius: "var(--r-lg)",

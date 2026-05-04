@@ -58,7 +58,6 @@ export default function RecentMovements({ revenues, expenses, limit = 10, isPrem
         background: "var(--cream-50)",
         borderRadius: "var(--r-lg)",
         boxShadow: "var(--shadow-md)",
-        overflow: "hidden",
       }}
     >
       <div className="p-5 md:p-6">
