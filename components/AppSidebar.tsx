@@ -11,6 +11,7 @@ type AppSidebarProps = {
     founder_number?: number | null
     subscription_type?: string | null
     is_beta_pioneer?: boolean | null
+    is_patron?: boolean | null
   }
   userEmail: string | undefined | null
 }
@@ -91,6 +92,7 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
   const isPremium = profile.plan === "premium"
   const isFounder = !!(profile.founder_number)
   const isBetaPioneer = !!(profile.is_beta_pioneer)
+  const isPatron = !!(profile.is_patron)
 
   return (
     <aside
@@ -193,14 +195,42 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
           className="mt-6 p-4"
           style={{
             borderRadius: "var(--r-md)",
-            background: isPremium ? "var(--ink-900)" : "var(--cream-200)",
+            background: isPatron
+              ? "linear-gradient(135deg, #1a0f2e 0%, #2d1657 100%)"
+              : isPremium ? "var(--ink-900)" : "var(--cream-200)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
+          {isPatron && (
+            <style>{`
+              @keyframes patronShimmer {
+                0%   { background-position: -200% center; }
+                100% { background-position:  200% center; }
+              }
+              .patron-badge {
+                background: linear-gradient(90deg, #7C3AED, #ec4899, #f59e0b, #7C3AED);
+                background-size: 200% auto;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: patronShimmer 3s linear infinite;
+              }
+            `}</style>
+          )}
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium" style={{ color: isPremium ? "var(--ink-300)" : "var(--ink-500)" }}>
+            <span className="text-xs font-medium" style={{ color: (isPremium || isPatron) ? "var(--ink-300)" : "var(--ink-500)" }}>
               Ton plan
             </span>
-            {isBetaPioneer ? (
+            {isPatron ? (
+              <span className="text-xs px-2 py-0.5 rounded-full font-bold patron-badge" style={{
+                border: "1px solid rgba(124,58,237,0.4)",
+                background: "rgba(124,58,237,0.15)",
+                WebkitTextFillColor: "unset",
+              }}>
+                ⚡ Le Patron
+              </span>
+            ) : isBetaPioneer ? (
               <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{
                 background: "linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.2))",
                 color: "#B45309",
@@ -228,8 +258,10 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
               </span>
             )}
           </div>
-          <p className="text-xs leading-5 mb-3" style={{ color: isPremium ? "var(--ink-300)" : "var(--ink-500)" }}>
-            {isBetaPioneer
+          <p className="text-xs leading-5 mb-3" style={{ color: (isPremium || isPatron) ? "var(--ink-300)" : "var(--ink-500)" }}>
+            {isPatron
+              ? "C'est toi qui as construit tout ça. Respect. 🫡"
+              : isBetaPioneer
               ? "Premier bêta-testeur — merci d'avoir cru au projet dès le début 🙏"
               : isFounder
               ? "Founder · 99€/an · toutes les fonctionnalités Premium."
