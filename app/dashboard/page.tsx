@@ -385,7 +385,7 @@ export default async function DashboardPage({
             </div>
             {/* Mobile period row */}
             <div
-              className="md:hidden flex items-center justify-between px-4 pb-2.5"
+              className="md:hidden flex items-center justify-between px-4 pt-2.5 pb-2.5"
               style={{ borderTop: "1px solid var(--cream-300)" }}
             >
               <TopbarPeriod
