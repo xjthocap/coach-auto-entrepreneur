@@ -374,6 +374,16 @@ export default async function DashboardPage({
                   {/* Badge plan */}
                   {(() => {
                     const isFounder = !!(profile.founder_number)
+                    const isBetaPioneer = !!(profile.is_beta_pioneer)
+                    if (isBetaPioneer) return (
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "3px 10px",
+                        whiteSpace: "nowrap", flexShrink: 0,
+                        background: "linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15))",
+                        color: "#B45309",
+                        border: "1px solid rgba(245,158,11,0.25)",
+                      }}>🧪 OG Bêta</span>
+                    )
                     return (
                       <span style={{
                         fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "3px 10px",

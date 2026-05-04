@@ -10,6 +10,7 @@ type AppSidebarProps = {
     id: string
     founder_number?: number | null
     subscription_type?: string | null
+    is_beta_pioneer?: boolean | null
   }
   userEmail: string | undefined | null
 }
@@ -89,6 +90,7 @@ const navLinks = [
 export default function AppSidebar({ activePage, profile, userEmail }: AppSidebarProps) {
   const isPremium = profile.plan === "premium"
   const isFounder = !!(profile.founder_number)
+  const isBetaPioneer = !!(profile.is_beta_pioneer)
 
   return (
     <aside
@@ -198,26 +200,38 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
             <span className="text-xs font-medium" style={{ color: isPremium ? "var(--ink-300)" : "var(--ink-500)" }}>
               Ton plan
             </span>
-            <span
-              className="text-xs px-2 py-0.5 rounded-full font-semibold"
-              style={{
-                background: isFounder
-                  ? "rgba(196, 181, 253, 0.25)"
-                  : isPremium
-                  ? "var(--violet-500)"
-                  : "var(--cream-300)",
-                color: isFounder
-                  ? "var(--violet-700)"
-                  : isPremium
-                  ? "var(--ink-900)"
-                  : "var(--ink-500)",
-              }}
-            >
-              {isFounder ? `⭐ Founder #${profile.founder_number}` : isPremium ? "Premium" : "Gratuit"}
-            </span>
+            {isBetaPioneer ? (
+              <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{
+                background: "linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.2))",
+                color: "#B45309",
+                border: "1px solid rgba(245,158,11,0.3)",
+              }}>
+                🧪 OG Bêta
+              </span>
+            ) : (
+              <span
+                className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                style={{
+                  background: isFounder
+                    ? "rgba(196, 181, 253, 0.25)"
+                    : isPremium
+                    ? "var(--violet-500)"
+                    : "var(--cream-300)",
+                  color: isFounder
+                    ? "var(--violet-700)"
+                    : isPremium
+                    ? "var(--ink-900)"
+                    : "var(--ink-500)",
+                }}
+              >
+                {isFounder ? `⭐ Founder #${profile.founder_number}` : isPremium ? "Premium" : "Gratuit"}
+              </span>
+            )}
           </div>
           <p className="text-xs leading-5 mb-3" style={{ color: isPremium ? "var(--ink-300)" : "var(--ink-500)" }}>
-            {isFounder
+            {isBetaPioneer
+              ? "Premier bêta-testeur — merci d'avoir cru au projet dès le début 🙏"
+              : isFounder
               ? "Founder · 99€/an · toutes les fonctionnalités Premium."
               : isPremium
               ? "Tu as accès au coach IA, à l'historique complet et aux exports."
