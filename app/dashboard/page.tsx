@@ -377,6 +377,7 @@ export default async function DashboardPage({
                   currentDate={formatLocalDate(baseDate)}
                   addAnchor="quick-add"
                   alertCount={(isInDeclarationWindow ? 1 : 0) + (isApproachingEnd ? 1 : 0)}
+                  declarationPeriodLabel={isInDeclarationWindow ? realPrevPeriod.label : undefined}
                 />
                 {isPremium && <ExportYearButton year={selectedYear} />}
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}

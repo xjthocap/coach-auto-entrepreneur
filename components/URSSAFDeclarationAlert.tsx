@@ -25,6 +25,8 @@ export default function URSSAFDeclarationAlert({
   function handleDone() {
     localStorage.setItem(storageKey, "1")
     setDismissed(true)
+    // Notify TopbarPeriod (same tab — storage event doesn't fire within same tab)
+    window.dispatchEvent(new CustomEvent("urssaf-dismissed", { detail: { key: storageKey } }))
   }
 
   return (

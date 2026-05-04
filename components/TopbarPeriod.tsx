@@ -18,6 +18,8 @@ type Props = {
   compact?: boolean
   /** Nombre d'alertes actives (déclaration / fin de période) */
   alertCount?: number
+  /** Label de la période URSSAF (ex: "Avril 2026") — pour synchro avec le dismiss localStorage */
+  declarationPeriodLabel?: string
 }
 
 function pad(n: number) {
@@ -32,10 +34,38 @@ export default function TopbarPeriod({
   addAnchor = "quick-add",
   compact = false,
   alertCount = 0,
+  declarationPeriodLabel,
 }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const [urssafDismissed, setUrssafDismissed] = useState(false)
+
+  // Sync URSSAF dismissal state from localStorage (client-side only)
+  useEffect(() => {
+    if (!declarationPeriodLabel) return
+    const key = `urssaf_declared_${declarationPeriodLabel}`
+    setUrssafDismissed(localStorage.getItem(key) === "1")
+
+    // Cross-tab sync
+    function onStorage(e: StorageEvent) {
+      if (e.key === key) setUrssafDismissed(e.newValue === "1")
+    }
+    // Same-tab sync (dispatched by URSSAFDeclarationAlert on dismiss)
+    function onDismissed(e: Event) {
+      const detail = (e as CustomEvent<{ key: string }>).detail
+      if (detail?.key === key) setUrssafDismissed(true)
+    }
+    window.addEventListener("storage", onStorage)
+    window.addEventListener("urssaf-dismissed", onDismissed)
+    return () => {
+      window.removeEventListener("storage", onStorage)
+      window.removeEventListener("urssaf-dismissed", onDismissed)
+    }
+  }, [declarationPeriodLabel])
+
+  // Effective badge count: subtract 1 if the URSSAF alert for this period was dismissed
+  const effectiveAlertCount = Math.max(0, alertCount - (urssafDismissed ? 1 : 0))
 
   // Année affichée dans le picker (initialisée sur l'année courante)
   const currentYear = parseInt(currentDate.split("-")[0])
@@ -290,7 +320,7 @@ export default function TopbarPeriod({
 
       {/* ── Bell ── */}
       <button
-        title={alertCount > 0 ? `${alertCount} alerte${alertCount > 1 ? "s" : ""} — cliquer pour voir` : "Aucune alerte"}
+        title={effectiveAlertCount > 0 ? `${effectiveAlertCount} alerte${effectiveAlertCount > 1 ? "s" : ""} — cliquer pour voir` : "Aucune alerte"}
         onClick={() => {
           const el = document.getElementById("declarations")
           if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -300,9 +330,9 @@ export default function TopbarPeriod({
           display: "flex", alignItems: "center", justifyContent: "center",
           width: 36, height: 36,
           borderRadius: 999,
-          border: `1px solid ${alertCount > 0 ? "rgba(251,113,133,0.5)" : "var(--cream-300)"}`,
-          background: alertCount > 0 ? "rgba(251,113,133,0.08)" : "var(--cream-50)",
-          color: alertCount > 0 ? "var(--rose-500)" : "var(--ink-500)",
+          border: `1px solid ${effectiveAlertCount > 0 ? "rgba(251,113,133,0.5)" : "var(--cream-300)"}`,
+          background: effectiveAlertCount > 0 ? "rgba(251,113,133,0.08)" : "var(--cream-50)",
+          color: effectiveAlertCount > 0 ? "var(--rose-500)" : "var(--ink-500)",
           cursor: "pointer", flexShrink: 0,
           transition: "all 0.15s",
         }}
@@ -311,7 +341,7 @@ export default function TopbarPeriod({
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
-        {alertCount > 0 && (
+        {effectiveAlertCount > 0 && (
           <span style={{
             position: "absolute", top: -3, right: -3,
             width: 14, height: 14, borderRadius: 999,
@@ -319,7 +349,7 @@ export default function TopbarPeriod({
             fontSize: 8, fontWeight: 700, color: "white",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            {alertCount}
+            {effectiveAlertCount}
           </span>
         )}
       </button>
