@@ -17,6 +17,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  // Vérifier que l'utilisateur est premium (la création de facture est une feature premium)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single()
+
+  if (profile?.plan !== "premium") {
+    return NextResponse.json({ error: "Premium requis" }, { status: 403 })
+  }
+
   const body = await req.json()
   const { revenueId } = body
 

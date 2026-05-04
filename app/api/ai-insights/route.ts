@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { OpenAI } from "openai"
+import { createClient } from "@/lib/supabase/server"
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
@@ -82,6 +83,20 @@ function computeFinancialHealth({
 
 export async function POST(req: Request) {
   try {
+    // ── Auth check ──────────────────────────────────────────────────────────
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    // Vérifier plan premium
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan, founder_number")
+      .eq("id", user.id)
+      .single()
+    const isPremium = profile?.plan === "premium"
+    if (!isPremium) return NextResponse.json({ error: "Premium requis" }, { status: 403 })
+
     const body = await req.json()
 
     const {

@@ -54,10 +54,13 @@ export async function GET(
   const line = rgb(0.65, 0.68, 0.72)
 
   // ── Logo (optionnel) ──────────────────────────────────────────────────────
+  // Protection SSRF : on n'autorise que les URLs du bucket Supabase Storage de ce projet
+  const ALLOWED_LOGO_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Logos/`
+
   type EmbeddedImage = Awaited<ReturnType<typeof pdfDoc.embedPng>>
   let logoImage: EmbeddedImage | null = null
   const rawLogoUrl = (profile as { logo_url?: string | null })?.logo_url
-  if (rawLogoUrl) {
+  if (rawLogoUrl && rawLogoUrl.startsWith(ALLOWED_LOGO_PREFIX)) {
     try {
       // Nettoyer l'URL (enlever cache-bust si présent)
       const cleanUrl = rawLogoUrl.split("?")[0]
@@ -489,7 +492,7 @@ export async function GET(
   return new NextResponse(pdfBuffer, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="F-${invoiceNumber}${profile?.company_name ? `-${profile.company_name}` : ''}.pdf"`,
+      "Content-Disposition": `attachment; filename="F-${invoiceNumber}${profile?.company_name ? `-${profile.company_name.replace(/[^a-zA-Z0-9\-_.]/g, "_")}` : ''}.pdf"`,
     },
   })
 }

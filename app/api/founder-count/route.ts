@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 
+// Route publique — utilise le client anon (pas admin) pour ne pas exposer la clé service role
 export async function GET() {
-  const { count } = await supabaseAdmin
+  const supabase = await createClient()
+
+  const { count } = await supabase
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .not("founder_number", "is", null)

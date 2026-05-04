@@ -10,7 +10,7 @@ type Props = {
 }
 
 const MAX_SIZE_MB = 2
-const ACCEPTED = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"]
+const ACCEPTED = ["image/png", "image/jpeg", "image/jpg", "image/webp"]
 
 export default function LogoUpload({ userId, initialLogoUrl, onUpdate }: Props) {
   const supabase = createClient()
@@ -25,7 +25,7 @@ export default function LogoUpload({ userId, initialLogoUrl, onUpdate }: Props) 
     setError("")
 
     if (!ACCEPTED.includes(file.type)) {
-      setError("Format non supporté. Utilise PNG, JPG, WebP ou SVG.")
+      setError("Format non supporté. Utilise PNG, JPG ou WebP.")
       return
     }
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
@@ -195,7 +195,7 @@ export default function LogoUpload({ userId, initialLogoUrl, onUpdate }: Props) 
           </div>
 
           <p style={{ fontSize: 11, color: "var(--ink-400)" }}>
-            PNG, JPG, WebP ou SVG · max {MAX_SIZE_MB} Mo · recommandé : fond transparent
+            PNG, JPG ou WebP · max {MAX_SIZE_MB} Mo · recommandé : fond transparent
           </p>
         </div>
       </div>

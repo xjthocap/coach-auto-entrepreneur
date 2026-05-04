@@ -1,48 +1,41 @@
 import { headers } from "next/headers"
+import Stripe from "stripe"
 import { stripe } from "@/lib/stripe"
 import { supabaseAdmin } from "@/lib/supabase/admin"
 
 const MAX_FOUNDERS = 50
 
 async function assignFounder(userId: string, stripeCustomerId: string | null): Promise<void> {
-  // Vérifier si déjà founder
-  const { data: existing } = await supabaseAdmin
-    .from("profiles")
-    .select("founder_number")
-    .eq("id", userId)
-    .single()
+  // Attribution atomique via fonction PostgreSQL (évite la race condition)
+  const { data, error } = await supabaseAdmin
+    .rpc("assign_founder_number", { p_user_id: userId, p_max: MAX_FOUNDERS })
 
-  if (existing?.founder_number) return // déjà attribué
+  if (error) {
+    console.error("Erreur RPC assign_founder_number :", error.message)
+    return
+  }
 
-  // Compter les founders actuels
-  const { count } = await supabaseAdmin
-    .from("profiles")
-    .select("id", { count: "exact", head: true })
-    .not("founder_number", "is", null)
+  const founderNumber = data as number
 
-  const currentCount = count ?? 0
-
-  if (currentCount >= MAX_FOUNDERS) {
+  if (founderNumber === -1) {
     console.warn(`Max founders (${MAX_FOUNDERS}) reached, cannot assign to ${userId}`)
     return
   }
 
-  const founderNumber = currentCount + 1
-
-  const { error } = await supabaseAdmin
+  // Compléter le profil avec les infos founder
+  const { error: updateError } = await supabaseAdmin
     .from("profiles")
     .update({
       plan: "premium",
       subscription_type: "founder",
-      founder_number: founderNumber,
       founder_started_at: new Date().toISOString(),
-      // Sauvegarder le customer_id pour pouvoir réagir aux échecs de paiement
       stripe_customer_id: stripeCustomerId,
     })
     .eq("id", userId)
+    .is("founder_number", null) // sécurité : ne pas écraser si déjà attribué
 
-  if (error) {
-    console.error("Erreur assignation founder :", error.message)
+  if (updateError) {
+    console.error("Erreur mise à jour profil founder :", updateError.message)
   }
 }
 
@@ -54,7 +47,7 @@ export async function POST(req: Request) {
     return new Response("Missing signature", { status: 400 })
   }
 
-  let event
+  let event: Stripe.Event
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -69,11 +62,11 @@ export async function POST(req: Request) {
 
   try {
     if (event.type === "checkout.session.completed") {
-      const session = event.data.object as any
+      const session = event.data.object as Stripe.Checkout.Session
       const userId = session.metadata?.supabase_user_id
       const planType = session.metadata?.plan_type
 
-      if (userId) {
+      if (typeof userId === "string" && userId) {
         if (planType === "founder") {
           const customerId = typeof session.customer === "string" ? session.customer : null
           await assignFounder(userId, customerId)
@@ -97,25 +90,21 @@ export async function POST(req: Request) {
       event.type === "customer.subscription.created" ||
       event.type === "customer.subscription.updated"
     ) {
-      const subscription = event.data.object as any
-      const customerId =
-        typeof subscription.customer === "string" ? subscription.customer : null
+      const subscription = event.data.object as Stripe.Subscription
+      const customerId = typeof subscription.customer === "string" ? subscription.customer : null
       const planType = subscription.metadata?.plan_type
 
       if (customerId) {
         const isActive = ["active", "trialing"].includes(subscription.status)
 
         if (planType === "founder") {
-          // Pour les founders, on ne rétrograde pas via subscription updated —
-          // on laisse le statut de founder intact tant que l'abonnement est actif
-          if (!isActive) {
-            const { error } = await supabaseAdmin
-              .from("profiles")
-              .update({ plan: "free" })
-              .eq("stripe_customer_id", customerId)
+          // Founders : sync plan selon statut abonnement
+          const { error } = await supabaseAdmin
+            .from("profiles")
+            .update({ plan: isActive ? "premium" : "free" })
+            .eq("stripe_customer_id", customerId)
 
-            if (error) console.error("Erreur downgrade founder :", error.message)
-          }
+          if (error) console.error("Erreur sync founder :", error.message)
         } else {
           const { error } = await supabaseAdmin
             .from("profiles")
@@ -128,9 +117,8 @@ export async function POST(req: Request) {
     }
 
     if (event.type === "customer.subscription.deleted") {
-      const subscription = event.data.object as any
-      const customerId =
-        typeof subscription.customer === "string" ? subscription.customer : null
+      const subscription = event.data.object as Stripe.Subscription
+      const customerId = typeof subscription.customer === "string" ? subscription.customer : null
 
       if (customerId) {
         const { error } = await supabaseAdmin
@@ -142,12 +130,13 @@ export async function POST(req: Request) {
       }
     }
 
+    // payment_failed : downgrade seulement après 3+ tentatives (évite rétrogradation sur erreur temporaire)
     if (event.type === "invoice.payment_failed") {
-      const invoice = event.data.object as any
-      const customerId =
-        typeof invoice.customer === "string" ? invoice.customer : null
+      const invoice = event.data.object as Stripe.Invoice
+      const customerId = typeof invoice.customer === "string" ? invoice.customer : null
+      const attemptCount = invoice.attempt_count ?? 0
 
-      if (customerId) {
+      if (customerId && attemptCount >= 3) {
         const { error } = await supabaseAdmin
           .from("profiles")
           .update({ plan: "free" })

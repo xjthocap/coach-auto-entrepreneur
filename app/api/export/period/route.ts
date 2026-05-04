@@ -145,15 +145,18 @@ export async function GET(req: Request) {
     .gte("date", period.start).lte("date", period.end)
     .order("date", { ascending: true })
 
-  const { data: allExpenses } = await supabase
-    .from("expenses").select("*").eq("user_id", user.id)
+  // Dépenses ponctuelles dans la période (filtrées côté DB)
+  const { data: oneTimeExpenses } = await supabase
+    .from("expenses").select("*").eq("user_id", user.id).eq("type", "one_time")
+    .gte("date", period.start).lte("date", period.end)
     .order("date", { ascending: true })
 
-  const expenses = (allExpenses || []).filter((exp) =>
-    exp.type === "one_time"
-      ? exp.date >= period.start && exp.date <= period.end
-      : exp.type === "recurring" && exp.active
-  )
+  // Dépenses récurrentes actives (sans filtre de date)
+  const { data: recurringExpenses } = await supabase
+    .from("expenses").select("*").eq("user_id", user.id).eq("type", "recurring").eq("active", true)
+    .order("date", { ascending: true })
+
+  const expenses = [...(oneTimeExpenses || []), ...(recurringExpenses || [])]
 
   const totalRevenues = (revenues || []).reduce((s, r) => s + Number(r.amount), 0)
   const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount), 0)
@@ -319,7 +322,7 @@ export async function GET(req: Request) {
   // ── Buffer ────────────────────────────────────────────────────────────────
   const buffer = await workbook.xlsx.writeBuffer()
 
-  const filename = `keskireste-${period.label.replace(/\s/g, "-")}.xlsx`
+  const filename = `keskireste-${period.label.replace(/[^a-zA-Z0-9\-_.]/g, "-")}.xlsx`
 
   return new NextResponse(buffer as ArrayBuffer, {
     headers: {

@@ -35,17 +35,19 @@ export async function GET(req: Request) {
     .gte("date", yearStart).lte("date", yearEnd)
     .order("date", { ascending: true })
 
-  const { data: allExpenses } = await supabase
-    .from("expenses").select("*").eq("user_id", user.id)
+  // One-time expenses in year (filtrées côté DB)
+  const { data: oneTimeExpensesData } = await supabase
+    .from("expenses").select("*").eq("user_id", user.id).eq("type", "one_time")
+    .gte("date", yearStart).lte("date", yearEnd)
     .order("date", { ascending: true })
 
-  // One-time expenses in year + recurring active ones (listed once)
-  const oneTimeExpenses = (allExpenses || []).filter(
-    (e) => e.type === "one_time" && e.date >= yearStart && e.date <= yearEnd
-  )
-  const recurringExpenses = (allExpenses || []).filter(
-    (e) => e.type === "recurring" && e.active
-  )
+  // Dépenses récurrentes actives (sans filtre de date)
+  const { data: recurringExpensesData } = await supabase
+    .from("expenses").select("*").eq("user_id", user.id).eq("type", "recurring").eq("active", true)
+    .order("date", { ascending: true })
+
+  const oneTimeExpenses = oneTimeExpensesData || []
+  const recurringExpenses = recurringExpensesData || []
 
   const totalRevenues = (revenues || []).reduce((s, r) => s + Number(r.amount), 0)
   const totalOneTime = oneTimeExpenses.reduce((s, e) => s + Number(e.amount), 0)
