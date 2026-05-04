@@ -56,15 +56,19 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     )
   } catch (err) {
-    console.error("Webhook signature error:", err)
+    console.error("[webhook] Signature invalide — vérifie STRIPE_WEBHOOK_SECRET dans Vercel env vars:", err)
     return new Response("Invalid signature", { status: 400 })
   }
+
+  console.log(`[webhook] Event reçu: ${event.type}`)
 
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session
       const userId = session.metadata?.supabase_user_id
       const planType = session.metadata?.plan_type
+
+      console.log(`[webhook] checkout.session.completed — userId=${userId} planType=${planType}`)
 
       if (typeof userId === "string" && userId) {
         if (planType === "founder") {
@@ -81,8 +85,14 @@ export async function POST(req: Request) {
             })
             .eq("id", userId)
 
-          if (error) console.error("Erreur passage premium :", error.message)
+          if (error) {
+            console.error("[webhook] Erreur passage premium :", error.message)
+          } else {
+            console.log(`[webhook] ✅ Profil ${userId} passé en premium`)
+          }
         }
+      } else {
+        console.error("[webhook] ⚠️ userId manquant dans session.metadata — vérifie que la metadata est bien passée au checkout")
       }
     }
 

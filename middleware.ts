@@ -59,7 +59,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Exclure les fichiers statiques et les routes API internes Next.js
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Exclure les fichiers statiques, les routes API internes Next.js,
+    // et la route webhook Stripe (doit recevoir le body brut sans interférence)
+    "/((?!_next/static|_next/image|favicon.ico|api/stripe/webhook|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
