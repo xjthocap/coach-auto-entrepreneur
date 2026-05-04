@@ -39,6 +39,8 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
   const [reference, setReference] = useState("")
 
   const [generateInvoice, setGenerateInvoice] = useState(false)
+  const [autoInvoiceNumber, setAutoInvoiceNumber] = useState("")
+  const [invoiceNumberLoading, setInvoiceNumberLoading] = useState(false)
   const [dueAt, setDueAt] = useState("")
   const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
 
@@ -50,9 +52,17 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
     },
   ])
 
-  function generateInvoiceNumber() {
-    const timestamp = Date.now()
-    return `FAC-${new Date().getFullYear()}-${timestamp}`
+  async function fetchNextInvoiceNumber() {
+    setInvoiceNumberLoading(true)
+    try {
+      const res = await fetch("/api/invoices/next-number")
+      if (res.ok) {
+        const { invoiceNumber } = await res.json()
+        setAutoInvoiceNumber(invoiceNumber)
+      }
+    } finally {
+      setInvoiceNumberLoading(false)
+    }
   }
 
   function updateItem(index: number, field: string, value: string) {
@@ -112,7 +122,15 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
     }
 
     if (generateInvoice) {
-      const invoiceNumber = reference.trim() || generateInvoiceNumber()
+      // Utilise le numéro auto-généré (déjà fetchés au toggle) ou en génère un nouveau en fallback
+      let invoiceNumber = autoInvoiceNumber
+      if (!invoiceNumber) {
+        const res = await fetch("/api/invoices/next-number")
+        if (res.ok) {
+          const data = await res.json()
+          invoiceNumber = data.invoiceNumber
+        }
+      }
 
       const { data: invoice, error: invoiceError } = await supabase
         .from("invoices")
@@ -154,6 +172,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
     setClientAddress("")
     setPaymentMethod("")
     setReference("")
+    setAutoInvoiceNumber("")
     setDueAt("")
     setGenerateInvoice(false)
     setLabel("")
@@ -274,7 +293,11 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             <input
               type="checkbox"
               checked={generateInvoice}
-              onChange={() => setGenerateInvoice(!generateInvoice)}
+              onChange={() => {
+                const next = !generateInvoice
+                setGenerateInvoice(next)
+                if (next && !autoInvoiceNumber) fetchNextInvoiceNumber()
+              }}
               style={{ width: 16, height: 16, accentColor: "var(--violet-700)" }}
             />
             Générer une facture PDF pour cette entrée
@@ -349,7 +372,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
               />
             </div>
 
-            {/* Adresse + Référence */}
+            {/* Adresse + N° facture auto */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <input
                 type="text"
@@ -358,13 +381,33 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
                 placeholder="Adresse client"
                 {...inputProps}
               />
-              <input
-                type="text"
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-                placeholder="Référence facture"
-                {...inputProps}
-              />
+              {/* Numéro de facture auto-généré — lecture seule */}
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={invoiceNumberLoading ? "Génération…" : autoInvoiceNumber}
+                  style={{
+                    ...inputStyle,
+                    background: "var(--cream-100)",
+                    color: autoInvoiceNumber ? "var(--ink-700)" : "var(--ink-400)",
+                    fontWeight: autoInvoiceNumber ? 600 : 400,
+                    fontFamily: "var(--font-geist-mono, monospace)",
+                    cursor: "default",
+                    paddingRight: 36,
+                  }}
+                />
+                {/* Icône cadenas */}
+                <span style={{
+                  position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                  color: "var(--ink-400)", pointerEvents: "none",
+                }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </span>
+              </div>
             </div>
 
             {/* Date d'échéance */}

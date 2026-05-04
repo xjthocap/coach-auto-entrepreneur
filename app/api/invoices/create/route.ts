@@ -1,9 +1,32 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
-function generateInvoiceNumber() {
-  const ts = Date.now()
-  return `FAC-${new Date().getFullYear()}-${ts}`
+/**
+ * Calcule le prochain numéro de facture F-YYYY-XXXXX pour un utilisateur donné.
+ * Séquence par utilisateur, repart à 00001 chaque année.
+ */
+async function nextInvoiceNumber(supabase: SupabaseClient, userId: string): Promise<string> {
+  const year = new Date().getFullYear()
+  const prefix = `F-${year}-`
+
+  const { data } = await supabase
+    .from("invoices")
+    .select("invoice_number")
+    .eq("user_id", userId)
+    .like("invoice_number", `${prefix}%`)
+    .order("invoice_number", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  let seq = 1
+  if (data?.invoice_number) {
+    const parts = (data.invoice_number as string).split("-")
+    const lastSeq = parseInt(parts[parts.length - 1], 10)
+    if (!isNaN(lastSeq)) seq = lastSeq + 1
+  }
+
+  return `${prefix}${String(seq).padStart(5, "0")}`
 }
 
 export async function POST(req: Request) {
@@ -58,7 +81,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ invoiceId: existing.id })
   }
 
-  const invoiceNumber = generateInvoiceNumber()
+  const invoiceNumber = await nextInvoiceNumber(supabase, user.id)
 
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")
