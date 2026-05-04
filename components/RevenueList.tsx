@@ -80,17 +80,17 @@ export default function RevenueList({ revenues, isPremium = false }: { revenues:
                       <span style={{ color: "var(--ink-400)" }}> · {sublabel}</span>
                     )}
                   </p>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    <p className="font-mono text-xs" style={{ color: "var(--ink-400)" }}>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <p className="font-mono text-xs shrink-0" style={{ color: "var(--ink-400)" }}>
                       {dateStr}
                     </p>
+                    {/* Badge statut facture — dans la zone texte pour rester responsive */}
                     {invoiceId && (
-                      <span
-                        className="rounded px-1.5 py-0.5 text-[10px] font-medium"
-                        style={{ background: "rgba(196, 181, 253, 0.25)", color: "var(--lime-700)" }}
-                      >
-                        facture
-                      </span>
+                      <InvoiceStatusBadge
+                        invoiceId={invoiceId}
+                        status={(rev.invoices?.[0]?.status ?? "draft") as any}
+                        invoiceNumber={rev.invoices?.[0]?.invoice_number}
+                      />
                     )}
                   </div>
                 </div>
@@ -103,37 +103,21 @@ export default function RevenueList({ revenues, isPremium = false }: { revenues:
                   +{Number(rev.amount).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
                 </p>
 
-                {/* Actions */}
+                {/* Actions — icônes uniquement, taille fixe */}
                 <div className="flex shrink-0 items-center gap-0.5">
                   {invoiceId ? (
-                    <>
-                      <a
-                        href={`/api/invoices/${invoiceId}/pdf`}
-                        target="_blank"
-                        rel="noreferrer"
-                        title="Télécharger la facture PDF"
-                        className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70"
-                        style={{ color: "var(--ink-300)" }}
-                      >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                        </svg>
-                      </a>
-                      <InvoiceStatusBadge
-                        invoiceId={invoiceId}
-                        status={(rev.invoices?.[0]?.status ?? "draft") as any}
-                        invoiceNumber={rev.invoices?.[0]?.invoice_number}
-                      />
-                    </>
+                    <a
+                      href={`/api/invoices/${invoiceId}/pdf`}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Télécharger la facture PDF"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70"
+                      style={{ color: "var(--ink-300)" }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                      </svg>
+                    </a>
                   ) : isPremium ? (
                     <GenerateInvoiceButton revenueId={rev.id} />
                   ) : (
@@ -141,9 +125,7 @@ export default function RevenueList({ revenues, isPremium = false }: { revenues:
                       title="Générer une facture PDF (Premium)"
                       className="flex h-7 w-7 items-center justify-center rounded-lg"
                       style={{ color: "var(--ink-300)", cursor: "default", opacity: 0.5 }}
-                    >
-                      🔒
-                    </span>
+                    >🔒</span>
                   )}
                   <DeleteRevenueButton revenueId={rev.id} />
                 </div>
