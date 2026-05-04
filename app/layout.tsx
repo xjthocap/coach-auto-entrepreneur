@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react"
 import UpgradeBanner from "@/components/UpgradeBanner"
+import ChatBotWrapper from "@/components/ChatBotWrapper"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,9 @@ export default function RootLayout({
           <UpgradeBanner />
         </Suspense>
         {children}
+        <Suspense>
+          <ChatBotWrapper />
+        </Suspense>
       </body>
     </html>
   );
