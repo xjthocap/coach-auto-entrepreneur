@@ -78,11 +78,11 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
               Deviens Founder
             </h3>
             <p className="mt-1.5 text-sm" style={{ color: "var(--ink-400)" }}>
-              Accès à vie pour les{" "}
+              99€/an{" "}
               <span className="font-semibold" style={{ color: "var(--lime-500)" }}>
-                {remaining} dernières places
+                prix figé à vie
               </span>
-              . Plus jamais de frais.
+              {" "}pour les {remaining} premières places.
             </p>
 
             {/* Progress bar */}
@@ -102,7 +102,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
                   99€
                 </p>
                 <p className="text-xs" style={{ color: "var(--ink-400)" }}>
-                  paiement unique · à vie
+                  / an · prix figé à vie
                 </p>
               </div>
               <div className="text-right">
@@ -110,7 +110,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
                   19,90€/mois
                 </p>
                 <p className="text-xs font-medium" style={{ color: "var(--lime-500)" }}>
-                  Économise ~240€/an
+                  Économise ~140€/an
                 </p>
               </div>
             </div>
@@ -119,7 +119,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
               {[
                 "Toutes les fonctionnalités Premium",
                 "Badge Founder numéroté",
-                "Accès à vie garanti",
+                "Prix figé à vie garanti",
                 "Mises à jour incluses",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-2 text-sm" style={{ color: "var(--ink-300)" }}>
@@ -137,7 +137,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
               className="mt-6 w-full rounded-xl py-3 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
               style={{ background: "var(--lime-500)", color: "var(--ink-900)" }}
             >
-              {loading ? "Redirection…" : `Rejoindre les Founders — 99€ unique`}
+              {loading ? "Redirection…" : `Rejoindre les Founders — 99€/an`}
             </button>
 
             {error && (
