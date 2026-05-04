@@ -26,6 +26,7 @@ import ExportYearButton from "@/components/ExportYearButton"
 import TopbarPeriod from "@/components/TopbarPeriod"
 import WelcomeEmailTrigger from "@/components/WelcomeEmailTrigger"
 import URSSAFDeclarationAlert from "@/components/URSSAFDeclarationAlert"
+import ChatTriggerButton from "@/components/ChatTriggerButton"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)
@@ -359,16 +360,43 @@ export default async function DashboardPage({
             className="sticky top-0 z-20 backdrop-blur"
             style={{ background: "rgba(248, 247, 252, 0.92)", borderBottom: "1px solid var(--cream-300)" }}
           >
+            {/* ── Ligne principale ── */}
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 md:px-8">
+              {/* Gauche : prénom + badge plan */}
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
                   Dashboard
                 </p>
-                <h1 className="truncate text-[22px] font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
-                  Bonjour {profile.first_name || "à toi"}&nbsp;<span className="wave-emoji">👋</span>
-                </h1>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="truncate text-[22px] font-semibold tracking-tight" style={{ color: "var(--ink-900)" }}>
+                    Bonjour {profile.first_name || "à toi"}&nbsp;<span className="wave-emoji">👋</span>
+                  </h1>
+                  {/* Badge plan */}
+                  {(() => {
+                    const isFounder = !!(profile.founder_number)
+                    return (
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "3px 10px",
+                        whiteSpace: "nowrap", flexShrink: 0,
+                        background: isFounder
+                          ? "rgba(196,181,253,0.2)"
+                          : isPremium
+                          ? "var(--violet-500)"
+                          : "rgba(196,181,253,0.12)",
+                        color: isFounder
+                          ? "var(--violet-700)"
+                          : isPremium
+                          ? "var(--ink-900)"
+                          : "var(--violet-700)",
+                      }}>
+                        {isFounder ? `⭐ Founder #${profile.founder_number}` : isPremium ? "Premium" : "Gratuit"}
+                      </span>
+                    )
+                  })()}
+                </div>
               </div>
 
+              {/* Droite desktop : période + exports */}
               <div className="hidden md:flex items-center gap-2">
                 <TopbarPeriod
                   label={buildPeriodLabel(frequency, period)}
@@ -382,8 +410,16 @@ export default async function DashboardPage({
                 {isPremium && <ExportYearButton year={selectedYear} />}
                 {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
               </div>
+
+              {/* Droite mobile : bouton chat (premium) */}
+              {isPremium && (
+                <div className="flex md:hidden items-center gap-2">
+                  <ChatTriggerButton />
+                </div>
+              )}
             </div>
-            {/* Mobile period row */}
+
+            {/* ── Ligne mobile : période + exports ── */}
             <div
               className="md:hidden flex items-center justify-between px-4 pt-2.5 pb-2.5"
               style={{ borderTop: "1px solid var(--cream-300)" }}
@@ -395,32 +431,12 @@ export default async function DashboardPage({
                 basePath="/dashboard"
                 currentDate={formatLocalDate(baseDate)}
               />
-              {(() => {
-                const isFounder = !!(profile.founder_number)
-                if (isPremium) {
-                  return (
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{
-                        fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "3px 10px",
-                        background: isFounder ? "rgba(196,181,253,0.2)" : "var(--violet-500)",
-                        color: isFounder ? "var(--violet-700)" : "var(--ink-900)",
-                      }}>
-                        {isFounder ? `⭐ Founder #${profile.founder_number}` : "Premium"}
-                      </span>
-                      <ExportYearButton year={selectedYear} />
-                      <ExportPeriodButton date={formatLocalDate(baseDate)} />
-                    </div>
-                  )
-                }
-                return (
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, borderRadius: 999, padding: "3px 10px",
-                    background: "rgba(196,181,253,0.12)", color: "var(--violet-700)",
-                  }}>
-                    Gratuit
-                  </span>
-                )
-              })()}
+              {isPremium && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <ExportYearButton year={selectedYear} />
+                  <ExportPeriodButton date={formatLocalDate(baseDate)} />
+                </div>
+              )}
             </div>
           </header>
 

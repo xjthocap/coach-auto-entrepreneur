@@ -94,6 +94,13 @@ export default function ChatBot() {
     return () => mq.removeEventListener("change", handler)
   }, [])
 
+  // Écoute le bouton topbar mobile
+  useEffect(() => {
+    function onOpenChat() { setOpen(true) }
+    window.addEventListener("open-chat", onOpenChat)
+    return () => window.removeEventListener("open-chat", onOpenChat)
+  }, [])
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [])
@@ -190,6 +197,11 @@ export default function ChatBot() {
           background: #6D28D9 !important;
         }
         .chat-send:disabled { opacity: 0.5; cursor: default; }
+
+        /* Bulle flottante cachée sur mobile — remplacée par le bouton topbar */
+        @media (max-width: 768px) {
+          .chat-fab { display: none !important; }
+        }
 
       `}</style>
 
