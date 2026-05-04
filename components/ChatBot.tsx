@@ -82,8 +82,17 @@ export default function ChatBot() {
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const [hasUnread, setHasUnread] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)")
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -182,10 +191,6 @@ export default function ChatBot() {
         }
         .chat-send:disabled { opacity: 0.5; cursor: default; }
 
-        /* Mobile : chatbot masqué (trop intrusif sur petit écran) */
-        @media (max-width: 768px) {
-          .chat-fab { display: none !important; }
-        }
       `}</style>
 
       {/* ── Floating button ── */}
@@ -197,7 +202,20 @@ export default function ChatBot() {
       }}>
         {/* Chat panel */}
         {open && (
-          <div className="chat-panel" style={{
+          <div className="chat-panel" style={isMobile ? {
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100dvh",
+            background: "white",
+            borderRadius: 0,
+            boxShadow: "none",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            zIndex: 10000,
+            animation: "chatSlideUp 0.2s ease",
+          } : {
             position: "absolute",
             bottom: 64,
             right: 0,
