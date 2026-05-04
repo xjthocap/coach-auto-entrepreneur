@@ -15,9 +15,7 @@ const inputStyle: React.CSSProperties = {
   fontSize: 14,
 }
 
-const inputProps = {
-  style: inputStyle,
-}
+const inputProps = { style: inputStyle }
 
 export default function AddRevenue({ isPremium = false }: { isPremium?: boolean }) {
   const supabase = createClient()
@@ -44,13 +42,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
   const [dueAt, setDueAt] = useState("")
   const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
 
-  const [items, setItems] = useState([
-    {
-      description: "",
-      quantity: "1",
-      unitPrice: "",
-    },
-  ])
+  const [items, setItems] = useState([{ description: "", quantity: "1", unitPrice: "" }])
 
   async function fetchNextInvoiceNumber() {
     setInvoiceNumberLoading(true)
@@ -122,7 +114,6 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
     }
 
     if (generateInvoice) {
-      // Utilise le numéro auto-généré (déjà fetchés au toggle) ou en génère un nouveau en fallback
       let invoiceNumber = autoInvoiceNumber
       if (!invoiceNumber) {
         const res = await fetch("/api/invoices/next-number")
@@ -197,18 +188,42 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         flexDirection: "column",
       }}
     >
+      <style>{`
+        /* Grilles responsives AddRevenue */
+        .ar-grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 400px) {
+          .ar-grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Lignes de facture : description pleine largeur sur mobile,
+           tout sur une ligne en dessus de 520px */
+        .ar-invoice-line {
+          display: grid;
+          grid-template-columns: 1fr 1fr auto;
+          grid-template-areas:
+            "desc desc desc"
+            "qty  price remove";
+          gap: 8px;
+        }
+        .ar-invoice-line-desc  { grid-area: desc; }
+        .ar-invoice-line-qty   { grid-area: qty; }
+        .ar-invoice-line-price { grid-area: price; }
+        .ar-invoice-line-rm    { grid-area: remove; }
+        @media (min-width: 520px) {
+          .ar-invoice-line {
+            grid-template-columns: 2fr 1fr 1fr auto;
+            grid-template-areas: "desc qty price remove";
+          }
+        }
+      `}</style>
+
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <p
-          style={{
-            marginBottom: 6,
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: "var(--violet-700)",
-          }}
-        >
+        <p style={{
+          marginBottom: 6, fontSize: 11, fontWeight: 600,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          color: "var(--violet-700)",
+        }}>
           Entrée d'argent
         </p>
         <h2 style={{ fontSize: 20, fontWeight: 600, color: "var(--ink-900)", marginBottom: 4 }}>
@@ -230,7 +245,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         />
 
         {/* Montant + Date */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div className="ar-grid-2">
           <input
             type="number"
             placeholder="Montant €"
@@ -252,7 +267,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
         </div>
 
         {/* Client + Paiement */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div className="ar-grid-2">
           <input
             type="text"
             value={clientName}
@@ -260,11 +275,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             placeholder="Nom du client"
             {...inputProps}
           />
-          <select
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            style={inputStyle}
-          >
+          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={inputStyle}>
             <option value="">Mode de paiement</option>
             <option value="Virement">Virement</option>
             <option value="Carte bancaire">Carte bancaire</option>
@@ -275,21 +286,12 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
 
         {/* Toggle facture */}
         {isPremium ? (
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              borderRadius: "var(--r-sm)",
-              border: "1px solid var(--cream-200)",
-              background: "var(--cream-100)",
-              padding: "12px 16px",
-              fontSize: 14,
-              fontWeight: 500,
-              color: "var(--ink-700)",
-              cursor: "pointer",
-            }}
-          >
+          <label style={{
+            display: "flex", alignItems: "center", gap: 12,
+            borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)",
+            background: "var(--cream-100)", padding: "12px 16px",
+            fontSize: 14, fontWeight: 500, color: "var(--ink-700)", cursor: "pointer",
+          }}>
             <input
               type="checkbox"
               checked={generateInvoice}
@@ -298,44 +300,26 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
                 setGenerateInvoice(next)
                 if (next && !autoInvoiceNumber) fetchNextInvoiceNumber()
               }}
-              style={{ width: 16, height: 16, accentColor: "var(--violet-700)" }}
+              style={{ width: 16, height: 16, accentColor: "var(--violet-700)", flexShrink: 0 }}
             />
             Générer une facture PDF pour cette entrée
           </label>
         ) : (
-          <a
-            href="/dashboard#premium"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              borderRadius: "var(--r-sm)",
-              border: "1px solid var(--cream-200)",
-              background: "var(--cream-100)",
-              padding: "12px 16px",
-              fontSize: 14,
-              fontWeight: 500,
-              color: "var(--ink-400)",
-              textDecoration: "none",
-              cursor: "pointer",
-              opacity: 0.75,
-            }}
-          >
-            <span style={{ fontSize: 15 }}>🔒</span>
-            Générer une facture PDF pour cette entrée
-            <span
-              style={{
-                marginLeft: "auto",
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "var(--violet-700)",
-                background: "rgba(196,181,253,0.2)",
-                borderRadius: 999,
-                padding: "2px 8px",
-              }}
-            >
+          <a href="/dashboard#premium" style={{
+            display: "flex", alignItems: "center", gap: 12,
+            borderRadius: "var(--r-sm)", border: "1px solid var(--cream-200)",
+            background: "var(--cream-100)", padding: "12px 16px",
+            fontSize: 14, fontWeight: 500, color: "var(--ink-400)",
+            textDecoration: "none", cursor: "pointer", opacity: 0.75,
+          }}>
+            <span style={{ fontSize: 15, flexShrink: 0 }}>🔒</span>
+            <span style={{ flex: 1 }}>Générer une facture PDF</span>
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+              textTransform: "uppercase", color: "var(--violet-700)",
+              background: "rgba(196,181,253,0.2)", borderRadius: 999, padding: "2px 8px",
+              whiteSpace: "nowrap", flexShrink: 0,
+            }}>
               Premium
             </span>
           </a>
@@ -343,19 +327,13 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
 
         {/* Détails facture */}
         {generateInvoice && (
-          <div
-            style={{
-              borderRadius: "var(--r-md)",
-              border: "1px solid var(--cream-200)",
-              background: "var(--cream-100)",
-              padding: 16,
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
+          <div style={{
+            borderRadius: "var(--r-md)", border: "1px solid var(--cream-200)",
+            background: "var(--cream-100)", padding: 16,
+            display: "flex", flexDirection: "column", gap: 10,
+          }}>
             {/* Société + Email */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div className="ar-grid-2">
               <input
                 type="text"
                 value={clientCompany}
@@ -373,7 +351,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             </div>
 
             {/* Adresse + N° facture auto */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div className="ar-grid-2">
               <input
                 type="text"
                 value={clientAddress}
@@ -381,92 +359,67 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
                 placeholder="Adresse client"
                 {...inputProps}
               />
-              {/* Numéro de facture auto-généré — lecture seule */}
-              <div style={{ position: "relative" }}>
-                <input
-                  type="text"
-                  readOnly
-                  value={invoiceNumberLoading ? "Génération…" : autoInvoiceNumber}
-                  style={{
-                    ...inputStyle,
-                    background: "var(--cream-100)",
-                    color: autoInvoiceNumber ? "var(--ink-700)" : "var(--ink-400)",
-                    fontWeight: autoInvoiceNumber ? 600 : 400,
-                    fontFamily: "var(--font-geist-mono, monospace)",
-                    cursor: "default",
-                    paddingRight: 36,
-                  }}
-                />
-                {/* Icône cadenas */}
-                <span style={{
-                  position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
-                  color: "var(--ink-400)", pointerEvents: "none",
-                }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                </span>
-              </div>
+              <input
+                type="text"
+                value={invoiceNumberLoading ? "Génération…" : autoInvoiceNumber}
+                onChange={(e) => setAutoInvoiceNumber(e.target.value)}
+                placeholder="N° facture (auto)"
+                style={{
+                  ...inputStyle,
+                  fontFamily: "var(--font-geist-mono, monospace)",
+                  fontWeight: 600,
+                }}
+              />
             </div>
 
             {/* Date d'échéance */}
-            <input
-              type="date"
-              value={dueAt}
-              onChange={(e) => setDueAt(e.target.value)}
-              {...inputProps}
-            />
+            <input type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} {...inputProps} />
 
-            {/* Lignes */}
+            {/* Lignes de facture */}
             <p style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-700)" }}>
               Lignes de facture
             </p>
 
             {items.map((item, index) => (
-              <div
-                key={index}
-                style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 8 }}
-              >
+              <div key={index} className="ar-invoice-line">
                 <input
+                  className="ar-invoice-line-desc"
                   type="text"
                   value={item.description}
                   onChange={(e) => updateItem(index, "description", e.target.value)}
                   placeholder="Description"
-                  {...inputProps}
+                  style={inputStyle}
                 />
                 <input
+                  className="ar-invoice-line-qty"
                   type="number"
                   value={item.quantity}
                   onChange={(e) => updateItem(index, "quantity", e.target.value)}
                   placeholder="Qté"
-                  {...inputProps}
+                  style={inputStyle}
                 />
                 <input
+                  className="ar-invoice-line-price"
                   type="number"
                   value={item.unitPrice}
                   onChange={(e) => updateItem(index, "unitPrice", e.target.value)}
                   placeholder="Prix HT"
-                  {...inputProps}
+                  style={inputStyle}
                 />
                 <button
+                  className="ar-invoice-line-rm"
                   type="button"
                   onClick={() => removeItem(index)}
                   disabled={items.length === 1}
                   style={{
-                    borderRadius: "var(--r-sm)",
-                    border: "1px solid var(--cream-300)",
+                    borderRadius: "var(--r-sm)", border: "1px solid var(--cream-300)",
                     background: "var(--cream-50)",
                     color: items.length === 1 ? "var(--ink-300)" : "var(--rose-500)",
-                    padding: "12px 14px",
-                    fontSize: 13,
-                    fontWeight: 600,
+                    padding: "12px 14px", fontSize: 13, fontWeight: 600,
                     cursor: items.length === 1 ? "not-allowed" : "pointer",
                     opacity: items.length === 1 ? 0.4 : 1,
                   }}
-                >
-                  ✕
-                </button>
+                >✕</button>
               </div>
             ))}
 
@@ -474,29 +427,19 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
               type="button"
               onClick={addItem}
               style={{
-                borderRadius: "var(--r-sm)",
-                border: "1px solid var(--cream-300)",
-                background: "var(--cream-200)",
-                color: "var(--ink-700)",
-                padding: "10px 16px",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                alignSelf: "flex-start",
+                borderRadius: "var(--r-sm)", border: "1px solid var(--cream-300)",
+                background: "var(--cream-200)", color: "var(--ink-700)",
+                padding: "10px 16px", fontSize: 13, fontWeight: 600,
+                cursor: "pointer", alignSelf: "flex-start",
               }}
             >
               + Ajouter une ligne
             </button>
 
-            <p
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--ink-900)",
-                borderTop: "1px solid var(--cream-300)",
-                paddingTop: 10,
-              }}
-            >
+            <p style={{
+              fontSize: 13, fontWeight: 700, color: "var(--ink-900)",
+              borderTop: "1px solid var(--cream-300)", paddingTop: 10,
+            }}>
               Total HT : {invoiceTotal.toFixed(2).replace(".", ",")} €
             </p>
           </div>
@@ -508,39 +451,26 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
           onClick={handleAdd}
           disabled={loading}
           style={{
-            width: "100%",
-            borderRadius: "var(--r-sm)",
-            border: "none",
-            background: "var(--ink-900)",
-            color: "var(--violet-500)",
-            padding: "14px 20px",
-            fontSize: 15,
-            fontWeight: 600,
+            width: "100%", borderRadius: "var(--r-sm)", border: "none",
+            background: "var(--ink-900)", color: "var(--violet-500)",
+            padding: "14px 20px", fontSize: 15, fontWeight: 600,
             cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.5 : 1,
-            boxShadow: "var(--shadow-md)",
+            opacity: loading ? 0.5 : 1, boxShadow: "var(--shadow-md)",
           }}
         >
           {loading ? "Enregistrement…" : "Ajouter le revenu"}
         </button>
 
-        {/* Lien téléchargement facture */}
         {lastInvoiceId && (
           <a
             href={`/api/invoices/${lastInvoiceId}/pdf`}
             target="_blank"
             rel="noreferrer"
             style={{
-              display: "block",
-              borderRadius: "var(--r-sm)",
-              border: "1px solid var(--cream-300)",
-              background: "var(--cream-200)",
-              color: "var(--violet-700)",
-              padding: "12px 16px",
-              textAlign: "center",
-              fontSize: 14,
-              fontWeight: 600,
-              textDecoration: "none",
+              display: "block", borderRadius: "var(--r-sm)",
+              border: "1px solid var(--cream-300)", background: "var(--cream-200)",
+              color: "var(--violet-700)", padding: "12px 16px",
+              textAlign: "center", fontSize: 14, fontWeight: 600, textDecoration: "none",
             }}
           >
             ↓ Télécharger la facture PDF

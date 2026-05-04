@@ -81,18 +81,25 @@ export default function AddExpense() {
         flexDirection: "column",
       }}
     >
+      <style>{`
+        .ae-grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .ae-grid-3 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 400px) {
+          .ae-grid-2 { grid-template-columns: 1fr 1fr; }
+          .ae-grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 600px) {
+          .ae-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        }
+      `}</style>
+
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <p
-          style={{
-            marginBottom: 6,
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: "var(--rose-500)",
-          }}
-        >
+        <p style={{
+          marginBottom: 6, fontSize: 11, fontWeight: 600,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          color: "var(--rose-500)",
+        }}>
           Sortie d'argent
         </p>
         <h2 style={{ fontSize: 20, fontWeight: 600, color: "var(--ink-900)", marginBottom: 4 }}>
@@ -114,7 +121,7 @@ export default function AddExpense() {
         />
 
         {/* Montant + Date + Type */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        <div className="ae-grid-3">
           <input
             type="number"
             placeholder="Montant €"
@@ -139,7 +146,7 @@ export default function AddExpense() {
         </div>
 
         {/* Fournisseur + Mode + Référence */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        <div className="ae-grid-3">
           <input
             type="text"
             value={supplierName}

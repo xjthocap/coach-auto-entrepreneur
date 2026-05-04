@@ -205,44 +205,38 @@ export default function ChatBot() {
 
       `}</style>
 
-      {/* ── Floating button ── */}
-      <div className="chat-fab" style={{
-        position: "fixed",
-        bottom: 24,
-        right: 24,
-        zIndex: 9999,
-      }}>
-        {/* Chat panel */}
-        {open && (
-          <div className="chat-panel" style={isMobile ? {
-            position: "fixed",
-            inset: 0,
-            width: "100vw",
-            height: "100dvh",
-            background: "white",
-            borderRadius: 0,
-            boxShadow: "none",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            zIndex: 10000,
-            animation: "chatSlideUp 0.2s ease",
-          } : {
-            position: "absolute",
-            bottom: 64,
-            right: 0,
-            width: 380,
-            maxWidth: "calc(100vw - 32px)",
-            height: 520,
-            maxHeight: "calc(100vh - 120px)",
-            background: "white",
-            borderRadius: 20,
-            boxShadow: "0 24px 64px rgba(37,3,78,0.18), 0 0 0 1px rgba(37,3,78,0.06)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            animation: "chatSlideUp 0.2s ease",
-          }}>
+      {/* ── Chat panel — rendu séparé de la bulle pour ne pas être masqué sur mobile ── */}
+      {open && (
+        <div style={isMobile ? {
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100dvh",
+          background: "white",
+          borderRadius: 0,
+          boxShadow: "none",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          zIndex: 10000,
+          animation: "chatSlideUp 0.2s ease",
+        } : {
+          position: "fixed",
+          bottom: 92,
+          right: 24,
+          width: 380,
+          maxWidth: "calc(100vw - 48px)",
+          height: 520,
+          maxHeight: "calc(100vh - 120px)",
+          background: "white",
+          borderRadius: 20,
+          boxShadow: "0 24px 64px rgba(37,3,78,0.18), 0 0 0 1px rgba(37,3,78,0.06)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          zIndex: 9998,
+          animation: "chatSlideUp 0.2s ease",
+        }}>
             {/* Header */}
             <div style={{
               padding: "16px 20px",
@@ -397,10 +391,16 @@ export default function ChatBot() {
                 </svg>
               </button>
             </div>
-          </div>
-        )}
+        </div>
+      )}
 
-        {/* Bubble button */}
+      {/* ── Bulle flottante — cachée sur mobile (remplacée par bouton topbar) ── */}
+      <div className="chat-fab" style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        zIndex: 9999,
+      }}>
         <button
           onClick={() => setOpen(o => !o)}
           style={{
