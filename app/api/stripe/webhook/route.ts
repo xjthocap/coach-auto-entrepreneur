@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin"
 
 const MAX_FOUNDERS = 50
 
-async function assignFounder(userId: string): Promise<void> {
+async function assignFounder(userId: string, stripeCustomerId: string | null): Promise<void> {
   // Vérifier si déjà founder
   const { data: existing } = await supabaseAdmin
     .from("profiles")
@@ -36,6 +36,8 @@ async function assignFounder(userId: string): Promise<void> {
       subscription_type: "founder",
       founder_number: founderNumber,
       founder_started_at: new Date().toISOString(),
+      // Sauvegarder le customer_id pour pouvoir réagir aux échecs de paiement
+      stripe_customer_id: stripeCustomerId,
     })
     .eq("id", userId)
 
@@ -73,7 +75,8 @@ export async function POST(req: Request) {
 
       if (userId) {
         if (planType === "founder") {
-          await assignFounder(userId)
+          const customerId = typeof session.customer === "string" ? session.customer : null
+          await assignFounder(userId, customerId)
         } else {
           const { error } = await supabaseAdmin
             .from("profiles")

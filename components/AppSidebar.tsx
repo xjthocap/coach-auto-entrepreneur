@@ -87,7 +87,7 @@ const navLinks = [
 ] as const
 
 export default function AppSidebar({ activePage, profile, userEmail }: AppSidebarProps) {
-  const isPremium = profile.plan === "premium" || !!profile.founder_number
+  const isPremium = profile.plan === "premium"
   const isFounder = !!(profile.founder_number)
 
   return (
@@ -218,7 +218,7 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
           </div>
           <p className="text-xs leading-5 mb-3" style={{ color: isPremium ? "var(--ink-300)" : "var(--ink-500)" }}>
             {isFounder
-              ? "Accès à vie · toutes les fonctionnalités Premium."
+              ? "Founder · 99€/an · toutes les fonctionnalités Premium."
               : isPremium
               ? "Tu as accès au coach IA, à l'historique complet et aux exports."
               : "Débloque le coach IA, l'historique et la génération de factures."}

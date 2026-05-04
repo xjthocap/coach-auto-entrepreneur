@@ -26,7 +26,7 @@ export default function FounderBadge({ founderNumber, size = "md" }: FounderBadg
           Founder #{founderNumber}
         </p>
         <p className="text-[10px]" style={{ color: "var(--ink-400)" }}>
-          Accès à vie · 99€/an
+          Accès à vie · 99€/an (paiement unique)
         </p>
       </div>
     </div>

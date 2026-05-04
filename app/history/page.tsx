@@ -165,7 +165,7 @@ export default async function HistoryPage({
 
   const totalAllTime = monthsDesc.reduce((s, m) => s + m.totalRevenue, 0)
   const activeMonths = monthsDesc.filter(m => m.totalRevenue > 0).length
-  const isPremium = profile.plan === "premium" || !!profile.founder_number
+  const isPremium = profile.plan === "premium"
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>

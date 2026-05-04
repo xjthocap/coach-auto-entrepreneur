@@ -15,7 +15,7 @@ export default async function UpgradeBanner() {
 
   if (!profile) return null
 
-  const isPremium = profile.plan === "premium" || !!profile.founder_number
+  const isPremium = profile.plan === "premium"
   if (isPremium) return null
 
   return <UpgradeBannerClient />

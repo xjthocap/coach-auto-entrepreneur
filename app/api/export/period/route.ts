@@ -131,7 +131,7 @@ export async function GET(req: Request) {
 
   if (!profile) return NextResponse.json({ error: "Profil introuvable" }, { status: 404 })
 
-  const isPremium = profile.plan === "premium" || !!profile.founder_number
+  const isPremium = profile.plan === "premium"
   if (!isPremium) return NextResponse.json({ error: "Premium requis" }, { status: 403 })
 
   const frequency = profile.declaration_frequency === "quarterly" ? "quarterly" : "monthly"

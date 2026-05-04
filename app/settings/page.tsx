@@ -30,7 +30,7 @@ export default async function SettingsPage() {
     redirect("/onboarding")
   }
 
-  const isPremium = profile.plan === "premium" || !!profile.founder_number
+  const isPremium = profile.plan === "premium"
   const isFounder = !!(profile.founder_number)
 
   return (
@@ -120,7 +120,7 @@ export default async function SettingsPage() {
                     </div>
                     <p className="text-sm mb-4" style={{ color: "var(--ink-300)", lineHeight: 1.6 }}>
                       {isFounder
-                        ? "Accès à vie · toutes les fonctionnalités Premium incluses."
+                        ? "Founder · 99€/an · toutes les fonctionnalités Premium incluses."
                         : "Tu as accès au coach IA, à l'historique complet et aux exports."}
                     </p>
                     <ManageSubscriptionButton />

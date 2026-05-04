@@ -102,7 +102,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
                   99€
                 </p>
                 <p className="text-xs" style={{ color: "var(--ink-400)" }}>
-                  / an · à vie
+                  paiement unique · à vie
                 </p>
               </div>
               <div className="text-right">
@@ -110,7 +110,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
                   19,90€/mois
                 </p>
                 <p className="text-xs font-medium" style={{ color: "var(--lime-500)" }}>
-                  Économise ~140€/an
+                  Économise ~240€/an
                 </p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function FounderOfferCard({ founderCount }: FounderOfferCardProps
               className="mt-6 w-full rounded-xl py-3 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
               style={{ background: "var(--lime-500)", color: "var(--ink-900)" }}
             >
-              {loading ? "Redirection…" : `Rejoindre les Founders — 99€/an`}
+              {loading ? "Redirection…" : `Rejoindre les Founders — 99€ unique`}
             </button>
 
             {error && (
