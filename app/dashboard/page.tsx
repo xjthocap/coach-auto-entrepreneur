@@ -186,16 +186,16 @@ export default async function DashboardPage({
     revenueIds.length > 0
       ? await supabase
           .from("invoices")
-          .select("id, revenue_id")
+          .select("id, revenue_id, status, invoice_number")
           .in("revenue_id", revenueIds)
       : { data: [] }
   const invoiceByRevenueId = new Map(
-    (invoices || []).map((inv) => [inv.revenue_id, inv.id])
+    (invoices || []).map((inv) => [inv.revenue_id, { id: inv.id, status: inv.status, invoice_number: inv.invoice_number }])
   )
   const revenuesWithInvoices = (revenues || []).map((r) => ({
     ...r,
     invoices: invoiceByRevenueId.has(r.id)
-      ? [{ id: invoiceByRevenueId.get(r.id)! }]
+      ? [invoiceByRevenueId.get(r.id)!]
       : [],
   }))
 

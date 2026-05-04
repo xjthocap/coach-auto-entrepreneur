@@ -1,7 +1,8 @@
 import DeleteRevenueButton from "@/components/DeleteRevenueButton"
 import GenerateInvoiceButton from "@/components/GenerateInvoiceButton"
+import InvoiceStatusBadge from "@/components/InvoiceStatusBadge"
 
-type Invoice = { id: string }
+type Invoice = { id: string; status?: string | null; invoice_number?: string | null }
 
 type Revenue = {
   id: string
@@ -105,27 +106,34 @@ export default function RevenueList({ revenues, isPremium = false }: { revenues:
                 {/* Actions */}
                 <div className="flex shrink-0 items-center gap-0.5">
                   {invoiceId ? (
-                    <a
-                      href={`/api/invoices/${invoiceId}/pdf`}
-                      target="_blank"
-                      rel="noreferrer"
-                      title="Télécharger la facture PDF"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70"
-                      style={{ color: "var(--ink-300)" }}
-                    >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    <>
+                      <a
+                        href={`/api/invoices/${invoiceId}/pdf`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Télécharger la facture PDF"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70"
+                        style={{ color: "var(--ink-300)" }}
                       >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                      </svg>
-                    </a>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                        </svg>
+                      </a>
+                      <InvoiceStatusBadge
+                        invoiceId={invoiceId}
+                        status={(rev.invoices?.[0]?.status ?? "draft") as any}
+                        invoiceNumber={rev.invoices?.[0]?.invoice_number}
+                      />
+                    </>
                   ) : isPremium ? (
                     <GenerateInvoiceButton revenueId={rev.id} />
                   ) : (
