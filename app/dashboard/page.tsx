@@ -25,6 +25,7 @@ import IRDetailButton from "@/components/IRDetailButton"
 import ExportYearButton from "@/components/ExportYearButton"
 import TopbarPeriod from "@/components/TopbarPeriod"
 import WelcomeEmailTrigger from "@/components/WelcomeEmailTrigger"
+import URSSAFDeclarationAlert from "@/components/URSSAFDeclarationAlert"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)
@@ -558,59 +559,11 @@ export default async function DashboardPage({
             {/* ── DECLARATION ALERTS ── */}
             <div id="declarations" />
             {isInDeclarationWindow && (
-              <section
-                className="flex items-start gap-3 px-5 py-4"
-                style={{
-                  background: "var(--rose-100)",
-                  borderRadius: "var(--r-md)",
-                  border: "1px solid rgba(251,113,133,0.35)",
-                }}
-              >
-                <span
-                  style={{
-                    flexShrink: 0,
-                    width: 32,
-                    height: 32,
-                    borderRadius: "var(--r-sm)",
-                    background: "var(--rose-500)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: 1,
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold" style={{ color: "var(--rose-500)" }}>
-                    Période {realPrevPeriod.label} — déclaration en cours
-                  </p>
-                  <p className="mt-0.5 text-sm" style={{ color: "var(--rose-500)" }}>
-                    Tu es dans la fenêtre de déclaration. Soumets ton chiffre d'affaires sur autoentrepreneur.urssaf.fr avant le{" "}
-                    <strong>{formatDeadline(deadlineDate)}</strong>
-                    {daysUntilDeadline <= 5 && (
-                      <span
-                        style={{
-                          marginLeft: 8,
-                          borderRadius: 999,
-                          background: "var(--rose-500)",
-                          padding: "2px 8px",
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: "white",
-                        }}
-                      >
-                        {daysUntilDeadline === 0 ? "Dernier jour !" : `J-${daysUntilDeadline}`}
-                      </span>
-                    )}
-                    .
-                  </p>
-                </div>
-              </section>
+              <URSSAFDeclarationAlert
+                periodLabel={realPrevPeriod.label}
+                deadlineFormatted={formatDeadline(deadlineDate)}
+                daysUntilDeadline={daysUntilDeadline}
+              />
             )}
 
             {isApproachingEnd && (
