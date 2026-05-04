@@ -181,10 +181,15 @@ export default function ChatBot() {
           background: #6D28D9 !important;
         }
         .chat-send:disabled { opacity: 0.5; cursor: default; }
+
+        /* Mobile : chatbot masqué (trop intrusif sur petit écran) */
+        @media (max-width: 768px) {
+          .chat-fab { display: none !important; }
+        }
       `}</style>
 
       {/* ── Floating button ── */}
-      <div style={{
+      <div className="chat-fab" style={{
         position: "fixed",
         bottom: 24,
         right: 24,
@@ -192,7 +197,7 @@ export default function ChatBot() {
       }}>
         {/* Chat panel */}
         {open && (
-          <div style={{
+          <div className="chat-panel" style={{
             position: "absolute",
             bottom: 64,
             right: 0,

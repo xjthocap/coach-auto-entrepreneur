@@ -395,25 +395,32 @@ export default async function DashboardPage({
                 basePath="/dashboard"
                 currentDate={formatLocalDate(baseDate)}
               />
-              {isPremium ? (
-                <div style={{ display: "flex", gap: 6 }}>
-                  <ExportYearButton year={selectedYear} />
-                  <ExportPeriodButton date={formatLocalDate(baseDate)} />
-                </div>
-              ) : (
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "var(--violet-700)",
-                    background: "rgba(196,181,253,0.15)",
-                    borderRadius: 999,
-                    padding: "3px 10px",
-                  }}
-                >
-                  Version gratuite
-                </span>
-              )}
+              {(() => {
+                const isFounder = !!(profile.founder_number)
+                if (isPremium) {
+                  return (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "3px 10px",
+                        background: isFounder ? "rgba(196,181,253,0.2)" : "var(--violet-500)",
+                        color: isFounder ? "var(--violet-700)" : "var(--ink-900)",
+                      }}>
+                        {isFounder ? `⭐ Founder #${profile.founder_number}` : "Premium"}
+                      </span>
+                      <ExportYearButton year={selectedYear} />
+                      <ExportPeriodButton date={formatLocalDate(baseDate)} />
+                    </div>
+                  )
+                }
+                return (
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, borderRadius: 999, padding: "3px 10px",
+                    background: "rgba(196,181,253,0.12)", color: "var(--violet-700)",
+                  }}>
+                    Gratuit
+                  </span>
+                )
+              })()}
             </div>
           </header>
 
