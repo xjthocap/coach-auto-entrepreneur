@@ -23,6 +23,7 @@ import ExportPeriodButton from "@/components/ExportPeriodButton"
 import IRDetailButton from "@/components/IRDetailButton"
 import ExportYearButton from "@/components/ExportYearButton"
 import TopbarPeriod from "@/components/TopbarPeriod"
+import WelcomeEmailTrigger from "@/components/WelcomeEmailTrigger"
 
 function parseLocalDate(value: string) {
   const [year, month, day] = value.split("-").map(Number)
@@ -338,6 +339,7 @@ export default async function DashboardPage({
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
+      <WelcomeEmailTrigger />
       <Suspense fallback={null}>
         <CheckoutBanner />
       </Suspense>
