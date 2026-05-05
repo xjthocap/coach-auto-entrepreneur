@@ -16,12 +16,12 @@ const AUTH_ROUTES = ["/login", "/signup", "/forgot-password", "/reset-password"]
 const LANDING_ROUTES = ["/", "/histoire", "/legal"]
 
 const APP_HOST = "app.keskireste.fr"
-const LANDING_HOST = "keskireste.fr"
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const host = request.headers.get("host") ?? ""
   const isAppSubdomain = host === APP_HOST || host.startsWith("app.")
+  const isLandingHost = host === "keskireste.fr" || host === "www.keskireste.fr"
 
   // ── Routage par domaine ──────────────────────────────────────────────────
 
@@ -30,8 +30,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
-  // Sur keskireste.fr : les routes app redirigent vers app.keskireste.fr
-  if (!isAppSubdomain && host.includes(LANDING_HOST)) {
+  // Sur keskireste.fr / www.keskireste.fr : les routes app redirigent vers app.keskireste.fr
+  if (!isAppSubdomain && isLandingHost) {
     const isAppRoute = PROTECTED_ROUTES.some((r) => pathname.startsWith(r)) ||
       AUTH_ROUTES.some((r) => pathname.startsWith(r))
     if (isAppRoute) {
