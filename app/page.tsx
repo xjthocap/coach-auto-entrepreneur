@@ -114,6 +114,7 @@ const landingStyles = `
   @media (min-width: 768px) { .btn-ghost { padding: 8px 16px; } }
   .btn-ghost:hover { background: rgba(26, 15, 46, 0.06); }
   .btn-primary {
+    display: none;
     padding: 10px 20px;
     font-size: 0.875rem;
     font-weight: 700;
@@ -123,10 +124,10 @@ const landingStyles = `
     border-radius: 10px;
     cursor: pointer;
     text-decoration: none;
-    transition: opacity 0.15s;
-    display: inline-flex;
     align-items: center;
+    transition: opacity 0.15s;
   }
+  @media (min-width: 768px) { .btn-primary { display: inline-flex; } }
   .btn-primary:hover { opacity: 0.88; }
 
   /* HERO */
