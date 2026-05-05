@@ -170,7 +170,7 @@ export default async function RevenuesPage({
                 basePath="/revenues"
                 currentDate={formatLocalDate(baseDate)}
               />
-              {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
+              {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} iconOnly />}
             </div>
           </header>
 

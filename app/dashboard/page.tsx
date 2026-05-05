@@ -454,8 +454,8 @@ export default async function DashboardPage({
               />
               {isPremium && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <ExportYearButton year={selectedYear} />
-                  <ExportPeriodButton date={formatLocalDate(baseDate)} />
+                  <ExportYearButton year={selectedYear} iconOnly />
+                  <ExportPeriodButton date={formatLocalDate(baseDate)} iconOnly />
                 </div>
               )}
             </div>

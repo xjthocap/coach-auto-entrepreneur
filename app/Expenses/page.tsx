@@ -174,7 +174,7 @@ export default async function ExpensesPage({
                 basePath="/Expenses"
                 currentDate={formatLocalDate(baseDate)}
               />
-              {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} />}
+              {isPremium && <ExportPeriodButton date={formatLocalDate(baseDate)} iconOnly />}
             </div>
           </header>
 

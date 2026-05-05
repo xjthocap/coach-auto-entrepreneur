@@ -98,8 +98,9 @@ const landingStyles = `
     gap: 8px;
   }
   .btn-ghost {
-    display: none;
-    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--ink);
@@ -110,7 +111,7 @@ const landingStyles = `
     text-decoration: none;
     transition: background 0.15s;
   }
-  @media (min-width: 768px) { .btn-ghost { display: inline-flex; align-items: center; } }
+  @media (min-width: 768px) { .btn-ghost { padding: 8px 16px; } }
   .btn-ghost:hover { background: rgba(26, 15, 46, 0.06); }
   .btn-primary {
     padding: 10px 20px;
