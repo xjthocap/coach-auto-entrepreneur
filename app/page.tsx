@@ -1270,12 +1270,7 @@ export default async function HomePage() {
               </a>
             </div>
             <div className="hero-trust">
-              <div className="hero-trust-avatars">
-                <span>L</span>
-                <span>M</span>
-                <span>T</span>
-              </div>
-              <span>Plus de <strong>4 200 freelances</strong> nous font déjà confiance</span>
+              <span>🚀 Tout juste lancé — sois parmi les premiers.</span>
             </div>
           </div>
 
@@ -1327,7 +1322,7 @@ export default async function HomePage() {
         {/* LOGOS BAND */}
         <div className="logos-band">
           <div className="logos-band-inner">
-            <p>Plus de 4 200 freelances français nous font confiance</p>
+            <p>Conçu pour les auto-entrepreneurs français</p>
             <div className="logos-row">
               <span className="logo-name">Malt</span>
               <span className="logo-name">Comet</span>
@@ -1808,7 +1803,7 @@ export default async function HomePage() {
         <section className="final-cta-section">
           <div className="final-cta-card">
             <h2>Tu encaisses.<br /><span>On te dit ce qu&apos;il reste.</span></h2>
-            <p>Rejoins les 4 200 freelances qui ont repris le contrôle de leurs finances.</p>
+            <p>Reprends le contrôle de tes finances — c&apos;est parti.</p>
             <div className="final-cta-actions">
               <Link href="/signup" className="btn-hero-primary">Essayer gratuitement — 0 €</Link>
               <Link href="/histoire" className="btn-hero-secondary">Notre histoire →</Link>
@@ -1851,7 +1846,7 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="footer-bottom">
-              <span>© 2025 keskireste. Fait avec ♥ en France.</span>
+              <span>© 2025 keskireste. Fait avec ♥ à Mpl.</span>
               <div style={{display:'flex', gap:'20px'}}>
                 <Link href="/legal/mentions">Mentions légales</Link>
                 <Link href="/legal/confidentialite">Politique de confidentialité</Link>
