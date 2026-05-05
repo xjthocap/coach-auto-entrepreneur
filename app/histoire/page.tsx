@@ -622,10 +622,10 @@ export default function HistoirePage() {
             <div className="chapter">
               <div className="chapter-marker">05</div>
               <div className="chapter-year">Aujourd&apos;hui</div>
-              <h2 className="chapter-title">Le tableur dans la poche de <em>4 200 freelances.</em></h2>
+              <h2 className="chapter-title">Le tableur, <em>enfin une vraie app.</em></h2>
               <div className="chapter-body">
                 <p>keskireste, c&apos;est mon fichier Excel — sans les bugs, sans les onglets cassés, sans avoir à m&apos;envoyer un message le 15 du mois pour demander la nouvelle version. C&apos;est aussi ce que je n&apos;aurais jamais pu coder seul dans Excel&nbsp;: un coach IA qui regarde tes chiffres et te dit quoi faire, des factures PDF générées en un clic, une projection annuelle qui anticipe avant que la mauvaise surprise n&apos;arrive.</p>
-                <p>Mais l&apos;idée de base, elle n&apos;a pas bougé d&apos;un millimètre depuis cette nuit de décembre 2018. Une seule question. <em>Combien il me reste vraiment&nbsp;?</em></p>
+                <p>On vient de lancer. Il n&apos;y a pas encore des milliers d&apos;utilisateurs — et c&apos;est précisément pour ça que c&apos;est le bon moment de rejoindre. Les premiers seront ceux qui auront façonné l&apos;outil. Mais l&apos;idée de base, elle n&apos;a pas bougé depuis cette nuit de décembre 2018. Une seule question. <em>Combien il me reste vraiment&nbsp;?</em></p>
               </div>
             </div>
 
@@ -647,8 +647,8 @@ export default function HistoirePage() {
                 <div className="stat-lbl">copies envoyées<br />à des amis freelances</div>
               </div>
               <div className="stat">
-                <div className="stat-num">4&nbsp;200</div>
-                <div className="stat-lbl">freelances utilisent<br />keskireste aujourd&apos;hui</div>
+                <div className="stat-num">J<em>-1</em></div>
+                <div className="stat-lbl">tout juste lancé —<br />sois parmi les premiers</div>
               </div>
               <div className="stat">
                 <div className="stat-num">0<em> €</em></div>
@@ -736,7 +736,7 @@ export default function HistoirePage() {
               </div>
             </div>
             <div className="h-footer-bottom">
-              <span>© 2026 keskireste — Fait à Paris, avec beaucoup de café.</span>
+              <span>© 2025 keskireste — Fait à Mpl, avec beaucoup de café.</span>
               <span>données chiffrées · hébergé en 🇫🇷</span>
             </div>
           </div>
