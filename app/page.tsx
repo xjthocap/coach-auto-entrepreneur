@@ -914,7 +914,6 @@ const landingStyles = `
     background: var(--violet-900);
     border: 1.5px solid rgba(245, 197, 66, 0.4);
     box-shadow: 0 16px 48px rgba(245, 197, 66, 0.08);
-    overflow: hidden;
   }
   .price-card-founder::before {
     content: '';
