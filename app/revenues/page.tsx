@@ -207,7 +207,7 @@ export default async function RevenuesPage({
             <section className="grid items-stretch gap-6 xl:grid-cols-[420px_1fr]">
               <div className="h-full">
                 <section
-                  className="relative h-full p-8 md:p-10"
+                  className="relative h-full p-5 md:p-8 xl:p-10"
                   style={{
                     background: "var(--ink-900)",
                     borderRadius: "var(--r-xl)",

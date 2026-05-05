@@ -35,7 +35,7 @@ export default function GenerateInvoiceButton({ revenueId }: { revenueId: string
         target="_blank"
         rel="noreferrer"
         title="Télécharger la facture PDF"
-        className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70"
+        className="flex h-8 w-8 items-center justify-center rounded-lg transition hover:opacity-70"
         style={{ color: "var(--ink-300)" }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -50,7 +50,7 @@ export default function GenerateInvoiceButton({ revenueId }: { revenueId: string
       onClick={handleGenerate}
       disabled={loading}
       title="Générer une facture"
-      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70 disabled:opacity-30"
+      className="flex h-8 w-8 items-center justify-center rounded-lg transition hover:opacity-70 disabled:opacity-30"
       style={{ color: "var(--ink-300)" }}
     >
       {loading ? (

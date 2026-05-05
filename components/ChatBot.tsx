@@ -266,7 +266,7 @@ export default function ChatBot() {
                   border: "none",
                   borderRadius: 8,
                   color: "white",
-                  width: 30, height: 30,
+                  width: 36, height: 36,
                   cursor: "pointer",
                   display: "grid", placeItems: "center",
                   fontSize: 18, lineHeight: 1,

@@ -53,7 +53,7 @@ export default function ExpenseList({
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className="rounded-lg border px-3 py-1.5 text-sm font-medium transition"
+              className="rounded-lg border px-3 py-2 text-sm font-medium transition"
               style={{
                 background: filter === f ? "var(--ink-900)" : "var(--cream-50)",
                 borderColor: filter === f ? "transparent" : "var(--cream-200)",

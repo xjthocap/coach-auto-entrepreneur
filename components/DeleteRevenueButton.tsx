@@ -22,7 +22,7 @@ export default function DeleteRevenueButton({ revenueId }: { revenueId: string }
       onClick={handleDelete}
       disabled={loading}
       title="Supprimer"
-      className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:opacity-70 disabled:opacity-30"
+      className="flex h-8 w-8 items-center justify-center rounded-lg transition hover:opacity-70 disabled:opacity-30"
       style={{ color: "var(--ink-300)" }}
     >
       {loading ? (

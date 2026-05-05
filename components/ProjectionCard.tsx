@@ -77,7 +77,8 @@ export default function ProjectionCard({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 12,
+          flexWrap: "wrap",
+          gap: 8,
           padding: "14px 20px",
           borderBottom: "1px solid var(--cream-200)",
         }}
@@ -164,7 +165,7 @@ export default function ProjectionCard({
         </div>
 
         {/* Breakdown — 2+2 sur mobile */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }} className="md:grid-cols-4">
+        <div style={{ gap: 8 }} className="grid grid-cols-2 md:grid-cols-4">
           {[
             { label: "CA projeté", value: projectedRevenue, color: "var(--ink-900)" },
             { label: "Charges + impôt", value: projectedCharges + projectedTax, color: "var(--rose-500)" },

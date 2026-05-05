@@ -226,7 +226,7 @@ export default async function HistoryPage({
               ].map((stat, i) => (
                 <div
                   key={i}
-                  className="rounded-[14px] p-5"
+                  className={`rounded-[14px] p-5${i === 2 ? " col-span-2 md:col-span-1" : ""}`}
                   style={{ background: stat.dark ? "var(--ink-900)" : "var(--cream-50)", boxShadow: "var(--shadow-md)" }}
                 >
                   <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: stat.dark ? "var(--ink-300)" : "var(--ink-400)" }}>
@@ -463,7 +463,7 @@ export default async function HistoryPage({
                       </div>
                       <p
                         className="font-mono font-light"
-                        style={{ fontSize: 24, letterSpacing: "-0.04em", color: "var(--ink-900)", lineHeight: 1.1 }}
+                        style={{ fontSize: "clamp(17px, 4.5vw, 24px)", letterSpacing: "-0.04em", color: "var(--ink-900)", lineHeight: 1.1 }}
                       >
                         {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
                       </p>

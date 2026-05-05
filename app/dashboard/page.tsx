@@ -467,7 +467,7 @@ export default async function DashboardPage({
 
             {/* ── HERO DARK CARD ── */}
             <section
-              className="relative overflow-hidden p-8 md:p-10"
+              className="relative overflow-hidden p-5 md:p-8 xl:p-10"
               style={{ background: "var(--ink-900)", borderRadius: "var(--r-xl)" }}
             >
               {/* Radial lime glow */}
@@ -700,7 +700,7 @@ export default async function DashboardPage({
                     </div>
                     <p
                       className="mt-3 font-mono font-normal"
-                      style={{ fontSize: 26, letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
+                      style={{ fontSize: "clamp(18px, 5.5vw, 26px)", letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
                     >
                       {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       <span className="text-base font-light"> €</span>

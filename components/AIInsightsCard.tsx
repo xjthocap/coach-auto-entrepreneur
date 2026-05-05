@@ -182,13 +182,18 @@ export default function AIInsightsCard(props: Props) {
         overflow: "hidden",
       }}
     >
+      <style>{`
+        .ai-score-grid { display: grid; grid-template-columns: 120px 1fr; gap: 16px; }
+        @media (max-width: 480px) { .ai-score-grid { grid-template-columns: 1fr; } }
+      `}</style>
       {/* ── HEADER ── */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 12,
+          flexWrap: "wrap",
+          gap: 8,
           padding: "16px 24px",
           borderBottom: "1px solid var(--cream-200)",
         }}
@@ -237,7 +242,7 @@ export default function AIInsightsCard(props: Props) {
       <div style={{ padding: "20px 24px 24px", display: "grid", gap: 20 }}>
 
         {/* Score + insights grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 16, alignItems: "start" }}>
+        <div className="ai-score-grid" style={{ alignItems: "start" }}>
 
           {/* Score column */}
           <div
