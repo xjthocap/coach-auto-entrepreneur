@@ -12,10 +12,35 @@ const PROTECTED_ROUTES = [
 
 const AUTH_ROUTES = ["/login", "/signup", "/forgot-password", "/reset-password"]
 
+// Routes qui appartiennent à la landing (keskireste.fr)
+const LANDING_ROUTES = ["/", "/histoire", "/legal"]
+
+const APP_HOST = "app.keskireste.fr"
+const LANDING_HOST = "keskireste.fr"
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const host = request.headers.get("host") ?? ""
+  const isAppSubdomain = host === APP_HOST || host.startsWith("app.")
 
-  // Construire la réponse de base (nécessaire pour rafraîchir les cookies Supabase)
+  // ── Routage par domaine ──────────────────────────────────────────────────
+
+  // Sur app.keskireste.fr : la racine "/" redirige vers /dashboard
+  if (isAppSubdomain && pathname === "/") {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
+
+  // Sur keskireste.fr : les routes app redirigent vers app.keskireste.fr
+  if (!isAppSubdomain && host.includes(LANDING_HOST)) {
+    const isAppRoute = PROTECTED_ROUTES.some((r) => pathname.startsWith(r)) ||
+      AUTH_ROUTES.some((r) => pathname.startsWith(r))
+    if (isAppRoute) {
+      return NextResponse.redirect(`https://${APP_HOST}${pathname}${request.nextUrl.search}`)
+    }
+  }
+
+  // ── Auth Supabase (inchangé) ─────────────────────────────────────────────
+
   const response = NextResponse.next({
     request: { headers: request.headers },
   })
@@ -36,7 +61,6 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Rafraîchir la session (important pour maintenir les tokens actifs)
   const { data: { user } } = await supabase.auth.getUser()
 
   const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r))
