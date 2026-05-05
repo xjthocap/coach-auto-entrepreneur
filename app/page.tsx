@@ -1,4 +1,19 @@
 import Link from "next/link"
+import { getSupabaseAdmin } from "@/lib/supabase/admin"
+
+const FOUNDER_TOTAL = 50
+
+async function getFounderCount(): Promise<number> {
+  try {
+    const { count } = await getSupabaseAdmin()
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .not("founder_number", "is", null)
+    return count ?? 0
+  } catch {
+    return 0
+  }
+}
 
 const landingStyles = `
   :root {
@@ -1114,9 +1129,225 @@ const landingStyles = `
   }
   .footer-bottom a { color: var(--muted); text-decoration: none; }
   .footer-bottom a:hover { color: var(--violet-300); }
+
+  /* FOUNDER OFFER */
+  .founder-section {
+    padding: 0 0 80px;
+    background: var(--violet-950);
+  }
+  .founder-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .founder-card {
+    border-radius: 24px;
+    border: 1.5px solid rgba(245, 197, 66, 0.25);
+    background: linear-gradient(135deg, rgba(245,197,66,0.06) 0%, rgba(124,92,255,0.08) 100%);
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 640px) {
+    .founder-card { padding: 28px 20px; }
+  }
+  .founder-card::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(245,197,66,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .founder-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245,197,66,0.12);
+    border: 1px solid rgba(245,197,66,0.3);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C542;
+    margin-bottom: 24px;
+  }
+  .founder-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 56px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .founder-layout { grid-template-columns: 1fr; gap: 36px; }
+  }
+  .founder-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    color: #fff;
+    margin: 0 0 16px;
+  }
+  .founder-title span { color: #F5C542; }
+  .founder-desc {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin: 0 0 28px;
+    max-width: 480px;
+  }
+  .founder-perks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .founder-perks li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--violet-200);
+  }
+  .founder-perks li .fcheck {
+    width: 22px;
+    height: 22px;
+    background: rgba(245,197,66,0.15);
+    color: #F5C542;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .founder-right {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(245,197,66,0.15);
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .founder-counter-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .founder-counter-label span:first-child {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--violet-300);
+  }
+  .founder-counter-label span:last-child {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: var(--font-geist-mono), monospace;
+  }
+  .founder-track {
+    height: 8px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .founder-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #F5C542, #f59e0b);
+    transition: width 0.6s cubic-bezier(.22,.68,0,1.2);
+  }
+  .founder-spots-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+  }
+  .founder-spots-taken { color: var(--muted); }
+  .founder-spots-left {
+    font-weight: 700;
+    color: #F5C542;
+  }
+  .founder-spots-left.urgent { color: #f87171; }
+  .founder-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .founder-price {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: #fff;
+    font-family: var(--font-geist-mono), monospace;
+  }
+  .founder-price-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .founder-price-once {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #F5C542;
+  }
+  .founder-price-compare {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+  .founder-cta {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #F5C542 0%, #f59e0b 100%);
+    color: #1A0F2E;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .founder-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+  .founder-cta-sub {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .founder-sold-out {
+    text-align: center;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
 `
 
-export default function HomePage() {
+export default async function HomePage() {
+  const founderCount = await getFounderCount()
+  const founderRemaining = Math.max(0, FOUNDER_TOTAL - founderCount)
+  const founderPct = Math.min(100, Math.round((founderCount / FOUNDER_TOTAL) * 100))
+  const isSoldOut = founderRemaining === 0
+  const isUrgent = founderRemaining <= 5
+
   return (
     <>
       <style>{landingStyles}</style>
@@ -1130,6 +1361,7 @@ export default function HomePage() {
               <li><a href="#how">Comment ça marche</a></li>
               <li><a href="#features">Fonctionnalités</a></li>
               <li><a href="#pricing">Tarifs</a></li>
+              <li><a href="#founder" style={{color:'#F5C542', fontWeight:700}}>⭐ Founder</a></li>
               <li><a href="#faq">FAQ</a></li>
               <li><Link href="/histoire">Notre histoire</Link></li>
             </ul>
@@ -1605,6 +1837,82 @@ export default function HomePage() {
                   <li><span className="pcheck">✓</span> Support prioritaire</li>
                 </ul>
                 <Link href="/signup" className="price-cta price-cta-premium">Essayer 14 jours gratuits</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FOUNDER OFFER */}
+        <section className="founder-section" id="founder">
+          <div className="founder-inner">
+            <div className="founder-card">
+              <div className="founder-eyebrow">⭐ Offre Fondateur · Limité à {FOUNDER_TOTAL} places</div>
+              <div className="founder-layout">
+                {/* Left — pitch */}
+                <div>
+                  <h2 className="founder-title">
+                    Accès Premium à vie.<br />
+                    <span>Une seule fois. 99 €.</span>
+                  </h2>
+                  <p className="founder-desc">
+                    Tu crois au projet dès le début ? On t&apos;offre l&apos;accès à vie à toutes les fonctionnalités Premium pour 99 € — une seule fois, jamais augmenté. En échange, ton feedback nous aide à construire le meilleur outil possible.
+                  </p>
+                  <ul className="founder-perks">
+                    <li><span className="fcheck">✓</span> Accès Premium à vie — toutes les fonctionnalités</li>
+                    <li><span className="fcheck">✓</span> Badge ⭐ Founder affiché sur ton dashboard</li>
+                    <li><span className="fcheck">✓</span> Prix garanti à vie, même si on augmente</li>
+                    <li><span className="fcheck">✓</span> Accès anticipé aux nouvelles fonctionnalités</li>
+                    <li><span className="fcheck">✓</span> Ligne directe avec le créateur pour ton feedback</li>
+                  </ul>
+                </div>
+
+                {/* Right — counter + CTA */}
+                <div className="founder-right">
+                  {/* Spot counter */}
+                  <div>
+                    <div className="founder-counter-label">
+                      <span>Places disponibles</span>
+                      <span>{founderCount}/{FOUNDER_TOTAL} prises</span>
+                    </div>
+                    <div className="founder-track">
+                      <div className="founder-fill" style={{ width: `${founderPct}%` }} />
+                    </div>
+                    <div className="founder-spots-row">
+                      <span className="founder-spots-taken">{founderCount} Founders ont rejoint</span>
+                      {isSoldOut ? (
+                        <span className="founder-spots-left urgent">Complet 🔒</span>
+                      ) : (
+                        <span className={`founder-spots-left${isUrgent ? " urgent" : ""}`}>
+                          {isUrgent ? "⚡ " : ""}{founderRemaining} place{founderRemaining > 1 ? "s" : ""} restante{founderRemaining > 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Price */}
+                  <div className="founder-price-row">
+                    <div className="founder-price">99 €</div>
+                    <div className="founder-price-detail">
+                      <span className="founder-price-once">paiement unique</span>
+                      <span className="founder-price-compare">vs 238,80 €/an</span>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  {isSoldOut ? (
+                    <div className="founder-sold-out">
+                      Toutes les places Founder sont prises.<br />
+                      <span style={{ color: "var(--violet-300)", fontWeight: 600 }}>Passe en Premium → 19,90 €/mois</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Link href="/signup?plan=founder" className="founder-cta">
+                        Rejoindre les Founders →
+                      </Link>
+                      <p className="founder-cta-sub">Paiement unique · Accès immédiat · Support direct</p>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
