@@ -1,7 +1,11 @@
 import { headers } from "next/headers"
 import Stripe from "stripe"
+import { render } from "@react-email/render"
 import { stripe } from "@/lib/stripe"
 import { supabaseAdmin } from "@/lib/supabase/admin"
+import { resend, FROM_EMAIL, REPLY_TO } from "@/lib/resend"
+import FounderWelcomeEmail from "@/emails/FounderWelcomeEmail"
+import PremiumWelcomeEmail from "@/emails/PremiumWelcomeEmail"
 
 const MAX_FOUNDERS = 50
 
@@ -85,19 +89,32 @@ export async function POST(req: Request) {
             .single()
 
           if (customerEmail) {
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.keskireste.fr"
-            fetch(`${appUrl}/api/email/founder-welcome`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-internal-secret": process.env.INTERNAL_SECRET || "",
-              },
-              body: JSON.stringify({
-                userId,
-                email: customerEmail,
-                founderNumber: founderProfile?.founder_number ?? null,
-              }),
-            }).catch(console.error)
+            try {
+              const { data: profileForName } = await supabaseAdmin
+                .from("profiles")
+                .select("first_name")
+                .eq("id", userId)
+                .single()
+
+              const html = await render(
+                FounderWelcomeEmail({
+                  firstName: profileForName?.first_name ?? null,
+                  founderNumber: founderProfile?.founder_number ?? null,
+                })
+              )
+
+              await resend.emails.send({
+                from: FROM_EMAIL,
+                replyTo: REPLY_TO,
+                to: customerEmail,
+                subject: `⭐ Bienvenue Founder #${founderProfile?.founder_number ?? "?"} — KeskiReste`,
+                html,
+              })
+
+              console.log(`[webhook] ✅ Email founder-welcome envoyé à ${customerEmail}`)
+            } catch (emailErr) {
+              console.error("[webhook] Erreur envoi email founder-welcome :", emailErr)
+            }
           }
         } else {
           const { error } = await supabaseAdmin
@@ -117,15 +134,38 @@ export async function POST(req: Request) {
           }
 
           if (customerEmail) {
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.keskireste.fr"
-            fetch(`${appUrl}/api/email/premium-welcome`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-internal-secret": process.env.INTERNAL_SECRET || "",
-              },
-              body: JSON.stringify({ userId, email: customerEmail }),
-            }).catch(console.error)
+            try {
+              const { data: profileForName } = await supabaseAdmin
+                .from("profiles")
+                .select("first_name")
+                .eq("id", userId)
+                .single()
+
+              const trialEnd = new Date()
+              trialEnd.setDate(trialEnd.getDate() + 7)
+              const trialEndDate = trialEnd.toLocaleDateString("fr-FR", {
+                day: "numeric", month: "long", year: "numeric",
+              })
+
+              const html = await render(
+                PremiumWelcomeEmail({
+                  firstName: profileForName?.first_name ?? null,
+                  trialEndDate,
+                })
+              )
+
+              await resend.emails.send({
+                from: FROM_EMAIL,
+                replyTo: REPLY_TO,
+                to: customerEmail,
+                subject: "Ton essai Premium de 7 jours a démarré ✨",
+                html,
+              })
+
+              console.log(`[webhook] ✅ Email premium-welcome envoyé à ${customerEmail}`)
+            } catch (emailErr) {
+              console.error("[webhook] Erreur envoi email premium-welcome :", emailErr)
+            }
           }
         }
       } else {
