@@ -343,7 +343,7 @@ export default async function DashboardPage({
     projectedResult.net - projection.projectedExpenses
 
   const isPremium = profile.plan === "premium"
-  const isFormerFounder = profile.founder_number != null && (profile.plan !== "premium" || profile.subscription_type !== "founder")
+  const isFormerFounder = profile.founder_number != null && profile.plan !== "premium"
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -376,7 +376,8 @@ export default async function DashboardPage({
                   {/* Badge plan */}
                   {(() => {
                     const isFounder = !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
-                    const isFormerFounderBadge = !!(profile.founder_number) && (!isPremium || profile.subscription_type !== "founder")
+                    const isFormerFounderPremiumBadge = !!(profile.founder_number) && isPremium && profile.subscription_type !== "founder"
+                    const isFormerFounderBadge = !!(profile.founder_number) && !isPremium
                     const isBetaPioneer = !!(profile.is_beta_pioneer)
                     const isPatron = !!(profile.is_patron)
                     if (isPatron) return (
@@ -404,6 +405,8 @@ export default async function DashboardPage({
                         whiteSpace: "nowrap", flexShrink: 0,
                         background: isFounder
                           ? "rgba(196,181,253,0.2)"
+                          : isFormerFounderPremiumBadge
+                          ? "var(--violet-500)"
                           : isFormerFounderBadge
                           ? "rgba(245,158,11,0.12)"
                           : isPremium
@@ -411,6 +414,8 @@ export default async function DashboardPage({
                           : "rgba(196,181,253,0.12)",
                         color: isFounder
                           ? "var(--violet-700)"
+                          : isFormerFounderPremiumBadge
+                          ? "var(--ink-900)"
                           : isFormerFounderBadge
                           ? "#B45309"
                           : isPremium
@@ -419,6 +424,8 @@ export default async function DashboardPage({
                       }}>
                         {isFounder
                           ? `⭐ Founder #${profile.founder_number}`
+                          : isFormerFounderPremiumBadge
+                          ? `Premium · ex-Founder #${profile.founder_number}`
                           : isFormerFounderBadge
                           ? `Ancien Founder #${profile.founder_number}`
                           : isPremium ? "Premium" : "Gratuit"}

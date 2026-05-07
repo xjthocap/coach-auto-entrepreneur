@@ -91,7 +91,8 @@ const navLinks = [
 export default function AppSidebar({ activePage, profile, userEmail }: AppSidebarProps) {
   const isPremium = profile.plan === "premium"
   const isFounder = !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
-  const isFormerFounder = !!(profile.founder_number) && (!isPremium || profile.subscription_type !== "founder")
+  const isFormerFounderPremium = !!(profile.founder_number) && isPremium && profile.subscription_type !== "founder"
+  const isFormerFounder = !!(profile.founder_number) && !isPremium
   const isBetaPioneer = !!(profile.is_beta_pioneer)
   const isPatron = !!(profile.is_patron)
 
@@ -230,6 +231,8 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
                 style={{
                   background: isFounder
                     ? "rgba(196, 181, 253, 0.25)"
+                    : isFormerFounderPremium
+                    ? "var(--violet-500)"
                     : isFormerFounder
                     ? "rgba(245,158,11,0.15)"
                     : isPremium
@@ -237,6 +240,8 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
                     : "var(--cream-300)",
                   color: isFounder
                     ? "var(--violet-700)"
+                    : isFormerFounderPremium
+                    ? "var(--ink-900)"
                     : isFormerFounder
                     ? "#B45309"
                     : isPremium
@@ -246,6 +251,8 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
               >
                 {isFounder
                   ? `⭐ Founder #${profile.founder_number}`
+                  : isFormerFounderPremium
+                  ? `Premium · ex-Founder #${profile.founder_number}`
                   : isFormerFounder
                   ? `Ancien Founder #${profile.founder_number}`
                   : isPremium ? "Premium" : "Gratuit"}
@@ -259,6 +266,8 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
               ? "Premier bêta-testeur — merci d'avoir cru au projet dès le début 🙏"
               : isFounder
               ? "Founder · 99€/an · toutes les fonctionnalités Premium."
+              : isFormerFounderPremium
+              ? `Tu fais partie des premiers. Merci d'être là. 🙏`
               : isFormerFounder
               ? "Ton accès Founder a expiré. Reprends Premium pour retrouver tes fonctionnalités."
               : isPremium
