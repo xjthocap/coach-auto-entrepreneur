@@ -90,8 +90,8 @@ const navLinks = [
 
 export default function AppSidebar({ activePage, profile, userEmail }: AppSidebarProps) {
   const isPremium = profile.plan === "premium"
-  const isFounder = !!(profile.founder_number) && isPremium
-  const isFormerFounder = !!(profile.founder_number) && !isPremium
+  const isFounder = !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
+  const isFormerFounder = !!(profile.founder_number) && (!isPremium || profile.subscription_type !== "founder")
   const isBetaPioneer = !!(profile.is_beta_pioneer)
   const isPatron = !!(profile.is_patron)
 

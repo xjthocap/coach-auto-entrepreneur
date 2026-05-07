@@ -343,7 +343,7 @@ export default async function DashboardPage({
     projectedResult.net - projection.projectedExpenses
 
   const isPremium = profile.plan === "premium"
-  const isFormerFounder = profile.founder_number != null && profile.plan !== "premium"
+  const isFormerFounder = profile.founder_number != null && (profile.plan !== "premium" || profile.subscription_type !== "founder")
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -375,8 +375,8 @@ export default async function DashboardPage({
                   </h1>
                   {/* Badge plan */}
                   {(() => {
-                    const isFounder = !!(profile.founder_number) && isPremium
-                    const isFormerFounderBadge = !!(profile.founder_number) && !isPremium
+                    const isFounder = !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
+                    const isFormerFounderBadge = !!(profile.founder_number) && (!isPremium || profile.subscription_type !== "founder")
                     const isBetaPioneer = !!(profile.is_beta_pioneer)
                     const isPatron = !!(profile.is_patron)
                     if (isPatron) return (
