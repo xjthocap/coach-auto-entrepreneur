@@ -31,7 +31,9 @@ export default async function SettingsPage() {
   }
 
   const isPremium = profile.plan === "premium"
-  const isFounder = !!(profile.founder_number)
+  const isActiveFounder = !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
+  const isFormerFounderPremium = !!(profile.founder_number) && isPremium && profile.subscription_type !== "founder"
+  const isFormerFounder = !!(profile.founder_number) && !isPremium
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -97,7 +99,45 @@ export default async function SettingsPage() {
               <div className="space-y-3">
 
                 {/* ── PLAN CARD ── */}
-                {isPremium ? (
+
+                {/* Founder actif — thème gold */}
+                {isActiveFounder && (
+                  <div
+                    className="p-5 relative overflow-hidden"
+                    style={{
+                      background: "linear-gradient(145deg, #1c1008, #2a1a06, #1a0f2e)",
+                      borderRadius: "var(--r-md)",
+                      border: "2px solid #F59E0B",
+                      boxShadow: "0 0 24px rgba(245,158,11,0.15), var(--shadow-md)",
+                    }}
+                  >
+                    {/* Glow décoratif */}
+                    <div style={{
+                      position: "absolute", inset: 0, pointerEvents: "none",
+                      background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 70%)",
+                    }} />
+                    <div style={{ position: "relative" }}>
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "#92400E" }}>
+                          Ton plan
+                        </p>
+                        <span
+                          className="text-xs px-2.5 py-1 rounded-full font-bold"
+                          style={{ background: "rgba(245,158,11,0.15)", color: "#FBBF24", border: "1px solid rgba(245,158,11,0.4)" }}
+                        >
+                          ⭐ Founder #{profile.founder_number}
+                        </span>
+                      </div>
+                      <p className="text-sm mb-4" style={{ color: "#D97706", lineHeight: 1.6 }}>
+                        Founder · 99€/an · toutes les fonctionnalités Premium incluses. Prix garanti à vie.
+                      </p>
+                      <ManageSubscriptionButton />
+                    </div>
+                  </div>
+                )}
+
+                {/* Premium classique */}
+                {isPremium && !isActiveFounder && !isFormerFounderPremium && (
                   <div
                     className="p-5"
                     style={{ background: "var(--ink-900)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)" }}
@@ -108,24 +148,82 @@ export default async function SettingsPage() {
                       </p>
                       <span
                         className="text-xs px-2.5 py-1 rounded-full font-semibold"
-                        style={{
-                          background: isFounder ? "rgba(196, 181, 253, 0.2)" : "var(--violet-500)",
-                          color: isFounder ? "var(--violet-400)" : "var(--ink-900)",
-                        }}
+                        style={{ background: "var(--violet-500)", color: "var(--ink-900)" }}
                       >
-                        {isFounder
-                          ? `⭐ Founder #${profile.founder_number}`
-                          : "Premium"}
+                        Premium
                       </span>
                     </div>
                     <p className="text-sm mb-4" style={{ color: "var(--ink-300)", lineHeight: 1.6 }}>
-                      {isFounder
-                        ? "Founder · 99€/an · toutes les fonctionnalités Premium incluses."
-                        : "Tu as accès au coach IA, à l'historique complet et aux exports."}
+                      Tu as accès au coach IA, à l'historique complet et aux exports.
                     </p>
                     <ManageSubscriptionButton />
                   </div>
-                ) : (
+                )}
+
+                {/* Ancien Founder — maintenant sur Premium mensuel */}
+                {isFormerFounderPremium && (
+                  <div
+                    className="p-5"
+                    style={{ background: "var(--ink-900)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)" }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--ink-300)" }}>
+                        Ton plan
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-xs px-2.5 py-1 rounded-full font-semibold"
+                          style={{ background: "var(--violet-500)", color: "var(--ink-900)" }}
+                        >
+                          Premium
+                        </span>
+                        <span
+                          className="text-xs px-2 py-1 rounded-full font-medium"
+                          style={{ background: "rgba(245,158,11,0.12)", color: "#FBBF24", border: "1px solid rgba(245,158,11,0.3)" }}
+                        >
+                          ex-Founder #{profile.founder_number}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm mb-4" style={{ color: "var(--ink-300)", lineHeight: 1.6 }}>
+                      Tu as accès à toutes les fonctionnalités Premium.
+                    </p>
+                    <ManageSubscriptionButton />
+                  </div>
+                )}
+
+                {/* Ancien Founder — plan gratuit */}
+                {isFormerFounder && (
+                  <div
+                    className="p-5 relative overflow-hidden"
+                    style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)", border: "1px solid rgba(245,158,11,0.25)" }}
+                  >
+                    <div style={{
+                      position: "absolute", inset: 0, pointerEvents: "none",
+                      background: "radial-gradient(ellipse 80% 50% at 100% 0%, rgba(245,158,11,0.06) 0%, transparent 70%)",
+                    }} />
+                    <div style={{ position: "relative" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--ink-400)" }}>
+                          Ton plan
+                        </p>
+                        <span
+                          className="text-xs px-2 py-1 rounded-full font-medium"
+                          style={{ background: "rgba(245,158,11,0.1)", color: "#D97706", border: "1px solid rgba(245,158,11,0.25)" }}
+                        >
+                          ex-Founder #{profile.founder_number}
+                        </span>
+                      </div>
+                      <p className="text-sm mb-4" style={{ color: "var(--ink-500)", lineHeight: 1.6 }}>
+                        Reprends un abonnement Premium pour retrouver toutes tes fonctionnalités.
+                      </p>
+                      <UpgradeButton label="Reprendre Premium · 19,90€/mois" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Gratuit — jamais été Founder */}
+                {!isPremium && !isFormerFounder && (
                   <div
                     className="p-5 relative overflow-hidden"
                     style={{ background: "var(--cream-50)", borderRadius: "var(--r-md)", boxShadow: "var(--shadow-md)", border: "1px solid var(--cream-200)" }}
