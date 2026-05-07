@@ -424,7 +424,14 @@ const css = `
 
   /* ── Responsive ── */
   @media (max-width: 1020px) { .h-nav-links { display: none; } }
+
+  /* Boutons nav : cacher "Se connecter" sur mobile, garder "Essayer" */
+  .h-btn-login { display: none; }
+  @media (min-width: 640px) { .h-btn-login { display: inline-flex; } }
+
   @media (max-width: 880px) {
+    .h-wrap, .h-narrow, .h-story { padding: 0 20px; }
+    .h-nav-inner { padding: 12px 20px; }
     .timeline { padding: 0 16px; }
     .timeline::before { left: 22px; }
     .chapter { padding-left: 60px; }
@@ -434,6 +441,56 @@ const css = `
     .values-grid { grid-template-columns: 1fr; }
     .h-footer-grid { grid-template-columns: 1fr 1fr; }
     .pull-quote { margin-left: -16px; margin-right: -16px; font-size: 18px; }
+  }
+
+  @media (max-width: 480px) {
+    /* Hero */
+    .story-hero { padding: 36px 0 28px; }
+    .story-h1 { font-size: clamp(30px, 9vw, 48px); margin-bottom: 20px; }
+    .story-lead { font-size: 16px; margin-bottom: 28px; }
+    .story-meta {
+      flex-wrap: wrap; gap: 6px 12px;
+      border-radius: 14px; padding: 10px 16px;
+      justify-content: center;
+    }
+    .story-meta .sep { display: none; }
+
+    /* Timeline */
+    .chapter-title { font-size: 22px; }
+    .chapter-body { font-size: 15px; }
+    .pull-quote { font-size: 16px; padding: 20px 20px 20px 22px; }
+
+    /* Excel artifact */
+    .excel { font-size: 10px; overflow-x: auto; }
+    .excel-header, .excel-row {
+      grid-template-columns: 18px 1.3fr 0.8fr 0.8fr 0.8fr;
+    }
+    .excel-header > div, .excel-row > div { padding: 5px 6px; }
+
+    /* DMs */
+    .dm-bubble { max-width: 260px; font-size: 12.5px; }
+
+    /* By the numbers */
+    .by-numbers { padding: 48px 0; margin: 24px 0; }
+    .by-numbers-h2 { font-size: clamp(24px, 7vw, 36px); margin-bottom: 36px; }
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 0; }
+    .stat-num { font-size: clamp(28px, 8vw, 44px); white-space: normal; }
+
+    /* Values */
+    .values-section { padding: 56px 0; }
+    .value-card { padding: 24px 20px; }
+
+    /* End CTA */
+    .end-cta { padding: 56px 0; }
+    .end-cta h2 { font-size: clamp(26px, 8vw, 44px); }
+    .end-cta p { font-size: 15px; }
+    .end-cta-btns { flex-direction: column; align-items: center; }
+    .h-btn-lg { font-size: 14px; padding: 14px 24px; }
+
+    /* Footer */
+    .h-footer-grid { grid-template-columns: 1fr; gap: 28px; }
+    .h-footer { padding: 40px 0 24px; }
+    .h-footer-bottom { flex-direction: column; gap: 8px; }
   }
 `
 
@@ -457,8 +514,8 @@ export default function HistoirePage() {
               <a href="/histoire" className="current">Notre histoire</a>
             </div>
             <div className="h-nav-cta">
-              <Link href="/login" className="h-btn h-btn-ghost h-btn-sm">Se connecter</Link>
-              <Link href="/#pricing" className="h-btn h-btn-dark h-btn-sm">Essayer gratuitement</Link>
+              <Link href="/login" className="h-btn h-btn-ghost h-btn-sm h-btn-login">Se connecter</Link>
+              <Link href="/signup" className="h-btn h-btn-violet h-btn-sm">Essayer gratuitement</Link>
             </div>
           </div>
         </nav>
