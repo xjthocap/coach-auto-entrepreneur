@@ -136,7 +136,14 @@ export async function GET(req: Request) {
 
   const frequency = profile.declaration_frequency === "quarterly" ? "quarterly" : "monthly"
   const dateParam = searchParams.get("date")
+  // Validate date format (YYYY-MM-DD) to avoid crashes on invalid input
+  if (dateParam && !/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    return NextResponse.json({ error: "Paramètre date invalide" }, { status: 400 })
+  }
   const baseDate = dateParam ? parseLocalDate(dateParam) : new Date()
+  if (isNaN(baseDate.getTime())) {
+    return NextResponse.json({ error: "Paramètre date invalide" }, { status: 400 })
+  }
   const period = getPeriodRange(frequency, baseDate)
 
   // ── Data ──────────────────────────────────────────────────────────────────

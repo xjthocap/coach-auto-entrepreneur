@@ -893,13 +893,15 @@ export default async function DashboardPage({
               </div>
             </section>
 
-            {/* ── DEV SWITCHER ── */}
-            <section
-              className="rounded-[14px] border border-dashed p-4"
-              style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)" }}
-            >
-              <DevPlanSwitcher currentPlan={profile.plan} profileId={profile.id} />
-            </section>
+            {/* ── DEV SWITCHER (dev only) ── */}
+            {process.env.NODE_ENV === "development" && (
+              <section
+                className="rounded-[14px] border border-dashed p-4"
+                style={{ borderColor: "var(--cream-200)", background: "var(--cream-50)" }}
+              >
+                <DevPlanSwitcher currentPlan={profile.plan} profileId={profile.id} />
+              </section>
+            )}
           </div>
         </section>
       </div>

@@ -29,6 +29,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Messages requis" }, { status: 400 })
     }
 
+    // Limite : 10 derniers messages, 2000 chars max par message
+    const sanitizedMessages = messages.slice(-10).map((m) => ({
+      role: m.role,
+      content: typeof m.content === "string" ? m.content.slice(0, 2000) : "",
+    }))
+
     // ── Récupérer les données financières réelles ──────────────────────────
     const frequency = profile.declaration_frequency === "quarterly" ? "quarterly" : "monthly"
     const periodsPerYear = frequency === "quarterly" ? 4 : 12
@@ -168,7 +174,7 @@ Statut TVA franchise : ${tvaStatus.status} (${yearRevenue.toFixed(0)}€ / ${tva
       model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        ...messages.slice(-10), // garder les 10 derniers messages max
+        ...sanitizedMessages, // 10 derniers messages, 2000 chars max chacun
       ],
       temperature: 0.4,
       max_tokens: 400,

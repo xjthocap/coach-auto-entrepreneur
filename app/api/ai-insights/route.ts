@@ -99,6 +99,7 @@ export async function POST(req: Request) {
 
     const body = await req.json()
 
+    // Validation basique des champs numériques attendus
     const {
       totalRevenue,
       charges,
@@ -113,6 +114,14 @@ export async function POST(req: Request) {
       prevRevenue,
       prevPeriodLabel,
     } = body
+
+    // Sanity check : les valeurs numériques doivent être des nombres, pas des strings arbitraires
+    const numericFields = [totalRevenue, charges, tax, expenses, realNet, reserveAmount, thresholdRatio, daysRemaining, prevRevenue]
+    for (const val of numericFields) {
+      if (val !== undefined && val !== null && isNaN(Number(val))) {
+        return NextResponse.json({ error: "Paramètres invalides" }, { status: 400 })
+      }
+    }
 
     const revenue = Number(totalRevenue || 0)
     const urssaf = Number(charges || 0)

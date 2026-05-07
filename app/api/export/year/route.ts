@@ -26,6 +26,10 @@ export async function GET(req: Request) {
   // Year param — default to current year
   const yearParam = searchParams.get("year")
   const year = yearParam ? parseInt(yearParam) : new Date().getFullYear()
+  const currentYear = new Date().getFullYear()
+  if (isNaN(year) || year < 2020 || year > currentYear + 1) {
+    return NextResponse.json({ error: "Année invalide" }, { status: 400 })
+  }
   const yearStart = `${year}-01-01`
   const yearEnd = `${year}-12-31`
 

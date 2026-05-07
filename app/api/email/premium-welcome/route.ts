@@ -6,8 +6,13 @@ import PremiumWelcomeEmail from "@/emails/PremiumWelcomeEmail"
 
 export async function POST(req: Request) {
   // Verify internal secret
+  const expectedSecret = process.env.INTERNAL_SECRET
+  if (!expectedSecret) {
+    console.error("[email/premium-welcome] INTERNAL_SECRET is not configured")
+    return NextResponse.json({ error: "Server misconfigured" }, { status: 500 })
+  }
   const secret = req.headers.get("x-internal-secret")
-  if (!secret || secret !== process.env.INTERNAL_SECRET) {
+  if (!secret || secret !== expectedSecret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
