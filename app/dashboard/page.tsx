@@ -324,12 +324,27 @@ export default async function DashboardPage({
   const prevReserveAmount = prevResult.charges + prevResult.tax + prevIrEstimate
   const prevRealNet       = prevResult.net - prevTotalExpenses - prevIrEstimate
 
+  // ===== PÉRIODE AVANT-PRÉCÉDENTE (pour historique projection) =====
+  const prevPrevDate = new Date(baseDate)
+  prevPrevDate.setMonth(prevPrevDate.getMonth() - step * 2)
+  const prevPrevPeriod = getPeriodRange(frequency, prevPrevDate)
+  const { data: prevPrevRevenues } = await supabase
+    .from("revenues")
+    .select("amount")
+    .eq("user_id", user.id)
+    .gte("date", prevPrevPeriod.start)
+    .lte("date", prevPrevPeriod.end)
+  const prevPrevTotalRevenue =
+    prevPrevRevenues?.reduce((sum, r) => sum + Number(r.amount), 0) || 0
+
   // ===== PROJECTION =====
   const projection = calculateProjection({
     currentRevenue: totalRevenue,
     currentExpenses: totalExpenses,
     start: period.start,
     end: period.end,
+    prevRevenue: prevTotalRevenue || undefined,
+    prevPrevRevenue: prevPrevTotalRevenue || undefined,
   })
 
   const projectedResult = calculateMicro({
@@ -799,6 +814,8 @@ export default async function DashboardPage({
                       currentExpenses={totalExpenses}
                       daysElapsed={projection.elapsedDays}
                       totalDays={projection.totalDays}
+                      projectionMethod={projection.projectionMethod}
+                      historicalAvg={projection.historicalAvg ?? undefined}
                     />
                   ) : null
                 }

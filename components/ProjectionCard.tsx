@@ -9,6 +9,8 @@ type ProjectionCardProps = {
   currentExpenses: number
   daysElapsed: number
   totalDays: number
+  projectionMethod?: "linear" | "historical_blend" | "historical"
+  historicalAvg?: number
 }
 
 export default function ProjectionCard({
@@ -21,6 +23,8 @@ export default function ProjectionCard({
   currentRevenue,
   daysElapsed,
   totalDays,
+  projectionMethod = "linear",
+  historicalAvg,
 }: ProjectionCardProps) {
   const timePct = Math.min(100, Math.round((daysElapsed / totalDays) * 100))
   const daysLeft = Math.max(0, totalDays - daysElapsed)
@@ -148,7 +152,11 @@ export default function ProjectionCard({
                 <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "clamp(18px, 4vw, 24px)", fontWeight: 300, letterSpacing: "-0.04em", color: isOnTrack ? "var(--lime-500)" : "var(--rose-500)", lineHeight: 1, wordBreak: "break-all" }}>
                   {fmt(projectedRealNet, 0)}<span style={{ fontSize: 13, marginLeft: 3 }}>€</span>
                 </p>
-                <p style={{ fontSize: 10, color: "var(--ink-500)", marginTop: 6 }}>si le rythme se maintient</p>
+                <p style={{ fontSize: 10, color: "var(--ink-500)", marginTop: 6 }}>
+                {projectionMethod === "historical" || projectionMethod === "historical_blend"
+                  ? `basé sur tes ${historicalAvg ? Math.round(historicalAvg) + "€" : ""} de moyenne`
+                  : "si le rythme se maintient"}
+              </p>
               </>
             )}
           </div>
