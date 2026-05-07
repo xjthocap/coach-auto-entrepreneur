@@ -173,28 +173,30 @@ export default function AddExpense() {
           />
         </div>
 
-        {/* Submit */}
-        <button
-          onClick={handleAdd}
-          disabled={loading}
-          style={{
-            marginTop: "auto",
-            width: "100%",
-            borderRadius: "var(--r-sm)",
-            border: "none",
-            background: "var(--ink-900)",
-            color: "var(--violet-500)",
-            padding: "13px 20px",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.5 : 1,
-            boxShadow: "var(--shadow-md)",
-          }}
-        >
-          {loading ? "Enregistrement…" : "Ajouter la dépense"}
-        </button>
-      </div>
+      </div>{/* fin champs */}
+
+      {/* Spacer + Submit */}
+      <div style={{ flex: 1 }} />
+      <button
+        onClick={handleAdd}
+        disabled={loading}
+        style={{
+          marginTop: 12,
+          width: "100%",
+          borderRadius: "var(--r-sm)",
+          border: "none",
+          background: "var(--ink-900)",
+          color: "var(--violet-500)",
+          padding: "13px 20px",
+          fontSize: 14,
+          fontWeight: 600,
+          cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.5 : 1,
+          boxShadow: "var(--shadow-md)",
+        }}
+      >
+        {loading ? "Enregistrement…" : "Ajouter la dépense"}
+      </button>
     </div>
   )
 }

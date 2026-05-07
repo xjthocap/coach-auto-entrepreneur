@@ -64,8 +64,15 @@ export function calculateProjection({
       ? "historical_blend"
       : "linear"
   } else {
-    // Pas d'historique : projection linéaire avec avertissement si trop tôt
-    projectedRevenue = linearProjection
+    // Pas d'historique : projection linéaire mais plafonnée quand trop tôt
+    // Si < 20% de la période écoulée, on atténue fortement la projection
+    if (elapsedPct < 0.2) {
+      // Lissage : on interpole entre CA actuel et la projection linéaire
+      const dampingFactor = elapsedPct / 0.2  // 0 → 1 sur les 20 premiers %
+      projectedRevenue = currentRevenue + (linearProjection - currentRevenue) * dampingFactor * 0.6
+    } else {
+      projectedRevenue = linearProjection
+    }
     projectionMethod = "linear"
   }
 

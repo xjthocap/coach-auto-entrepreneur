@@ -362,37 +362,39 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
           </div>
         )}
 
-        {/* Submit */}
-        <button
-          onClick={handleAdd}
-          disabled={loading}
-          style={{
-            marginTop: "auto",
-            paddingTop: 10,
-            width: "100%", borderRadius: "var(--r-sm)", border: "none",
-            background: "var(--ink-900)", color: "var(--violet-500)",
-            padding: "13px 20px", fontSize: 14, fontWeight: 600,
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.5 : 1, boxShadow: "var(--shadow-md)",
-          }}
-        >
-          {loading ? "Enregistrement…" : "Ajouter le revenu"}
-        </button>
+      </div>{/* fin champs */}
 
-        {lastInvoiceId && (
-          <a
-            href={`/api/invoices/${lastInvoiceId}/pdf`}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: "block", borderRadius: "var(--r-sm)",
-              border: "1px solid var(--cream-300)", background: "var(--cream-200)",
-              color: "var(--violet-700)", padding: "11px 16px",
-              textAlign: "center", fontSize: 13, fontWeight: 600, textDecoration: "none",
-            }}
-          >↓ Télécharger la facture PDF</a>
-        )}
-      </div>
+      {/* Spacer + Submit */}
+      <div style={{ flex: 1 }} />
+      <button
+        onClick={handleAdd}
+        disabled={loading}
+        style={{
+          marginTop: 12,
+          width: "100%", borderRadius: "var(--r-sm)", border: "none",
+          background: "var(--ink-900)", color: "var(--violet-500)",
+          padding: "13px 20px", fontSize: 14, fontWeight: 600,
+          cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.5 : 1, boxShadow: "var(--shadow-md)",
+        }}
+      >
+        {loading ? "Enregistrement…" : "Ajouter le revenu"}
+      </button>
+
+      {lastInvoiceId && (
+        <a
+          href={`/api/invoices/${lastInvoiceId}/pdf`}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: "block", borderRadius: "var(--r-sm)",
+            border: "1px solid var(--cream-300)", background: "var(--cream-200)",
+            color: "var(--violet-700)", padding: "11px 16px",
+            textAlign: "center", fontSize: 13, fontWeight: 600, textDecoration: "none",
+            marginTop: 8,
+          }}
+        >↓ Télécharger la facture PDF</a>
+      )}
     </div>
   )
 }
