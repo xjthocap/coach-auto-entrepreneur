@@ -86,7 +86,7 @@ export default function AIInsightsCard(props: Props) {
         const cached = localStorage.getItem(cacheKey)
         if (cached) {
           const { data: cachedData, ts } = JSON.parse(cached)
-          if (Date.now() - ts < 2 * 60 * 60 * 1000) {
+          if (Date.now() - ts < 30 * 60 * 1000) {
             setData(cachedData)
             setUpdatedAt(new Date(ts))
             setLoading(false)

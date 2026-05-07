@@ -157,54 +157,55 @@ export async function POST(req: Request) {
       ? "- Comparatif periode precedente (" + prevLabel + ") : CA etait " + prevRev + " EUR, evolution " + deltaStr
       : ""
 
+    // Angle aléatoire pour varier les insights à chaque appel
+    const angles = [
+      "trésorerie et timing des encaissements",
+      "optimisation des dépenses professionnelles déductibles",
+      "pilotage du seuil annuel et croissance",
+      "stratégie de facturation et rythme d'activité",
+      "anticipation fiscale et mise de côté",
+      "comparaison avec la période précédente et tendances",
+      "équilibre vie pro / rentabilité",
+      "actions concrètes pour les prochains jours",
+    ]
+    const randomAngle = angles[Math.floor(Math.random() * angles.length)]
+
     const prompt = `
-Tu es un expert en gestion financière spécialisé en micro-entreprise française.
+Tu es un coach financier direct et utile, spécialisé micro-entreprise française. Tu parles comme un ami qui s'y connaît — pas comme un comptable.
 
-CONTEXTE MÉTIER IMPORTANT :
-- L'utilisateur est en micro-entreprise
-- Les charges correspondent aux cotisations URSSAF, elles sont liées au chiffre d'affaires et sont incompressibles
-- Il n'existe pas de déduction classique des charges en micro-entreprise
-- Les dépenses représentent de vrais décaissements de trésorerie
-- Ne critique pas l'existence des charges URSSAF : elles sont normales
-- Ne confonds jamais charges URSSAF, impôt et dépenses
-
-DONNÉES :
+DONNÉES DE L'UTILISATEUR :
 - Période : ${periodLabel}
-- Activité : ${activityType}
+- Type d'activité : ${activityType}
 - Chiffre d'affaires : ${revenue}€
-- Charges URSSAF : ${urssaf}€
-- Impôt : ${incomeTax}€
-- Dépenses : ${businessExpenses}€
-- Revenu réel : ${net}€
-- À mettre de côté : ${reserve}€
+- Cotisations URSSAF : ${urssaf}€ (incompressibles, liées au CA — ne pas les critiquer)
+- Impôt estimé : ${incomeTax}€
+- Dépenses pro : ${businessExpenses}€
+- Disponible réel net : ${net}€
+- À mettre de côté pour charges + impôt : ${reserve}€
 - Jours restants dans la période : ${remainingDays}
-- Ratio du seuil annuel : ${Math.round(yearlyThresholdRatio * 100)}%
-${comparisonContext}
+- Utilisation du seuil annuel : ${Math.round(yearlyThresholdRatio * 100)}%
+- Ratio coûts totaux / CA : ${Math.round(health.costRatio * 100)}%
+${comparisonContext ? `- Période précédente (${prevLabel}) : CA ${prevRev}€, évolution ${deltaStr}` : ""}
 
-SCORE ET STATUT DÉJÀ CALCULÉS :
-- Score : ${health.score}/100
-- Statut : ${health.status}
-- Message global : ${health.message}
-- Ratio coûts totaux / chiffre d'affaires : ${Math.round(health.costRatio * 100)}%
+STATUT SANTÉ : ${health.status} (score ${health.score}/100)
 
-RÈGLES :
-- Tu ne dois PAS changer le score, le statut ni le message global
-- Tu dois seulement expliquer la situation et proposer 3 insights/actions utiles
-- Si une comparaison avec la période précédente est disponible, mentionne-la dans un insight pertinent
-- Utilise **texte en gras** (double astérisque markdown) pour mettre en valeur les chiffres clés dans tes insights
-- Si les dépenses sont faibles, ne sois pas alarmiste
-- Si les coûts sont élevés, sois direct mais concret
-- Réponses courtes (max 2 phrases par insight), utiles, sans jargon, sans ton dramatique inutile
-- Pas de conseils juridiques
-- Pas de "vois un expert" sauf situation vraiment critique
+ANGLE PRIORITAIRE pour cette analyse : **${randomAngle}**
 
-RÉPONDS UNIQUEMENT EN JSON VALIDE, sans markdown autour, avec ce format exact :
+INSTRUCTIONS :
+- Génère 3 insights DIFFÉRENTS et ACTIONNABLES, centrés sur l'angle prioritaire ci-dessus
+- Chaque insight doit apporter une information nouvelle ou une action concrète — pas juste décrire les chiffres
+- Varie le style : une question rhétorique, un conseil pratique, une alerte ou une opportunité
+- Utilise **gras** (double astérisque) uniquement sur les chiffres clés ou mots d'action
+- Max 2 phrases par insight, ton direct et humain, zéro jargon comptable inutile
+- Ne commence JAMAIS deux insights par la même structure de phrase
+- Si aucune dépense : suggère des investissements pro pertinents pour le type d'activité
+- Si période presque terminée (< 7 jours) : focus sur les actions urgentes
+- Si comparatif dispo : intègre-le naturellement dans au moins un insight
+- Jamais de conseil juridique, jamais de "consulte un expert" sauf danger réel
+
+RÉPONDS EN JSON VALIDE uniquement, sans markdown autour :
 {
-  "insights": [
-    "conseil 1",
-    "conseil 2",
-    "conseil 3"
-  ]
+  "insights": ["insight 1", "insight 2", "insight 3"]
 }
 `
 
@@ -214,8 +215,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE, sans markdown autour, avec ce format exact :
       messages: [
         {
           role: "system",
-          content:
-            "Tu es un coach financier spécialisé micro-entreprise, précis, utile et non alarmiste.",
+          content: "Tu es un coach financier pour auto-entrepreneurs français. Tu es direct, humain, précis. Tu varies tes conseils à chaque analyse et tu proposes toujours des actions concrètes.",
         },
         {
           role: "user",
@@ -223,7 +223,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE, sans markdown autour, avec ce format exact :
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.3,
+      temperature: 0.8,
     })
 
     const raw = completion.choices?.[0]?.message?.content || ""
