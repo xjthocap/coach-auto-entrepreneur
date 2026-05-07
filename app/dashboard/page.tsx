@@ -15,6 +15,7 @@ import AIInsightsCard from "@/components/AIInsightsCard"
 import DashboardPremiumShell from "@/components/DashboardPremiumShell"
 import DevPlanSwitcher from "@/components/DevPlanSwitcher"
 import CheckoutBanner from "@/components/CheckoutBanner"
+import UpgradeButton from "@/components/UpgradeButton"
 import { calculateMicro, estimateIRProvision, buildAnnualProjection } from "@/lib/calculations"
 import { getPeriodRange } from "@/lib/period"
 import { calculateProjection } from "@/lib/projection"
@@ -374,7 +375,8 @@ export default async function DashboardPage({
                   </h1>
                   {/* Badge plan */}
                   {(() => {
-                    const isFounder = !!(profile.founder_number)
+                    const isFounder = !!(profile.founder_number) && isPremium
+                    const isFormerFounderBadge = !!(profile.founder_number) && !isPremium
                     const isBetaPioneer = !!(profile.is_beta_pioneer)
                     const isPatron = !!(profile.is_patron)
                     if (isPatron) return (
@@ -402,16 +404,24 @@ export default async function DashboardPage({
                         whiteSpace: "nowrap", flexShrink: 0,
                         background: isFounder
                           ? "rgba(196,181,253,0.2)"
+                          : isFormerFounderBadge
+                          ? "rgba(245,158,11,0.12)"
                           : isPremium
                           ? "var(--violet-500)"
                           : "rgba(196,181,253,0.12)",
                         color: isFounder
                           ? "var(--violet-700)"
+                          : isFormerFounderBadge
+                          ? "#B45309"
                           : isPremium
                           ? "var(--ink-900)"
                           : "var(--violet-700)",
                       }}>
-                        {isFounder ? `⭐ Founder #${profile.founder_number}` : isPremium ? "Premium" : "Gratuit"}
+                        {isFounder
+                          ? `⭐ Founder #${profile.founder_number}`
+                          : isFormerFounderBadge
+                          ? `Ancien Founder #${profile.founder_number}`
+                          : isPremium ? "Premium" : "Gratuit"}
                       </span>
                     )
                   })()}
@@ -495,18 +505,9 @@ export default async function DashboardPage({
                     </p>
                   </div>
                 </div>
-                <a
-                  href="/api/stripe/checkout"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    padding: "8px 16px", borderRadius: 999,
-                    background: "linear-gradient(135deg, #F59E0B, #D97706)",
-                    color: "#fff", fontSize: 13, fontWeight: 600,
-                    textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0,
-                  }}
-                >
-                  Reprendre Premium →
-                </a>
+                <div className="shrink-0">
+                  <UpgradeButton fullWidth={false} label="Reprendre Premium →" />
+                </div>
               </section>
             )}
 
