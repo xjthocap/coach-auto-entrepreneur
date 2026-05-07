@@ -283,9 +283,10 @@ export default async function ExpensesPage({
                     <p
                       className="mt-3 font-mono font-normal"
                       style={{
-                        fontSize: 22,
+                        fontSize: "clamp(16px, 4.5vw, 22px)",
                         letterSpacing: "-0.04em",
                         color: "var(--rose-500)",
+                        wordBreak: "break-all",
                       }}
                     >
                       {stat.value.toLocaleString("fr-FR", {
@@ -297,7 +298,7 @@ export default async function ExpensesPage({
                     <p
                       className="mt-3 font-mono font-normal"
                       style={{
-                        fontSize: 26,
+                        fontSize: "clamp(20px, 5vw, 26px)",
                         letterSpacing: "-0.04em",
                         color: stat.dark ? "var(--lime-500)" : "var(--ink-900)",
                       }}

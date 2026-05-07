@@ -73,19 +73,19 @@ function WaterfallRow({
 }) {
   return (
     <div
-      className="water-row flex items-center justify-between py-3"
+      className="water-row flex items-center justify-between gap-2 py-3"
       style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <span className="flex items-center gap-2 text-sm" style={{ color: "var(--ink-300)" }}>
-        {label}
+      <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-sm" style={{ color: "var(--ink-300)" }}>
+        <span className="shrink-0">{label}</span>
         {tag && (
-          <span className="rounded px-1.5 py-0.5 text-[10px]" style={tagStyle}>
+          <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px]" style={tagStyle}>
             {tag}
           </span>
         )}
         {action}
       </span>
-      <span className="font-mono text-sm" style={{ color: valueColor }}>{value}</span>
+      <span className="shrink-0 font-mono text-sm" style={{ color: valueColor }}>{value}</span>
     </div>
   )
 }
@@ -490,7 +490,7 @@ export default async function DashboardPage({
                   </p>
                   <div
                     className="font-mono font-light"
-                    style={{ fontSize: "clamp(48px, 7vw, 76px)", letterSpacing: "-0.05em", color: "var(--violet-500)", lineHeight: 1.05 }}
+                    style={{ fontSize: "clamp(32px, 7vw, 76px)", letterSpacing: "-0.05em", color: "var(--violet-500)", lineHeight: 1.05, wordBreak: "break-all" }}
                   >
                     {realNet.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}&nbsp;€
                   </div>
@@ -553,9 +553,9 @@ export default async function DashboardPage({
                     value={`−${totalExpenses.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
                     valueColor="var(--rose-500)"
                   />
-                  <div className="water-row flex items-center justify-between py-3">
+                  <div className="water-row flex items-center justify-between gap-2 py-3">
                     <span className="text-sm font-medium" style={{ color: "var(--cream-50)" }}>= Disponible réel</span>
-                    <span className="font-mono font-medium" style={{ fontSize: 17, color: "var(--lime-500)" }}>
+                    <span className="shrink-0 font-mono font-medium" style={{ fontSize: 17, color: "var(--lime-500)" }}>
                       {realNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
                     </span>
                   </div>
@@ -593,7 +593,7 @@ export default async function DashboardPage({
                       style={{ width: `${pct}%`, background: fillColor }}
                     />
                   </div>
-                  <p className="mt-2.5 font-mono text-xs" style={{ color: "var(--ink-400)" }}>
+                  <p className="mt-2.5 font-mono text-xs leading-relaxed" style={{ color: "var(--ink-400)", wordBreak: "break-word" }}>
                     {yearRevenue.toLocaleString("fr-FR")} € / {threshold.toLocaleString("fr-FR")} € — il te reste{" "}
                     {Math.max(0, threshold - yearRevenue).toLocaleString("fr-FR")} € avant le seuil
                   </p>
@@ -801,7 +801,7 @@ export default async function DashboardPage({
                   Montants estimés pour anticiper ta déclaration.
                 </p>
               </div>
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
                 {[
                   { label: "Chiffre d'affaires", value: totalRevenue },
                   { label: "Charges sociales",  value: result.charges, sub: `${(result.socialRate * 100).toFixed(2)}%` },

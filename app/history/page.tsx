@@ -233,11 +233,11 @@ export default async function HistoryPage({
                     {stat.label}
                   </p>
                   {"value" in stat ? (
-                    <p className="mt-3 font-mono font-normal" style={{ fontSize: 22, letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)" }}>
+                    <p className="mt-3 font-mono font-normal" style={{ fontSize: "clamp(16px, 4.5vw, 22px)", letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", wordBreak: "break-all" }}>
                       {(stat.value ?? 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
                     </p>
                   ) : (
-                    <p className="mt-3 font-mono font-normal" style={{ fontSize: 26, letterSpacing: "-0.04em", color: "var(--ink-900)" }}>
+                    <p className="mt-3 font-mono font-normal" style={{ fontSize: "clamp(20px, 5vw, 26px)", letterSpacing: "-0.04em", color: "var(--ink-900)" }}>
                       {stat.count}
                     </p>
                   )}
@@ -326,12 +326,20 @@ export default async function HistoryPage({
                         </p>
 
                         {/* CA · Dép */}
-                        <p
-                          className="mt-1.5 font-mono text-[11px]"
-                          style={{ color: isActive ? "var(--ink-400)" : "var(--ink-400)" }}
-                        >
-                          CA {month.totalRevenue.toLocaleString("fr-FR")} · Dép {month.totalExpenses.toLocaleString("fr-FR")}
-                        </p>
+                        <div className="mt-1.5 flex flex-wrap gap-x-1.5 gap-y-0">
+                          <p
+                            className="font-mono text-[11px] shrink-0"
+                            style={{ color: isActive ? "var(--ink-400)" : "var(--ink-400)" }}
+                          >
+                            CA {month.totalRevenue.toLocaleString("fr-FR")}
+                          </p>
+                          <p
+                            className="font-mono text-[11px] shrink-0"
+                            style={{ color: isActive ? "var(--ink-400)" : "var(--ink-400)" }}
+                          >
+                            · Dép {month.totalExpenses.toLocaleString("fr-FR")}
+                          </p>
+                        </div>
 
                         {/* Mini bar chart */}
                         <div className="mt-4 flex items-end gap-1" style={{ height: 44 }}>
@@ -447,14 +455,14 @@ export default async function HistoryPage({
                   ].map((stat, i) => (
                     <div
                       key={i}
-                      className="rounded-[14px] p-5"
+                      className="rounded-[14px] p-4"
                       style={{ background: "var(--cream-100)" }}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm" style={{ color: "var(--ink-500)" }}>{stat.label}</span>
+                      <div className="flex items-start justify-between gap-1 mb-3">
+                        <span className="min-w-0 text-xs font-medium leading-tight" style={{ color: "var(--ink-500)" }}>{stat.label}</span>
                         <div
-                          className="flex items-center justify-center rounded-lg"
-                          style={{ width: 28, height: 28, background: "var(--cream-200)", color: "var(--ink-400)" }}
+                          className="flex shrink-0 items-center justify-center rounded-lg"
+                          style={{ width: 26, height: 26, background: "var(--cream-200)", color: "var(--ink-400)" }}
                         >
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                             {stat.icon}

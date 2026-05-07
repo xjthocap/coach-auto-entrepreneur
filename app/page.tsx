@@ -895,7 +895,7 @@ const landingStyles = `
     gap: 24px;
     max-width: 1100px;
   }
-  @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; max-width: 440px; } }
+  @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; max-width: 440px; margin-left: auto; margin-right: auto; } }
   .price-card {
     border-radius: 20px;
     padding: 32px;
@@ -1102,7 +1102,7 @@ const landingStyles = `
     margin: 0 auto;
     background: var(--violet-950);
     border-radius: 24px;
-    padding: 56px 48px;
+    padding: clamp(32px, 6vw, 56px) clamp(20px, 5vw, 48px);
     text-align: center;
     position: relative;
     overflow: hidden;

@@ -133,7 +133,7 @@ export default function ProjectionCard({
         </div>
 
         {/* Hero + rythme */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+        <div className="grid grid-cols-2" style={{ gap: 10, marginBottom: 10 }}>
 
           <div style={{ background: "var(--ink-900)", borderRadius: "var(--r-md)", padding: "14px 16px" }}>
             <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-400)", marginBottom: 8 }}>
@@ -145,7 +145,7 @@ export default function ProjectionCard({
               </p>
             ) : (
               <>
-                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 24, fontWeight: 300, letterSpacing: "-0.04em", color: isOnTrack ? "var(--lime-500)" : "var(--rose-500)", lineHeight: 1 }}>
+                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "clamp(18px, 4vw, 24px)", fontWeight: 300, letterSpacing: "-0.04em", color: isOnTrack ? "var(--lime-500)" : "var(--rose-500)", lineHeight: 1, wordBreak: "break-all" }}>
                   {fmt(projectedRealNet, 0)}<span style={{ fontSize: 13, marginLeft: 3 }}>€</span>
                 </p>
                 <p style={{ fontSize: 10, color: "var(--ink-500)", marginTop: 6 }}>si le rythme se maintient</p>
@@ -157,7 +157,7 @@ export default function ProjectionCard({
             <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-400)", marginBottom: 8 }}>
               Rythme actuel
             </p>
-            <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 24, fontWeight: 300, letterSpacing: "-0.04em", color: "var(--ink-900)", lineHeight: 1 }}>
+            <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "clamp(18px, 4vw, 24px)", fontWeight: 300, letterSpacing: "-0.04em", color: "var(--ink-900)", lineHeight: 1, wordBreak: "break-all" }}>
               {dailyAvg > 0 ? `${fmt(dailyAvg)} €` : "—"}
             </p>
             <p style={{ fontSize: 10, color: "var(--ink-400)", marginTop: 6 }}>par jour en moyenne</p>

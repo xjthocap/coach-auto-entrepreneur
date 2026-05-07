@@ -169,8 +169,8 @@ export default function RecentMovements({ revenues, expenses, limit = 10, isPrem
                         <span style={{ color: "var(--ink-400)" }}> · {sublabel}</span>
                       )}
                     </p>
-                    <div className="mt-0.5 flex items-center gap-2">
-                      <p className="font-mono text-xs" style={{ color: "var(--ink-400)" }}>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      <p className="shrink-0 font-mono text-xs" style={{ color: "var(--ink-400)" }}>
                         {formatDate(m.data.date)}
                       </p>
                       {invoiceId && (

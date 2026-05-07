@@ -120,17 +120,23 @@ export default function ExpenseList({
                       <span style={{ color: "var(--ink-400)" }}> · {sublabel}</span>
                     )}
                   </p>
-                  <p className="mt-0.5 font-mono text-xs" style={{ color: "var(--ink-400)" }}>
-                    {dateStr}&nbsp;·&nbsp;{exp.type === "recurring" ? "récurrente" : "ponctuelle"}
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                    <p className="shrink-0 font-mono text-xs" style={{ color: "var(--ink-400)" }}>
+                      {dateStr}
+                    </p>
+                    <span className="font-mono text-xs" style={{ color: "var(--ink-300)" }}>·</span>
+                    <span className="text-xs" style={{ color: "var(--ink-400)" }}>
+                      {exp.type === "recurring" ? "récurrente" : "ponctuelle"}
+                    </span>
                     {exp.type === "recurring" && !exp.active && (
                       <span
-                        className="ml-2 rounded px-1.5 py-0.5 text-[10px]"
+                        className="rounded px-1.5 py-0.5 text-[10px]"
                         style={{ background: "var(--cream-200)", color: "var(--ink-400)" }}
                       >
                         inactive
                       </span>
                     )}
-                  </p>
+                  </div>
                 </div>
 
                 {/* Montant */}
