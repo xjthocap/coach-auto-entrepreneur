@@ -678,7 +678,7 @@ export default async function DashboardPage({
                   <div
                     key={i}
                     className="rounded-[14px] p-5 transition hover:-translate-y-0.5"
-                    style={{ background: stat.dark ? "var(--violet-500)" : "var(--cream-50)", boxShadow: "var(--shadow-md)" }}
+                    style={{ background: stat.dark ? "var(--ink-900)" : "var(--cream-50)", boxShadow: "var(--shadow-md)" }}
                   >
                     <div className="flex items-start justify-between gap-1">
                       <p className="text-[11px] uppercase tracking-[0.08em]" style={{ color: stat.dark ? "rgba(255,255,255,0.55)" : "var(--ink-400)" }}>
@@ -688,10 +688,10 @@ export default async function DashboardPage({
                         <span
                           className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
                           style={{
-                            background: isGood ? "rgba(196,181,253,0.22)" : isBad ? "rgba(251,113,133,0.22)" : "rgba(0,0,0,0.06)",
+                            background: isGood ? (stat.dark ? "rgba(196,181,253,0.18)" : "rgba(196,181,253,0.22)") : isBad ? "rgba(251,113,133,0.22)" : (stat.dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"),
                             color: isGood
-                              ? stat.dark ? "var(--lime-500)" : "var(--violet-700)"
-                              : isBad ? "var(--rose-500)" : "var(--ink-400)",
+                              ? stat.dark ? "#C4B5FD" : "var(--violet-700)"
+                              : isBad ? "var(--rose-500)" : (stat.dark ? "rgba(255,255,255,0.6)" : "var(--ink-400)"),
                           }}
                         >
                           {delta >= 0 ? "+" : ""}{delta.toFixed(1).replace(".", ",")}%
@@ -700,12 +700,12 @@ export default async function DashboardPage({
                     </div>
                     <p
                       className="mt-3 font-mono font-normal"
-                      style={{ fontSize: "clamp(18px, 5.5vw, 26px)", letterSpacing: "-0.04em", color: stat.dark ? "var(--lime-500)" : "var(--ink-900)", lineHeight: 1.1 }}
+                      style={{ fontSize: "clamp(18px, 5.5vw, 26px)", letterSpacing: "-0.04em", color: stat.dark ? "#ffffff" : "var(--ink-900)", lineHeight: 1.1 }}
                     >
                       {stat.value.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       <span className="text-base font-light"> €</span>
                     </p>
-                    <p className="mt-2 text-xs" style={{ color: stat.dark ? "rgba(255,255,255,0.4)" : "var(--ink-400)" }}>{stat.sub}</p>
+                    <p className="mt-2 text-xs" style={{ color: stat.dark ? "rgba(255,255,255,0.6)" : "var(--ink-400)" }}>{stat.sub}</p>
                   </div>
                 )
               })}
