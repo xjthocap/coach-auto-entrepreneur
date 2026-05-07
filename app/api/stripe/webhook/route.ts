@@ -70,9 +70,35 @@ export async function POST(req: Request) {
       console.log(`[webhook] checkout.session.completed — userId=${userId} planType=${planType}`)
 
       if (typeof userId === "string" && userId) {
+        const customerEmail =
+          session.customer_email || session.customer_details?.email || null
+
         if (planType === "founder") {
           const customerId = typeof session.customer === "string" ? session.customer : null
           await assignFounder(userId, customerId)
+
+          // Récupérer le founder_number attribué pour l'email
+          const { data: founderProfile } = await supabaseAdmin
+            .from("profiles")
+            .select("founder_number")
+            .eq("id", userId)
+            .single()
+
+          if (customerEmail) {
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.keskireste.fr"
+            fetch(`${appUrl}/api/email/founder-welcome`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-internal-secret": process.env.INTERNAL_SECRET || "",
+              },
+              body: JSON.stringify({
+                userId,
+                email: customerEmail,
+                founderNumber: founderProfile?.founder_number ?? null,
+              }),
+            }).catch(console.error)
+          }
         } else {
           const { error } = await supabaseAdmin
             .from("profiles")
@@ -88,6 +114,18 @@ export async function POST(req: Request) {
             console.error("[webhook] Erreur passage premium :", error.message)
           } else {
             console.log(`[webhook] ✅ Profil ${userId} passé en premium`)
+          }
+
+          if (customerEmail) {
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.keskireste.fr"
+            fetch(`${appUrl}/api/email/premium-welcome`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-internal-secret": process.env.INTERNAL_SECRET || "",
+              },
+              body: JSON.stringify({ userId, email: customerEmail }),
+            }).catch(console.error)
           }
         }
       } else {
