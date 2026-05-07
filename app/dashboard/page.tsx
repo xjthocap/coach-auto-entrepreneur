@@ -342,6 +342,7 @@ export default async function DashboardPage({
     projectedResult.net - projection.projectedExpenses
 
   const isPremium = profile.plan === "premium"
+  const isFormerFounder = profile.founder_number != null && profile.plan !== "premium"
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -464,6 +465,50 @@ export default async function DashboardPage({
 
 
           <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 md:px-8 md:py-8">
+
+            {/* ── ANCIEN FOUNDER ── */}
+            {isFormerFounder && (
+              <section
+                className="flex flex-wrap items-center justify-between gap-4 px-5 py-4"
+                style={{
+                  background: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.08))",
+                  borderRadius: "var(--r-md)",
+                  border: "1px solid rgba(245,158,11,0.3)",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    style={{
+                      flexShrink: 0, width: 34, height: 34,
+                      borderRadius: "var(--r-sm)",
+                      background: "linear-gradient(135deg, #F59E0B, #D97706)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 16,
+                    }}
+                  >⭐</span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: "#92400E" }}>
+                      Vous étiez Founder #{profile.founder_number} — votre accès a expiré
+                    </p>
+                    <p className="mt-0.5 text-xs" style={{ color: "#B45309" }}>
+                      Reprenez un abonnement Premium pour retrouver toutes vos fonctionnalités.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="/api/stripe/checkout"
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "8px 16px", borderRadius: 999,
+                    background: "linear-gradient(135deg, #F59E0B, #D97706)",
+                    color: "#fff", fontSize: 13, fontWeight: 600,
+                    textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0,
+                  }}
+                >
+                  Reprendre Premium →
+                </a>
+              </section>
+            )}
 
             {/* ── HERO DARK CARD ── */}
             <section
