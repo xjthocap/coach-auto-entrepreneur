@@ -67,6 +67,21 @@ export async function POST(req: Request) {
         .eq("id", user.id)
     }
 
+    // ── Protection : vérifier via Stripe si un abonnement actif existe déjà ──
+    if (customerId) {
+      const [activeSubs, trialingSubs] = await Promise.all([
+        stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 }),
+        stripe.subscriptions.list({ customer: customerId, status: "trialing", limit: 1 }),
+      ])
+
+      if (activeSubs.data.length > 0 || trialingSubs.data.length > 0) {
+        return NextResponse.json(
+          { error: "Tu as déjà un abonnement actif. Gère-le depuis les paramètres." },
+          { status: 400 }
+        )
+      }
+    }
+
     const isFounder = planType === "founder"
     const priceId = isFounder
       ? process.env.STRIPE_PRICE_FOUNDER_YEARLY!
