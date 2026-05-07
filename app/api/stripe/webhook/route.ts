@@ -32,7 +32,6 @@ async function assignFounder(userId: string, stripeCustomerId: string | null): P
       stripe_customer_id: stripeCustomerId,
     })
     .eq("id", userId)
-    .is("founder_number", null) // sécurité : ne pas écraser si déjà attribué
 
   if (updateError) {
     console.error("Erreur mise à jour profil founder :", updateError.message)
