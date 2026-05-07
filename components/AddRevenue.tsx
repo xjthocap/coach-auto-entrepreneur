@@ -167,6 +167,9 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
       background: "var(--cream-50)",
       padding: 20,
       boxShadow: "var(--shadow-md)",
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
     }}>
       <style>{`
         .ar-grid-2 { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -364,7 +367,8 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
           onClick={handleAdd}
           disabled={loading}
           style={{
-            marginTop: 6,
+            marginTop: "auto",
+            paddingTop: 10,
             width: "100%", borderRadius: "var(--r-sm)", border: "none",
             background: "var(--ink-900)", color: "var(--violet-500)",
             padding: "13px 20px", fontSize: 14, fontWeight: 600,

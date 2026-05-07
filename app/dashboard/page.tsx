@@ -836,7 +836,7 @@ export default async function DashboardPage({
                   Ajoute rapidement une entrée ou une sortie.
                 </p>
               </div>
-              <div className="grid gap-6 xl:grid-cols-2 items-start">
+              <div className="grid gap-6 xl:grid-cols-2 items-stretch">
                   <AddRevenue isPremium={isPremium} />
                   <AddExpense />
               </div>

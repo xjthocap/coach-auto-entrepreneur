@@ -75,6 +75,9 @@ export default function AddExpense() {
       background: "var(--cream-50)",
       padding: 20,
       boxShadow: "var(--shadow-md)",
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
     }}>
       <style>{`
         .ae-grid-2 { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -175,7 +178,7 @@ export default function AddExpense() {
           onClick={handleAdd}
           disabled={loading}
           style={{
-            marginTop: 6,
+            marginTop: "auto",
             width: "100%",
             borderRadius: "var(--r-sm)",
             border: "none",
