@@ -84,10 +84,10 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
               className="mt-2 text-2xl font-semibold tracking-tight"
               style={{ color: "var(--ink-900)" }}
             >
-              Passe au niveau supérieur
+              7 jours gratuits, sans engagement
             </h2>
             <p className="mt-2 text-sm" style={{ color: "var(--ink-400)" }}>
-              Débloque le vrai copilote financier pour auto-entrepreneur.
+              Essaie Premium gratuitement — aucune carte débitée pendant 7 jours.
             </p>
           </div>
           <button
@@ -138,11 +138,16 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
               <p className="text-sm font-medium" style={{ color: "var(--violet-500)" }}>
                 Version Premium
               </p>
-              <div className="mt-3 flex items-end gap-2">
-                <p className="font-mono text-3xl font-light" style={{ color: "var(--cream-50)" }}>
-                  19,90€
+              <div className="mt-3">
+                <div className="flex items-end gap-2">
+                  <p className="font-mono text-3xl font-light" style={{ color: "var(--cream-50)" }}>
+                    19,90€
+                  </p>
+                  <p className="mb-1 text-sm" style={{ color: "var(--ink-400)" }}>/ mois</p>
+                </div>
+                <p className="mt-1 text-xs font-semibold" style={{ color: "var(--violet-400, #a78bfa)" }}>
+                  ✦ 7 jours gratuits — sans CB débitée
                 </p>
-                <p className="mb-1 text-sm" style={{ color: "var(--ink-400)" }}>/ mois</p>
               </div>
               <div className="mt-5 space-y-2.5">
                 {[
@@ -166,7 +171,7 @@ export default function PricingModal({ open, onClose }: PricingModalProps) {
                 ))}
               </div>
               <div className="mt-5">
-                <UpgradeButton label="Passer en Premium · 19,90€/mois" />
+                <UpgradeButton label="Essayer 7 jours gratuit · puis 19,90€/mois" />
               </div>
             </div>
           </div>

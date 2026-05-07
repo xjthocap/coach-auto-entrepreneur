@@ -83,6 +83,7 @@ export async function POST(req: Request) {
         plan_type: isFounder ? "founder" : "premium",
       },
       subscription_data: {
+        trial_period_days: isFounder ? undefined : 7,
         metadata: {
           supabase_user_id: user.id,
           plan_type: isFounder ? "founder" : "premium",
