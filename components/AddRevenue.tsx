@@ -205,14 +205,13 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             grid-template-areas: "desc qty price rm";
           }
         }
-        @keyframes ar-rise {
-          0%   { opacity: 0; transform: translateY(8px); }
-          18%  { opacity: 1; transform: translateY(0px); }
-          72%  { opacity: 1; transform: translateY(-72px); }
-          100% { opacity: 0; transform: translateY(-100px); }
+        @keyframes ar-toast-in {
+          0%   { opacity: 0; transform: translateY(6px); }
+          20%  { opacity: 1; transform: translateY(0px); }
+          75%  { opacity: 1; transform: translateY(0px); }
+          100% { opacity: 0; transform: translateY(-4px); }
         }
-        .ar-coin   { animation: ar-rise 1.8s ease-out forwards; }
-        .ar-bubble { animation: ar-rise 1.8s ease-out forwards; }
+        .ar-toast { animation: ar-toast-in 1.8s ease-out forwards; }
       `}</style>
 
       {/* Header */}
@@ -387,66 +386,48 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
       {/* Spacer + Submit */}
       <div style={{ flex: 1 }} />
 
-      {/* 🎉 Animation pièce */}
-      <div style={{ position: "relative" }}>
-        {celebration.active && (
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 10,
-              pointerEvents: "none",
-              zIndex: 50,
-            }}
-          >
-            {/* Bulle montant */}
-            <div
-              className="ar-bubble"
-              style={{
-                background: "linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)",
-                color: "#fff",
-                fontWeight: 800,
-                fontSize: 18,
-                borderRadius: 999,
-                padding: "8px 20px",
-                boxShadow: "0 6px 24px rgba(124,58,237,0.45)",
-                whiteSpace: "nowrap",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              +{formatAmount(celebration.amount)} €
-            </div>
-
-            {/* Pièce € */}
-            <div
-              className="ar-coin"
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: "50%",
-                background: "linear-gradient(145deg, #A78BFA 0%, #7C3AED 55%, #5B21B6 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 22,
-                fontWeight: 900,
-                color: "#fff",
-                boxShadow: "0 4px 20px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
-                border: "2px solid rgba(255,255,255,0.2)",
-                userSelect: "none",
-              }}
-            >
-              €
-            </div>
+      {/* ✓ Toast confirmation */}
+      {celebration.active && (
+        <div
+          aria-hidden="true"
+          className="ar-toast"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            background: "var(--ink-900)",
+            border: "1px solid rgba(155,123,255,0.25)",
+            borderRadius: "var(--r-sm)",
+            padding: "10px 16px",
+            pointerEvents: "none",
+          }}
+        >
+          {/* Icône check */}
+          <div style={{
+            width: 18,
+            height: 18,
+            borderRadius: "50%",
+            background: "rgba(155,123,255,0.15)",
+            border: "1.5px solid var(--violet-500)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}>
+            <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+              <path d="M1 3.5L3.5 6L8 1" stroke="#9B7BFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
-        )}
-      </div>
+          {/* Texte */}
+          <span style={{ fontSize: 13, color: "var(--cream-100)", fontWeight: 500, letterSpacing: "-0.01em" }}>
+            Revenu ajouté
+          </span>
+          {/* Montant */}
+          <span style={{ fontSize: 13, color: "var(--violet-400, #9B7BFF)", fontWeight: 700, letterSpacing: "-0.02em", marginLeft: "auto", paddingLeft: 12 }}>
+            +{formatAmount(celebration.amount)} €
+          </span>
+        </div>
+      )}
 
       <button
         onClick={handleAdd}
