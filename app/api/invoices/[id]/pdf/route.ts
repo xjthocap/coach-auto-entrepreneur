@@ -142,15 +142,6 @@ export async function GET(
       width: drawW,
       height: drawH,
     })
-
-    // Nom entreprise à droite du logo
-    page.drawText(issuerName, {
-      x: 50 + drawW + 12,
-      y: 784,
-      size: 18,
-      font: bold,
-      color: black,
-    })
   } else {
     // ── Fallback : carré violet + "K" ────────────────────────────────────────
     page.drawRectangle({
