@@ -136,6 +136,7 @@ export default async function DashboardPage({
   nextDate.setMonth(nextDate.getMonth() + step)
 
   const today = new Date()
+  const isDecember = today.getMonth() === 11 // 0-indexed
   const endDate = parsePeriodDate(period.end)
   const diffTime = endDate.getTime() - today.getTime()
   const daysRemainingInPeriod = Math.max(
@@ -635,17 +636,47 @@ export default async function DashboardPage({
                   )}
 
                   {/* Rappel CFE */}
-                  <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-500)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
-                    💡 N&apos;oublie pas la <strong style={{ color: "var(--ink-400)" }}>CFE</strong> — due chaque année en décembre.{" "}
-                    <a
-                      href="https://cfspro-idp.impots.gouv.fr"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: "var(--violet-400, #9B7BFF)", textDecoration: "underline", textUnderlineOffset: 2 }}
-                    >
-                      Consulter mon avis CFE →
-                    </a>
-                  </p>
+                  {isDecember ? (
+                    <div className="mt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                      <a
+                        href="https://cfspro-idp.impots.gouv.fr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          background: "rgba(245,158,11,0.1)",
+                          border: "1px solid rgba(245,158,11,0.3)",
+                          borderRadius: "var(--r-sm)",
+                          padding: "9px 12px",
+                          textDecoration: "none",
+                        }}
+                      >
+                        <span style={{ fontSize: 15, flexShrink: 0 }}>⚠️</span>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: "#F59E0B", marginBottom: 1 }}>
+                            N&apos;oublie pas de payer ta CFE !
+                          </p>
+                          <p style={{ fontSize: 11, color: "var(--ink-400)" }}>
+                            Échéance en décembre — Accéder à mon espace impôts →
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-500)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                      💡 N&apos;oublie pas la <strong style={{ color: "var(--ink-400)" }}>CFE</strong> — due chaque année en décembre.{" "}
+                      <a
+                        href="https://cfspro-idp.impots.gouv.fr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "var(--violet-400, #9B7BFF)", textDecoration: "underline", textUnderlineOffset: 2 }}
+                      >
+                        Consulter mon avis CFE →
+                      </a>
+                    </p>
+                  )}
                 </div>
               </div>
             </section>
