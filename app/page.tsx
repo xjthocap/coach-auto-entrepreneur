@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { getSupabaseAdmin } from "@/lib/supabase/admin"
 
@@ -1230,7 +1231,9 @@ export default async function HomePage() {
         {/* NAV */}
         <nav className="nav">
           <div className="nav-inner">
-            <Link href="/" className="nav-logo">keskireste<span>.</span></Link>
+            <Link href="/" className="nav-logo">
+              <Image src="/logos/logo-dark.webp" alt="keskireste." width={140} height={34} style={{ height: 30, width: "auto" }} priority />
+            </Link>
             <ul className="nav-links">
               <li><a href="#how">Comment ça marche</a></li>
               <li><a href="#features">Fonctionnalités</a></li>
@@ -1816,7 +1819,9 @@ export default async function HomePage() {
           <div className="footer-inner">
             <div className="footer-grid">
               <div>
-                <div className="footer-brand-logo">keskireste<span>.</span></div>
+                <div className="footer-brand-logo">
+                  <Image src="/logos/logo-dark.webp" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
+                </div>
                 <p className="footer-brand-desc">Le copilote financier des auto-entrepreneurs français. Simple, honnête, utile.</p>
               </div>
               <div>

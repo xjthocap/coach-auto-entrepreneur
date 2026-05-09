@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import LogoutButton from "@/components/LogoutButton"
 import PricingTrigger from "@/components/PricingTrigger"
@@ -112,30 +113,15 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
       <div className="flex flex-col h-full px-5 py-6">
 
         {/* ── Logo ── */}
-        <Link href="/dashboard" className="flex items-center gap-3 mb-1">
-          <div
-            className="relative shrink-0 rounded-lg flex items-center justify-center"
-            style={{ width: 32, height: 32, background: "var(--ink-900)" }}
-          >
-            <span
-              className="absolute rounded-full border-2"
-              style={{
-                width: 14,
-                height: 14,
-                background: "var(--lime-500)",
-                borderColor: "var(--cream-50)",
-                bottom: -4,
-                right: -4,
-              }}
-            />
-          </div>
-          <span
-            className="text-xl font-semibold tracking-tight"
-            style={{ color: "var(--ink-900)" }}
-          >
-            keskireste
-            <span style={{ color: "var(--lime-700)" }}>.</span>
-          </span>
+        <Link href="/dashboard" className="flex items-center mb-1">
+          <Image
+            src="/logos/logo-dark.webp"
+            alt="keskireste."
+            width={148}
+            height={36}
+            style={{ height: 32, width: "auto" }}
+            priority
+          />
         </Link>
 
         <p
