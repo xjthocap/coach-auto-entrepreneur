@@ -8,9 +8,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://keskireste.fr/histoire" },
   openGraph: {
     title: "Notre histoire — keskireste.",
-    description: "Comment un fichier Excel partagé entre freelances est devenu un vrai produit. L'histoire honnête de keskireste.",
+    description: "Comment un fichier Excel partagé entre freelances est devenu un vrai produit. L'histoire honnête de keskireste. — keskireste.fr",
     url: "https://keskireste.fr/histoire",
-    images: [{ url: "/logos/logo-dark-tagline.png", width: 1200, height: 300, alt: "keskireste. — Notre histoire" }],
   },
 }
 

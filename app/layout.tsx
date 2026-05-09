@@ -40,21 +40,12 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "keskireste.",
     title: "keskireste. — Le copilote financier des auto-entrepreneurs",
-    description: "Suivez vos revenus, dépenses et cotisations URSSAF en temps réel. Simple, honnête, utile.",
-    images: [
-      {
-        url: "/logos/logo-dark-tagline.png",
-        width: 1200,
-        height: 300,
-        alt: "keskireste. — Ton vrai solde, sans prise de tête.",
-      },
-    ],
+    description: "Revenus, URSSAF, impôt, dépenses — tout en un. Le tableau de bord simple et honnête pour les auto-entrepreneurs et freelances français.",
   },
   twitter: {
     card: "summary_large_image",
     title: "keskireste. — Le copilote financier des auto-entrepreneurs",
-    description: "Suivez vos revenus, dépenses et cotisations URSSAF en temps réel.",
-    images: ["/logos/logo-dark-tagline.png"],
+    description: "Revenus, URSSAF, impôt, dépenses — tout en un. Le tableau de bord simple et honnête pour les auto-entrepreneurs et freelances français.",
     creator: "@keskireste",
   },
   icons: {

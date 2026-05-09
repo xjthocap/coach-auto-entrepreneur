@@ -9,9 +9,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://keskireste.fr" },
   openGraph: {
     title: "keskireste. — Le copilote financier des auto-entrepreneurs",
-    description: "Ton vrai solde, sans prise de tête. Revenus, URSSAF, impôt, dépenses — tout en un.",
+    description: "Ton vrai solde, sans prise de tête. Revenus, URSSAF, impôt, dépenses — tout en un. L'outil simple et honnête pour les auto-entrepreneurs français.",
     url: "https://keskireste.fr",
-    images: [{ url: "/logos/logo-dark-tagline.png", width: 1200, height: 300, alt: "keskireste. — Ton vrai solde, sans prise de tête." }],
   },
 }
 
