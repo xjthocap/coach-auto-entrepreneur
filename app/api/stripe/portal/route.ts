@@ -34,9 +34,19 @@ export async function POST() {
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
-    console.error("Portal error:", error)
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error("Portal error:", msg)
+
+    // Erreur fréquente : portail Stripe non configuré dans le dashboard
+    if (msg.includes("No configuration was provided") || msg.includes("customer portal")) {
+      return NextResponse.json(
+        { error: "Le portail client Stripe n’est pas encore configuré. Va dans Stripe Dashboard → Settings → Billing → Customer portal." },
+        { status: 500 }
+      )
+    }
+
     return NextResponse.json(
-      { error: "Impossible d’ouvrir le portail client" },
+      { error: msg || "Impossible d’ouvrir le portail client" },
       { status: 500 }
     )
   }
