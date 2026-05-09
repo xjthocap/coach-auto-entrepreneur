@@ -1820,7 +1820,7 @@ export default async function HomePage() {
             <div className="footer-grid">
               <div>
                 <div className="footer-brand-logo">
-                  <Image src="/logos/logo-dark.webp" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
+                  <Image src="/logos/logo-light.webp" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
                 </div>
                 <p className="footer-brand-desc">Le copilote financier des auto-entrepreneurs français. Simple, honnête, utile.</p>
               </div>

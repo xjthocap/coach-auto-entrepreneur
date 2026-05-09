@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 
@@ -504,8 +505,7 @@ export default function HistoirePage() {
         <nav className="h-nav">
           <div className="h-nav-inner">
             <Link href="/" className="h-logo">
-              <div className="h-logo-mark" />
-              <span className="h-logo-name">keskireste<span className="dot">.</span></span>
+              <Image src="/logos/logo-dark.webp" alt="keskireste." width={140} height={34} style={{ height: 30, width: "auto" }} priority />
             </Link>
             <div className="h-nav-links">
               <a href="/#how">Comment ça marche</a>
@@ -765,8 +765,7 @@ export default function HistoirePage() {
             <div className="h-footer-grid">
               <div className="h-footer-brand">
                 <Link href="/" className="h-logo" style={{marginBottom:14}}>
-                  <div className="h-logo-mark" style={{background:'#FBFAF5'}} />
-                  <span className="h-footer-logo-name">keskireste<span className="dot">.</span></span>
+                  <Image src="/logos/logo-light.webp" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
                 </Link>
                 <p>L&apos;outil de pilotage financier conçu pour les auto-entrepreneurs français. Né d&apos;un fichier Excel, en 2018.</p>
               </div>
