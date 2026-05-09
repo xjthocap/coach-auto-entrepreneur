@@ -161,7 +161,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
 
     // 🎉 Animation pièce
     setCelebration({ active: true, amount: finalAmount })
-    setTimeout(() => setCelebration({ active: false, amount: 0 }), 2400)
+    setTimeout(() => setCelebration({ active: false, amount: 0 }), 1900)
 
     router.refresh()
   }
@@ -205,20 +205,14 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             grid-template-areas: "desc qty price rm";
           }
         }
-        @keyframes ar-float-up {
-          0%   { opacity: 0; transform: translateY(0) scale(0.6); }
-          15%  { opacity: 1; transform: translateY(-24px) scale(1.08); }
-          65%  { opacity: 1; transform: translateY(-110px) scale(1); }
-          100% { opacity: 0; transform: translateY(-160px) scale(0.88); }
+        @keyframes ar-rise {
+          0%   { opacity: 0; transform: translateY(8px); }
+          18%  { opacity: 1; transform: translateY(0px); }
+          72%  { opacity: 1; transform: translateY(-72px); }
+          100% { opacity: 0; transform: translateY(-100px); }
         }
-        @keyframes ar-bubble-in {
-          0%   { opacity: 0; transform: translateY(0) scale(0.5); }
-          15%  { opacity: 1; transform: translateY(-24px) scale(1.05); }
-          65%  { opacity: 1; transform: translateY(-110px) scale(1); }
-          100% { opacity: 0; transform: translateY(-160px) scale(0.9); }
-        }
-        .ar-coin   { animation: ar-float-up  2.4s cubic-bezier(0.22,0.61,0.36,1) forwards; }
-        .ar-bubble { animation: ar-bubble-in 2.4s cubic-bezier(0.22,0.61,0.36,1) forwards; }
+        .ar-coin   { animation: ar-rise 1.8s ease-out forwards; }
+        .ar-bubble { animation: ar-rise 1.8s ease-out forwards; }
       `}</style>
 
       {/* Header */}
