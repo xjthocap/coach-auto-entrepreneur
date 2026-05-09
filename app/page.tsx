@@ -1,6 +1,19 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { getSupabaseAdmin } from "@/lib/supabase/admin"
+
+export const metadata: Metadata = {
+  title: "keskireste. — Le copilote financier des auto-entrepreneurs",
+  description: "Suivez vos revenus, dépenses et cotisations URSSAF en temps réel. Simple, honnête, fait par un freelance pour les freelances français.",
+  alternates: { canonical: "https://keskireste.fr" },
+  openGraph: {
+    title: "keskireste. — Le copilote financier des auto-entrepreneurs",
+    description: "Ton vrai solde, sans prise de tête. Revenus, URSSAF, impôt, dépenses — tout en un.",
+    url: "https://keskireste.fr",
+    images: [{ url: "/logos/logo-dark-tagline.png", width: 1200, height: 300, alt: "keskireste. — Ton vrai solde, sans prise de tête." }],
+  },
+}
 
 const FOUNDER_TOTAL = 50
 
@@ -1232,7 +1245,7 @@ export default async function HomePage() {
         <nav className="nav">
           <div className="nav-inner">
             <Link href="/" className="nav-logo">
-              <Image src="/logos/logo-dark.webp" alt="keskireste." width={140} height={34} style={{ height: 30, width: "auto" }} priority />
+              <Image src="/logos/logo-dark.png" alt="keskireste." width={140} height={34} style={{ height: 30, width: "auto" }} priority />
             </Link>
             <ul className="nav-links">
               <li><a href="#how">Comment ça marche</a></li>
@@ -1820,7 +1833,7 @@ export default async function HomePage() {
             <div className="footer-grid">
               <div>
                 <div className="footer-brand-logo">
-                  <Image src="/logos/logo-light.webp" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
+                  <Image src="/logos/logo-light.png" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
                 </div>
                 <p className="footer-brand-desc">Le copilote financier des auto-entrepreneurs français. Simple, honnête, utile.</p>
               </div>

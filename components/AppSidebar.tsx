@@ -115,7 +115,7 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
         {/* ── Logo ── */}
         <Link href="/dashboard" className="flex items-center mb-1">
           <Image
-            src="/logos/logo-dark.webp"
+            src="/logos/logo-dark.png"
             alt="keskireste."
             width={148}
             height={36}

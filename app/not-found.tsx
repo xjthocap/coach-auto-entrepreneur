@@ -31,7 +31,7 @@ export default function NotFound() {
         {/* Logo */}
         <div style={{ marginBottom: 40 }}>
           <Image
-            src="/logos/logo-dark.webp"
+            src="/logos/logo-dark.png"
             alt="keskireste."
             height={30}
             width={120}
