@@ -205,13 +205,13 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             grid-template-areas: "desc qty price rm";
           }
         }
-        @keyframes ar-rise {
-          0%   { opacity: 0; transform: translateY(0px); }
-          15%  { opacity: 1; transform: translateY(-16px); }
-          70%  { opacity: 1; transform: translateY(-80px); }
-          100% { opacity: 0; transform: translateY(-104px); }
+        @keyframes ar-toast-in {
+          0%   { opacity: 0; transform: translateY(6px); }
+          20%  { opacity: 1; transform: translateY(0px); }
+          75%  { opacity: 1; transform: translateY(0px); }
+          100% { opacity: 0; transform: translateY(-4px); }
         }
-        .ar-rise { animation: ar-rise 1.9s ease-out forwards; }
+        .ar-toast { animation: ar-toast-in 1.8s ease-out forwards; }
       `}</style>
 
       {/* Header */}
@@ -386,76 +386,55 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
       {/* Spacer + Submit */}
       <div style={{ flex: 1 }} />
 
-      <div style={{ position: "relative" }}>
-        {/* ✦ Animation coin + bulle */}
-        {celebration.active && (
-          <div
-            aria-hidden="true"
-            className="ar-rise"
-            style={{
-              position: "absolute",
-              bottom: "calc(100% + 8px)",
-              left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 6,
-              pointerEvents: "none",
-              zIndex: 50,
-            }}
-          >
-            {/* Bulle montant */}
-            <div style={{
-              background: "#1A0F2E",
-              border: "1px solid rgba(155,123,255,0.35)",
-              borderRadius: 999,
-              padding: "6px 16px",
-              fontSize: 14,
-              fontWeight: 700,
-              color: "#9B7BFF",
-              letterSpacing: "-0.02em",
-              whiteSpace: "nowrap",
-              boxShadow: "0 2px 12px rgba(124,92,255,0.2)",
-            }}>
-              +{formatAmount(celebration.amount)} €
-            </div>
-
-            {/* Pièce € */}
-            <div style={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              background: "linear-gradient(145deg, #9B7BFF 0%, #7C5CFF 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 18,
-              fontWeight: 700,
-              color: "#fff",
-              boxShadow: "0 4px 16px rgba(124,92,255,0.4)",
-              userSelect: "none",
-            }}>
-              €
-            </div>
-          </div>
-        )}
-
-        <button
-          onClick={handleAdd}
-          disabled={loading}
+      {/* ✓ Toast confirmation */}
+      {celebration.active && (
+        <div
+          aria-hidden="true"
+          className="ar-toast"
           style={{
-            marginTop: 12,
-            width: "100%", borderRadius: "var(--r-sm)", border: "none",
-            background: "var(--ink-900)", color: "var(--violet-500)",
-            padding: "13px 20px", fontSize: 14, fontWeight: 600,
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.5 : 1, boxShadow: "var(--shadow-md)",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            background: "var(--ink-900)",
+            border: "1px solid rgba(155,123,255,0.25)",
+            borderRadius: "var(--r-sm)",
+            padding: "10px 16px",
+            pointerEvents: "none",
           }}
         >
-          {loading ? "Enregistrement…" : "Ajouter le revenu"}
-        </button>
-      </div>
+          <div style={{
+            width: 18, height: 18, borderRadius: "50%",
+            background: "rgba(155,123,255,0.15)",
+            border: "1.5px solid var(--violet-500)",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          }}>
+            <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+              <path d="M1 3.5L3.5 6L8 1" stroke="#9B7BFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <span style={{ fontSize: 13, color: "var(--cream-100)", fontWeight: 500, letterSpacing: "-0.01em" }}>
+            Revenu ajouté
+          </span>
+          <span style={{ fontSize: 13, color: "#9B7BFF", fontWeight: 700, letterSpacing: "-0.02em", marginLeft: "auto", paddingLeft: 12 }}>
+            +{formatAmount(celebration.amount)} €
+          </span>
+        </div>
+      )}
+
+      <button
+        onClick={handleAdd}
+        disabled={loading}
+        style={{
+          marginTop: 12,
+          width: "100%", borderRadius: "var(--r-sm)", border: "none",
+          background: "var(--ink-900)", color: "var(--violet-500)",
+          padding: "13px 20px", fontSize: 14, fontWeight: 600,
+          cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.5 : 1, boxShadow: "var(--shadow-md)",
+        }}
+      >
+        {loading ? "Enregistrement…" : "Ajouter le revenu"}
+      </button>
 
       {lastInvoiceId && (
         <a
