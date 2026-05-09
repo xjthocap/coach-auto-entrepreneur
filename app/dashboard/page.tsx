@@ -633,6 +633,19 @@ export default async function DashboardPage({
                       ⚠️ Provision IR calculée sur le barème 2025 · hypothèse : foyer 1 part, aucun autre revenu. Ajuste en fonction de ta situation réelle.
                     </p>
                   )}
+
+                  {/* Rappel CFE */}
+                  <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-500)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                    💡 N&apos;oublie pas la <strong style={{ color: "var(--ink-400)" }}>CFE</strong> — due chaque année en décembre.{" "}
+                    <a
+                      href="https://cfspro-idp.impots.gouv.fr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "var(--violet-400, #9B7BFF)", textDecoration: "underline", textUnderlineOffset: 2 }}
+                    >
+                      Consulter mon avis CFE →
+                    </a>
+                  </p>
                 </div>
               </div>
             </section>
