@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export default function NotFound() {
   return (
@@ -29,9 +30,13 @@ export default function NotFound() {
 
         {/* Logo */}
         <div style={{ marginBottom: 40 }}>
-          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--cream-50)" }}>
-            keski<span style={{ color: "var(--violet-500, #7C5CFF)" }}>reste</span>.
-          </span>
+          <Image
+            src="/logos/logo-dark.webp"
+            alt="keskireste."
+            height={30}
+            width={120}
+            style={{ height: 30, width: "auto" }}
+          />
         </div>
 
         {/* Big number */}
