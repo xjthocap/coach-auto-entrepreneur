@@ -27,6 +27,7 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
   const [amount, setAmount] = useState("")
   const [date, setDate] = useState(today)
   const [loading, setLoading] = useState(false)
+  const [celebration, setCelebration] = useState<{ active: boolean; amount: number }>({ active: false, amount: 0 })
 
   const [clientName, setClientName] = useState("")
   const [clientCompany, setClientCompany] = useState("")
@@ -157,7 +158,18 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
     setGenerateInvoice(false); setLabel(""); setAmount(""); setDate(today)
     setItems([{ description: "", quantity: "1", unitPrice: "" }])
     setLoading(false)
+
+    // 🎉 Animation pièce
+    setCelebration({ active: true, amount: finalAmount })
+    setTimeout(() => setCelebration({ active: false, amount: 0 }), 2400)
+
     router.refresh()
+  }
+
+  function formatAmount(n: number) {
+    return n % 1 === 0
+      ? n.toLocaleString("fr-FR")
+      : n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
   return (
@@ -193,6 +205,20 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
             grid-template-areas: "desc qty price rm";
           }
         }
+        @keyframes ar-float-up {
+          0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+          15%  { opacity: 1; transform: translateY(-24px) scale(1.08); }
+          65%  { opacity: 1; transform: translateY(-110px) scale(1); }
+          100% { opacity: 0; transform: translateY(-160px) scale(0.88); }
+        }
+        @keyframes ar-bubble-in {
+          0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+          15%  { opacity: 1; transform: translateY(-24px) scale(1.05); }
+          65%  { opacity: 1; transform: translateY(-110px) scale(1); }
+          100% { opacity: 0; transform: translateY(-160px) scale(0.9); }
+        }
+        .ar-coin   { animation: ar-float-up  2.4s cubic-bezier(0.22,0.61,0.36,1) forwards; }
+        .ar-bubble { animation: ar-bubble-in 2.4s cubic-bezier(0.22,0.61,0.36,1) forwards; }
       `}</style>
 
       {/* Header */}
@@ -366,6 +392,68 @@ export default function AddRevenue({ isPremium = false }: { isPremium?: boolean 
 
       {/* Spacer + Submit */}
       <div style={{ flex: 1 }} />
+
+      {/* 🎉 Animation pièce */}
+      <div style={{ position: "relative" }}>
+        {celebration.active && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 10,
+              pointerEvents: "none",
+              zIndex: 50,
+            }}
+          >
+            {/* Bulle montant */}
+            <div
+              className="ar-bubble"
+              style={{
+                background: "linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)",
+                color: "#fff",
+                fontWeight: 800,
+                fontSize: 18,
+                borderRadius: 999,
+                padding: "8px 20px",
+                boxShadow: "0 6px 24px rgba(124,58,237,0.45)",
+                whiteSpace: "nowrap",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              +{formatAmount(celebration.amount)} €
+            </div>
+
+            {/* Pièce € */}
+            <div
+              className="ar-coin"
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: "50%",
+                background: "linear-gradient(145deg, #A78BFA 0%, #7C3AED 55%, #5B21B6 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 22,
+                fontWeight: 900,
+                color: "#fff",
+                boxShadow: "0 4px 20px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
+                border: "2px solid rgba(255,255,255,0.2)",
+                userSelect: "none",
+              }}
+            >
+              €
+            </div>
+          </div>
+        )}
+      </div>
+
       <button
         onClick={handleAdd}
         disabled={loading}
