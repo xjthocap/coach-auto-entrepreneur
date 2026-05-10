@@ -56,6 +56,23 @@ const landingStyles = `
     min-height: 100vh;
   }
 
+  /* Skip nav */
+  .skip-nav {
+    position: absolute;
+    top: -48px;
+    left: 16px;
+    z-index: 9999;
+    background: var(--violet-500);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.15s;
+  }
+  .skip-nav:focus { top: 8px; }
+
   /* NAV */
   .nav {
     position: sticky;
@@ -1241,17 +1258,7 @@ export default async function HomePage() {
       <div className="landing">
 
         {/* Skip to main content — accessibilité */}
-        <a
-          href="#main-content"
-          style={{
-            position: "absolute", top: -40, left: 16, zIndex: 9999,
-            background: "var(--violet-500)", color: "#fff",
-            padding: "8px 16px", borderRadius: 6, fontSize: 14, fontWeight: 600,
-            textDecoration: "none", transition: "top 0.15s",
-          }}
-          onFocus={(e) => { (e.currentTarget as HTMLElement).style.top = "8px" }}
-          onBlur={(e) => { (e.currentTarget as HTMLElement).style.top = "-40px" }}
-        >
+        <a href="#main-content" className="skip-nav">
           Aller au contenu principal
         </a>
 
