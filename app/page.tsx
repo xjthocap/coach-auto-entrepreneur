@@ -332,7 +332,7 @@ const landingStyles = `
   }
   .mockup-label {
     font-size: 0.75rem;
-    color: rgba(189, 168, 255, 0.5);
+    color: rgba(189, 168, 255, 0.78);
     font-family: var(--font-geist-mono), monospace;
     margin-left: auto;
   }
@@ -918,7 +918,7 @@ const landingStyles = `
   }
   .pricing-section .eyebrow { color: var(--violet-300); }
   .pricing-section .section-h2 { color: #fff; }
-  .pricing-sub { font-size: 1.0625rem; color: var(--muted); margin-bottom: 48px; }
+  .pricing-sub { font-size: 1.0625rem; color: var(--violet-300); margin-bottom: 48px; }
   .pricing-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -996,7 +996,7 @@ const landingStyles = `
   .price-card-premium .price-amount { color: var(--ink); }
   .price-card-founder .price-amount { color: #fff; }
   .price-period { font-size: 0.875rem; margin-bottom: 24px; }
-  .price-card-free .price-period { color: var(--muted); }
+  .price-card-free .price-period { color: var(--violet-300); }
   .price-card-premium .price-period { color: var(--muted); }
   .price-card-founder .price-period { color: #F5C542; font-weight: 600; }
   .price-features {
@@ -1045,7 +1045,7 @@ const landingStyles = `
     margin-bottom: 6px;
   }
   .founder-mini-label span:first-child { color: var(--violet-300); font-weight: 600; }
-  .founder-mini-label span:last-child { color: var(--muted); font-family: var(--font-geist-mono), monospace; }
+  .founder-mini-label span:last-child { color: var(--violet-300); font-family: var(--font-geist-mono), monospace; }
   .founder-mini-track {
     height: 5px;
     background: rgba(255,255,255,0.08);
@@ -1211,7 +1211,7 @@ const landingStyles = `
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(189, 168, 255, 0.5);
+    color: var(--violet-300);
     margin-bottom: 16px;
   }
   .footer-links {
