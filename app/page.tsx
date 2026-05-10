@@ -1228,7 +1228,7 @@ const landingStyles = `
     text-decoration: none;
     transition: color 0.15s;
   }
-  .footer-links a:hover { color: var(--violet-300); }
+  .footer-links a:hover { color: #fff; }
   .footer-bottom {
     display: flex;
     align-items: center;
@@ -1241,7 +1241,7 @@ const landingStyles = `
     gap: 12px;
   }
   .footer-bottom a { color: var(--violet-300); text-decoration: none; }
-  .footer-bottom a:hover { color: var(--violet-300); }
+  .footer-bottom a:hover { color: #fff; }
 
 `
 
