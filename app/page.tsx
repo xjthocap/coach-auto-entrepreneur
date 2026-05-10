@@ -1268,7 +1268,7 @@ export default async function HomePage() {
               Le copilote financier des auto-entrepreneurs
             </div>
             <h1>
-              Sache enfin<br />
+              Comprends enfin<br />
               combien il te<br />
               reste <span className="accent">vraiment.</span>
             </h1>
