@@ -785,16 +785,16 @@ export default function HistoirePage() {
               <div className="h-footer-col">
                 <h4>Entreprise</h4>
                 <a href="/histoire">Notre histoire</a>
-                <a href="#">Blog</a>
-                <a href="#">Programme partenaires</a>
                 <a href="mailto:hello@keskireste.fr">Nous contacter</a>
+                <span style={{ opacity: 0.4, cursor: "default" }}>
+                  Blog <span style={{ fontSize: 10 }}>bientôt</span>
+                </span>
               </div>
               <div className="h-footer-col">
                 <h4>Légal</h4>
-                <Link href="/legal/terms">CGU</Link>
-                <Link href="/legal/privacy">Politique de confidentialité</Link>
-                <a href="#">Mentions légales</a>
-                <a href="#">RGPD</a>
+                <Link href="/legal/mentions">Mentions légales</Link>
+                <Link href="/legal/confidentialite">Confidentialité</Link>
+                <Link href="/legal/cgv">CGV</Link>
               </div>
             </div>
             <div className="h-footer-bottom">
