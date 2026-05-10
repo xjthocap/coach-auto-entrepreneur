@@ -630,7 +630,7 @@ export default async function DashboardPage({
                   </div>
 
                   {useIREstimate && (
-                    <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-500)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                    <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-300)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
                       ⚠️ Provision IR calculée sur le barème 2025 · hypothèse : foyer 1 part, aucun autre revenu. Ajuste en fonction de ta situation réelle.
                     </p>
                   )}
@@ -665,13 +665,13 @@ export default async function DashboardPage({
                       </a>
                     </div>
                   ) : (
-                    <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-500)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
-                      💡 N&apos;oublie pas la <strong style={{ color: "var(--ink-400)" }}>CFE</strong> — due chaque année en décembre.{" "}
+                    <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--ink-300)", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                      💡 N&apos;oublie pas la <strong style={{ color: "var(--cream-100, #F8F7FC)" }}>CFE</strong> — due chaque année en décembre.{" "}
                       <a
                         href="https://cfspro-idp.impots.gouv.fr"
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: "var(--violet-400, #9B7BFF)", textDecoration: "underline", textUnderlineOffset: 2 }}
+                        style={{ color: "#C4B5FD", textDecoration: "underline", textUnderlineOffset: 2 }}
                       >
                         Consulter mon avis CFE →
                       </a>
