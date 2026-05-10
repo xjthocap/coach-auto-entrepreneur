@@ -445,37 +445,40 @@ export async function GET(
     })
   }
 
-  page.drawText("Détails bancaires :", {
-    x: 50,
-    y: 80,
-    size: 10,
-    font,
-    color: black,
-  })
+  const hasIban = profile?.iban && profile.iban.trim().length > 0
+  if (hasIban) {
+    page.drawText("Détails bancaires :", {
+      x: 50,
+      y: 80,
+      size: 10,
+      font,
+      color: black,
+    })
 
-  page.drawText(`Titulaire : ${safe(profile?.bank_holder || issuerName)}`, {
-    x: 50,
-    y: 58,
-    size: 9,
-    font,
-    color: black,
-  })
+    page.drawText(`Titulaire : ${safe(profile?.bank_holder || issuerName)}`, {
+      x: 50,
+      y: 58,
+      size: 9,
+      font,
+      color: black,
+    })
 
-  page.drawText(`IBAN : ${safe(profile?.iban)}`, {
-    x: 50,
-    y: 40,
-    size: 9,
-    font,
-    color: black,
-  })
+    page.drawText(`IBAN : ${safe(profile?.iban)}`, {
+      x: 50,
+      y: 40,
+      size: 9,
+      font,
+      color: black,
+    })
 
-  page.drawText(`BIC : ${safe(profile?.bic)}`, {
-    x: 50,
-    y: 22,
-    size: 9,
-    font,
-    color: black,
-  })
+    page.drawText(`BIC : ${safe(profile?.bic)}`, {
+      x: 50,
+      y: 22,
+      size: 9,
+      font,
+      color: black,
+    })
+  }
 
   const pdfBytes = await pdfDoc.save()
   const pdfBuffer = Buffer.from(pdfBytes)
