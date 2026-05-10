@@ -1203,7 +1203,7 @@ const landingStyles = `
   .footer-brand-desc {
     font-size: 0.875rem;
     line-height: 1.7;
-    color: var(--muted);
+    color: var(--violet-300);
     max-width: 260px;
   }
   .footer-col-title {
@@ -1224,7 +1224,7 @@ const landingStyles = `
   }
   .footer-links a {
     font-size: 0.875rem;
-    color: var(--muted);
+    color: var(--violet-300);
     text-decoration: none;
     transition: color 0.15s;
   }
@@ -1236,11 +1236,11 @@ const landingStyles = `
     padding-top: 24px;
     border-top: 1px solid rgba(124, 92, 255, 0.12);
     font-size: 0.8125rem;
-    color: var(--muted);
+    color: var(--violet-300);
     flex-wrap: wrap;
     gap: 12px;
   }
-  .footer-bottom a { color: var(--muted); text-decoration: none; }
+  .footer-bottom a { color: var(--violet-300); text-decoration: none; }
   .footer-bottom a:hover { color: var(--violet-300); }
 
 `
