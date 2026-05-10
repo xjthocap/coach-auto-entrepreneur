@@ -1699,8 +1699,6 @@ export default async function HomePage() {
                   <li><span className="pcheck">✓</span> Dashboard basique</li>
                   <li><span className="pcheck">✓</span> Suivi des revenus (3 mois)</li>
                   <li><span className="pcheck">✓</span> Calcul URSSAF automatique</li>
-                  <li><span className="pcheck">✓</span> 3 factures / mois</li>
-                  <li><span className="pcheck">✓</span> 1 question IA / semaine</li>
                 </ul>
                 <Link href="/signup" className="price-cta price-cta-free">Commencer gratuitement</Link>
               </div>
