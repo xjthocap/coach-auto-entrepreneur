@@ -31,10 +31,9 @@ export default async function SettingsPage() {
   }
 
   const isPremium = profile.plan === "premium"
-  const isPatron = !!(profile as { is_patron?: boolean }).is_patron
-  const isActiveFounder = !isPatron && !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
-  const isFormerFounderPremium = !isPatron && !!(profile.founder_number) && isPremium && profile.subscription_type !== "founder"
-  const isFormerFounder = !isPatron && !!(profile.founder_number) && !isPremium
+  const isActiveFounder = !!(profile.founder_number) && isPremium && profile.subscription_type === "founder"
+  const isFormerFounderPremium = !!(profile.founder_number) && isPremium && profile.subscription_type !== "founder"
+  const isFormerFounder = !!(profile.founder_number) && !isPremium
 
   return (
     <main className="min-h-screen" style={{ background: "var(--cream-100)", color: "var(--ink-900)" }}>
@@ -100,45 +99,6 @@ export default async function SettingsPage() {
               <div className="space-y-3">
 
                 {/* ── PLAN CARD ── */}
-
-                {/* El Patron */}
-                {isPatron && (
-                  <div
-                    className="p-5 relative overflow-hidden"
-                    style={{
-                      background: "linear-gradient(135deg, #1a0f2e 0%, #2d1657 100%)",
-                      borderRadius: "var(--r-md)",
-                      border: "1px solid rgba(124,58,237,0.3)",
-                      boxShadow: "0 0 32px rgba(124,58,237,0.12), var(--shadow-md)",
-                    }}
-                  >
-                    <div style={{
-                      position: "absolute", inset: 0, pointerEvents: "none",
-                      background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(236,72,153,0.08) 0%, transparent 70%)",
-                    }} />
-                    <div style={{ position: "relative" }}>
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--ink-300)" }}>
-                          Ton plan
-                        </p>
-                        <span
-                          className="text-xs px-2.5 py-1 rounded-full font-bold"
-                          style={{
-                            background: "linear-gradient(90deg, #7C3AED, #ec4899, #f59e0b)",
-                            color: "white",
-                            letterSpacing: "0.01em",
-                          }}
-                        >
-                          ⚡ El Patron
-                        </span>
-                      </div>
-                      <p className="text-sm mb-4" style={{ color: "var(--ink-300)", lineHeight: 1.6 }}>
-                        C&apos;est toi qui as construit tout ça. Respect. 🫡
-                      </p>
-                      <ManageSubscriptionButton />
-                    </div>
-                  </div>
-                )}
 
                 {/* Founder actif — thème gold */}
                 {isActiveFounder && (
