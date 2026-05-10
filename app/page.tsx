@@ -1870,7 +1870,10 @@ export default async function HomePage() {
                 <ul className="footer-links">
                   <li><Link href="/histoire">Notre histoire</Link></li>
                   <li><a href="mailto:hello@keskireste.fr">Contact</a></li>
-                  <li><a href="/histoire">Notre histoire</a></li>
+                  <li>
+                    <span style={{ opacity: 0.4, cursor: "default" }}>Blog</span>
+                    <span style={{ fontSize: 10, marginLeft: 6, opacity: 0.4 }}>bientôt</span>
+                  </li>
                 </ul>
               </div>
               <div>
@@ -1883,11 +1886,7 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="footer-bottom">
-              <span>© 2025 keskireste. Fait avec ♥ à Mpl.</span>
-              <div style={{display:'flex', gap:'20px'}}>
-                <Link href="/legal/mentions">Mentions légales</Link>
-                <Link href="/legal/confidentialite">Politique de confidentialité</Link>
-              </div>
+              <span>© 2025 keskireste. — Fait avec ♥ à Mpl.</span>
             </div>
           </div>
         </footer>
