@@ -343,7 +343,7 @@ const landingStyles = `
     font-size: 0.875rem;
   }
   .wf-row:hover { background: rgba(124, 92, 255, 0.06); }
-  .wf-row .label { color: rgba(221, 206, 255, 0.7); }
+  .wf-row .label { color: rgba(221, 206, 255, 0.85); }
   .wf-row .bar-wrap {
     width: 120px;
     height: 6px;
@@ -629,7 +629,7 @@ const landingStyles = `
     padding: 7px 0;
     font-size: 0.8125rem;
   }
-  .calc-row .clabel { color: rgba(189, 168, 255, 0.6); }
+  .calc-row .clabel { color: rgba(189, 168, 255, 0.82); }
   .calc-row .cval { font-weight: 700; font-family: var(--font-geist-mono), monospace; }
   .calc-row .cval-green { color: var(--green); }
   .calc-row .cval-rose { color: #f4a593; }
@@ -1240,11 +1240,26 @@ export default async function HomePage() {
       <style>{landingStyles}</style>
       <div className="landing">
 
+        {/* Skip to main content — accessibilité */}
+        <a
+          href="#main-content"
+          style={{
+            position: "absolute", top: -40, left: 16, zIndex: 9999,
+            background: "var(--violet-500)", color: "#fff",
+            padding: "8px 16px", borderRadius: 6, fontSize: 14, fontWeight: 600,
+            textDecoration: "none", transition: "top 0.15s",
+          }}
+          onFocus={(e) => { (e.currentTarget as HTMLElement).style.top = "8px" }}
+          onBlur={(e) => { (e.currentTarget as HTMLElement).style.top = "-40px" }}
+        >
+          Aller au contenu principal
+        </a>
+
         {/* NAV */}
-        <nav className="nav">
+        <nav className="nav" aria-label="Navigation principale">
           <div className="nav-inner">
             <Link href="/" className="nav-logo">
-              <Image src="/logos/logo-dark.png" alt="keskireste." width={140} height={34} style={{ height: 30, width: "auto" }} priority />
+              <Image src="/logos/logo-dark.png" alt="keskireste." width={140} height={34} sizes="140px" style={{ height: 30, width: "auto" }} priority />
             </Link>
             <ul className="nav-links">
               <li><a href="#how">Comment ça marche</a></li>
@@ -1261,7 +1276,7 @@ export default async function HomePage() {
         </nav>
 
         {/* HERO */}
-        <section className="hero">
+        <section id="main-content" className="hero">
           <div>
             <div className="hero-eyebrow">
               <span className="dot"></span>
@@ -1395,7 +1410,7 @@ export default async function HomePage() {
         </section>
 
         {/* HOW */}
-        <section id="how" className="how-section">
+        <section id="how" className="how-section" aria-label="Comment ça marche">
           <div className="section-inner">
             <div className="eyebrow"><span className="eyebrow-num">02</span> Comment ça marche</div>
             <h2 className="section-h2">Trois étapes,<br />aucune prise de tête</h2>
@@ -1481,7 +1496,7 @@ export default async function HomePage() {
         </section>
 
         {/* FEATURES */}
-        <section id="features" className="features-section">
+        <section id="features" className="features-section" aria-label="Fonctionnalités">
           <div className="section-inner">
             {/* Feature 1 — Alertes */}
             <div className="feature-row">
@@ -1684,7 +1699,7 @@ export default async function HomePage() {
         </section>
 
         {/* PRICING */}
-        <section id="pricing" className="pricing-section">
+        <section id="pricing" className="pricing-section" aria-label="Tarifs">
           <div className="section-inner">
             <div className="eyebrow"><span className="eyebrow-num" style={{color:'rgba(189,168,255,0.5)'}}>06</span> Tarifs</div>
             <h2 className="section-h2">Simple. Transparent.<br />Sans mauvaises surprises.</h2>
@@ -1765,7 +1780,7 @@ export default async function HomePage() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="faq-section">
+        <section id="faq" className="faq-section" aria-label="Questions fréquentes">
           <div className="section-inner">
             <div style={{textAlign:'center'}}>
               <div className="eyebrow" style={{justifyContent:'center'}}>FAQ</div>
@@ -1830,7 +1845,7 @@ export default async function HomePage() {
             <div className="footer-grid">
               <div>
                 <div className="footer-brand-logo">
-                  <Image src="/logos/logo-light.png" alt="keskireste." width={130} height={32} style={{ height: 28, width: "auto" }} />
+                  <Image src="/logos/logo-light.png" alt="keskireste." width={130} height={32} sizes="130px" style={{ height: 28, width: "auto" }} />
                 </div>
                 <p className="footer-brand-desc">Le copilote financier des auto-entrepreneurs français. Simple, honnête, utile.</p>
               </div>
@@ -1848,7 +1863,7 @@ export default async function HomePage() {
                 <ul className="footer-links">
                   <li><Link href="/histoire">Notre histoire</Link></li>
                   <li><a href="mailto:hello@keskireste.fr">Contact</a></li>
-                  <li><a href="#">Blog</a></li>
+                  <li><a href="/histoire">Notre histoire</a></li>
                 </ul>
               </div>
               <div>
