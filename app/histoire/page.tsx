@@ -422,7 +422,7 @@ const css = `
     display: block; color: #EAE3D0; text-decoration: none;
     font-size: 14px; padding: 5px 0; transition: color 0.15s;
   }
-  .h-footer-col a:hover { color: var(--v400); }
+  .h-footer-col a:hover { color: #fff; }
   .h-footer-bottom {
     border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px;
     display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
