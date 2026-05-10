@@ -9,21 +9,6 @@ const LAST_UPDATED = "1er mai 2025"
 export default function PrivacyPage() {
   return (
     <main style={{ minHeight: "100vh", background: "var(--cream-100)", color: "var(--ink-900)" }}>
-      {/* Header */}
-      <header style={{ background: "var(--cream-50)", borderBottom: "1px solid var(--cream-200)", padding: "16px 24px" }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--ink-900)" }}>
-              KeskiReste<span style={{ color: "var(--violet-500)" }}>.</span>
-            </span>
-          </Link>
-          <div style={{ display: "flex", gap: 16, fontSize: 13, color: "var(--ink-400)" }}>
-            <Link href="/legal/terms" style={{ color: "var(--ink-400)", textDecoration: "none" }}>CGU</Link>
-            <Link href="/login" style={{ color: "var(--violet-700)", textDecoration: "none", fontWeight: 600 }}>Connexion</Link>
-          </div>
-        </div>
-      </header>
-
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--violet-700)", marginBottom: 12 }}>
           Légal
