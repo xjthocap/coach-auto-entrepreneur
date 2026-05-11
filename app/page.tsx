@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { getSupabaseAdmin } from "@/lib/supabase/admin"
+import LandingCalculator from "@/components/LandingCalculator"
 
 export const metadata: Metadata = {
   title: "keskireste. — Le copilote financier des auto-entrepreneurs",
@@ -1416,10 +1417,13 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* CALCULATOR */}
+        <LandingCalculator />
+
         {/* HOW */}
         <section id="how" className="how-section" aria-label="Comment ça marche">
           <div className="section-inner">
-            <div className="eyebrow"><span className="eyebrow-num">02</span> Comment ça marche</div>
+            <div className="eyebrow"><span className="eyebrow-num">03</span> Comment ça marche</div>
             <h2 className="section-h2">Trois étapes,<br />aucune prise de tête</h2>
             <div className="how-steps">
               <div className="how-step">
@@ -1508,7 +1512,7 @@ export default async function HomePage() {
             {/* Feature 1 — Alertes */}
             <div className="feature-row">
               <div className="feature-text">
-                <div className="eyebrow"><span className="eyebrow-num">03</span> Alertes intelligentes</div>
+                <div className="eyebrow"><span className="eyebrow-num">04</span> Alertes intelligentes</div>
                 <h3 className="feature-h3">Ne sois plus jamais<br />pris par surprise</h3>
                 <p>KeskiReste surveille ta trésorerie et t&apos;alerte avant que tu débordes. Echéance URSSAF dans 15 jours ? Provision insuffisante ? Tu le sais avant que ça arrive.</p>
                 <ul className="feature-list">
@@ -1557,7 +1561,7 @@ export default async function HomePage() {
             {/* Feature 2 — Coach IA */}
             <div className="feature-row reverse">
               <div className="feature-text">
-                <div className="eyebrow"><span className="eyebrow-num">04</span> Coach IA</div>
+                <div className="eyebrow"><span className="eyebrow-num">05</span> Coach IA</div>
                 <h3 className="feature-h3">Un conseiller financier<br />dans ta poche</h3>
                 <p>Pose tes questions en langage naturel. &quot;Est-ce que je peux m&apos;acheter un Mac à 1 500 € ce mois-ci ?&quot; — Il sait, il répond, il argumente.</p>
                 <ul className="feature-list">
@@ -1588,7 +1592,7 @@ export default async function HomePage() {
             {/* Feature 3 — Factures PDF */}
             <div className="feature-row">
               <div className="feature-text">
-                <div className="eyebrow"><span className="eyebrow-num">05</span> Factures PDF</div>
+                <div className="eyebrow"><span className="eyebrow-num">06</span> Factures PDF</div>
                 <h3 className="feature-h3">Tes factures en 30 secondes,<br />conformes et prêtes</h3>
                 <p>Génère des factures professionnelles conformes à la législation française. Numérotation automatique, mentions légales, export PDF d&apos;un clic.</p>
                 <ul className="feature-list">
