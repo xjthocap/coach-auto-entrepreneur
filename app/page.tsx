@@ -55,6 +55,7 @@ const landingStyles = `
     background: var(--cream-50);
     color: var(--ink);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   /* Skip nav */

@@ -101,6 +101,7 @@ body {
   background: var(--cream-100);
   color: var(--ink-900);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 /* ── Animations ── */
