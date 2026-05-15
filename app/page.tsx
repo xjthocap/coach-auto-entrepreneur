@@ -4,6 +4,9 @@ import Link from "next/link"
 import { getSupabaseAdmin } from "@/lib/supabase/admin"
 import LandingCalculator from "@/components/LandingCalculator"
 
+// Revalider la page toutes les 60s pour que le compteur Founder soit frais
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "keskireste. — Le copilote financier des auto-entrepreneurs",
   description: "Suivez vos revenus, dépenses et cotisations URSSAF en temps réel. Simple, honnête, fait par un freelance pour les freelances français.",
