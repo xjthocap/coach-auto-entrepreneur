@@ -102,7 +102,9 @@ export function calculateMicro({
     taxRate = 0.022
   }
 
-  // 🔹 ACRE (version simplifiée)
+  // 🔹 ACRE — exonération dégressive (simplifiée : on applique 50% sans gestion de la durée)
+  // Réalité : 50% les 4 premiers trimestres, 25% les suivants, 10% encore après.
+  // TODO: implémenter acre_start_date dans le profil pour calculer le bon taux.
   if (acre) {
     socialRate = socialRate * 0.5
   }

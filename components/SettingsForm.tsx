@@ -189,7 +189,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         />
         <div>
           <p style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-900)" }}>ACRE</p>
-          <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 1 }}>Réduction des cotisations sociales la 1ère année</p>
+          <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 1 }}>Réduction de 50% les 4 premiers trimestres — décocher après la 1ère année d'activité</p>
         </div>
       </label>
 

@@ -6,9 +6,9 @@ import Link from "next/link"
 type ActivityType = "service" | "vente" | "liberal"
 
 const ACTIVITIES: { value: ActivityType; label: string; urssaf: number; abattement: number }[] = [
-  { value: "service",  label: "Prestation de services",  urssaf: 0.212, abattement: 0.50 },
-  { value: "vente",    label: "Vente de marchandises",   urssaf: 0.123, abattement: 0.71 },
-  { value: "liberal",  label: "Profession libérale",     urssaf: 0.256, abattement: 0.34 },
+  { value: "service",  label: "Prestation de services (BIC)",          urssaf: 0.212, abattement: 0.50 },
+  { value: "vente",    label: "Vente de marchandises",                  urssaf: 0.123, abattement: 0.71 },
+  { value: "liberal",  label: "Profession libérale non réglementée",   urssaf: 0.256, abattement: 0.34 },
 ]
 
 const BAREME_IR = [
@@ -383,7 +383,7 @@ export default function LandingCalculator() {
             </div>
 
             <p className="lc-disclaimer">
-              Estimation hors dépenses professionnelles · hypothèse 1 part fiscale, sans ACRE ni versement libératoire
+              Simulation indicative · foyer célibataire sans autre revenu · 1 part fiscale · hors dépenses pro · sans ACRE ni versement libératoire · professions libérales réglementées (CIPAV) : taux URSSAF différent (22,8%)
             </p>
           </div>
         </div>

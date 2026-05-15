@@ -25,7 +25,8 @@ export default function MentionsPage() {
         <LegalSection title="1. Éditeur du site">
           <p><strong>Nom :</strong> Thomas Capron</p>
           <p style={{ marginTop: 8 }}><strong>Statut :</strong> Micro-entrepreneur</p>
-          <p style={{ marginTop: 8 }}><strong>Adresse :</strong> Montpellier, France</p>
+          <p style={{ marginTop: 8 }}><strong>Adresse :</strong> Montpellier (34), France</p>
+          <p style={{ marginTop: 8 }}><strong>SIRET :</strong> [À compléter]</p>
           <p style={{ marginTop: 8 }}><strong>Email :</strong>{" "}
             <a href="mailto:contact@keskireste.fr" style={{ color: "var(--violet-700)" }}>contact@keskireste.fr</a>
           </p>

@@ -56,12 +56,15 @@ export default function PrivacyPage() {
         </LegalSection>
 
         <LegalSection title="5. Hébergement et sous-traitants">
+          <p style={{ marginBottom: 12 }}>Conformément à l&apos;article 28 du RGPD, nous faisons appel aux sous-traitants suivants :</p>
           <ul style={{ paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
             <li><strong>Supabase</strong> (base de données et authentification) — hébergé sur AWS eu-west-1 (Irlande)</li>
             <li><strong>Vercel</strong> (hébergement web) — infrastructure UE disponible</li>
-            <li><strong>Stripe</strong> (paiements) — conforme PCI-DSS</li>
-            <li><strong>Anthropic</strong> (coach IA) — données de la période transmises pour l&apos;analyse, sans identifiant personnel</li>
+            <li><strong>Stripe</strong> (paiements) — conforme PCI-DSS, données de paiement non stockées par nos soins</li>
+            <li><strong>Resend</strong> (emails transactionnels) — votre adresse email est transmise pour l&apos;envoi des emails du service (confirmation, alertes)</li>
+            <li><strong>OpenAI</strong> (coach IA) — données agrégées de la période transmises pour l&apos;analyse, sans identifiant personnel direct</li>
           </ul>
+          <p style={{ marginTop: 12 }}>Vos données financières (IBAN, revenus, factures) ne sont transmises à aucun de ces sous-traitants, à l&apos;exception de Supabase qui les héberge.</p>
         </LegalSection>
 
         <LegalSection title="6. Durée de conservation">

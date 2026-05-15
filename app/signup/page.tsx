@@ -35,11 +35,13 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
     if (loading) return
     setMessage("")
+    if (!acceptedTerms) { setMessage("Tu dois accepter les conditions d'utilisation pour continuer."); return }
     if (!email || !password) { setMessage("Remplis ton email et ton mot de passe."); return }
     if (password !== confirmPassword) { setMessage("Les mots de passe ne correspondent pas."); return }
     setLoading(true)
@@ -287,6 +289,27 @@ export default function SignupPage() {
                   onFocus={e => e.currentTarget.style.borderColor = "var(--violet-500)"}
                   onBlur={e => e.currentTarget.style.borderColor = "var(--cream-300)"}
                 />
+              </div>
+
+              {/* Case CGU obligatoire */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginTop: 4 }}>
+                <input
+                  id="accept-terms"
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={e => setAcceptedTerms(e.target.checked)}
+                  style={{ marginTop: 2, accentColor: "var(--violet-700)", width: 16, height: 16, flexShrink: 0, cursor: "pointer" }}
+                />
+                <label htmlFor="accept-terms" style={{ fontSize: 13, color: "var(--ink-500)", lineHeight: 1.5, cursor: "pointer" }}>
+                  J&apos;accepte les{" "}
+                  <Link href="/legal/cgv" target="_blank" style={{ color: "var(--violet-700)", fontWeight: 600 }}>
+                    Conditions d&apos;utilisation
+                  </Link>{" "}
+                  et la{" "}
+                  <Link href="/legal/confidentialite" target="_blank" style={{ color: "var(--violet-700)", fontWeight: 600 }}>
+                    Politique de confidentialité
+                  </Link>
+                </label>
               </div>
 
               {message && (
