@@ -7,6 +7,7 @@ import ManageSubscriptionButton from "@/components/ManageSubscriptionButton"
 import UpgradeButton from "@/components/UpgradeButton"
 import DeleteAccountButton from "@/components/DeleteAccountButton"
 import LogoUpload from "@/components/LogoUpload"
+import LogoutButton from "@/components/LogoutButton"
 import Link from "next/link"
 
 export default async function SettingsPage() {
@@ -338,6 +339,19 @@ export default async function SettingsPage() {
             </section>
           </div>
         </section>
+      </div>
+
+      {/* Bouton déconnexion mobile — visible uniquement sur mobile (caché sur lg = sidebar présente) */}
+      <div className="mx-auto max-w-7xl px-4 pb-24 lg:hidden">
+        <div
+          className="rounded-2xl p-4"
+          style={{ background: "var(--cream-50)", border: "1px solid var(--cream-300)" }}
+        >
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--ink-400)" }}>
+            Session
+          </p>
+          <LogoutButton />
+        </div>
       </div>
 
       <MobileNav />
