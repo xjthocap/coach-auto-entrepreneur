@@ -102,8 +102,8 @@ body {
   color: var(--ink-900);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
-  /* Support safe area iOS (PWA + notch) */
-  padding-bottom: env(safe-area-inset-bottom);
+  /* Compense la barre de statut iOS (heure, batterie) en mode PWA */
+  padding-top: env(safe-area-inset-top);
 }
 
 /* ── Animations ── */
