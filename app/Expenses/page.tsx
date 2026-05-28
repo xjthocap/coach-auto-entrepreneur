@@ -131,7 +131,7 @@ export default async function ExpensesPage({
         <section className="min-w-0 flex-1 pb-20 lg:pb-0 page-enter">
           {/* TOPBAR */}
           <header
-            className="sticky top-0 z-20 backdrop-blur"
+            className="sticky-safe z-20 backdrop-blur"
             style={{
               background: "rgba(248, 247, 252, 0.92)",
               borderBottom: "1px solid var(--cream-300)",

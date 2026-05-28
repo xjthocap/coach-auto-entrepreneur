@@ -106,6 +106,10 @@ body {
   padding-top: env(safe-area-inset-top);
 }
 
+/* ── Safe area : headers sticky en mode PWA iOS ── */
+/* Remplace top-0 sur les éléments sticky pour coller sous la barre de statut */
+.sticky-safe { position: sticky; top: env(safe-area-inset-top); }
+
 /* ── Animations ── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

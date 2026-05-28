@@ -44,7 +44,7 @@ export default async function SettingsPage() {
         <section className="min-w-0 flex-1 pb-20 lg:pb-0 page-enter">
           {/* TOPBAR */}
           <header
-            className="sticky top-0 z-20 backdrop-blur"
+            className="sticky-safe z-20 backdrop-blur"
             style={{ background: "rgba(248, 247, 252, 0.92)", borderBottom: "1px solid var(--cream-300)" }}
           >
             <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3.5 md:px-8">
