@@ -2,13 +2,39 @@
   "name": "keskireste.",
   "short_name": "keskireste",
   "description": "Le copilote financier des auto-entrepreneurs français",
+  "id": "/dashboard",
   "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#F8F7FC",
-  "theme_color": "#0F172A",
+  "theme_color": "#6D28D9",
   "lang": "fr",
+  "categories": ["finance", "business", "productivity"],
   "icons": [
     { "src": "/logos/icon-32.png",  "sizes": "32x32",   "type": "image/png" },
-    { "src": "/logos/icon-64.png",  "sizes": "64x64",   "type": "image/png" }
+    { "src": "/logos/icon-64.png",  "sizes": "64x64",   "type": "image/png" },
+    { "src": "/logos/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/logos/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "/logos/logo-dark-tagline.png",
+      "sizes": "1200x300",
+      "type": "image/png",
+      "label": "keskireste. — Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ajouter un revenu",
+      "url": "/revenues",
+      "description": "Enregistrer un nouveau revenu"
+    },
+    {
+      "name": "Tableau de bord",
+      "url": "/dashboard",
+      "description": "Voir mon résumé financier"
+    }
   ]
 }

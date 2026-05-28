@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react"
 import UpgradeBanner from "@/components/UpgradeBanner"
 import ChatBotWrapper from "@/components/ChatBotWrapper"
+import PWARegister from "@/components/PWARegister"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,15 +51,22 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/logos/icon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/logos/icon-64.png", sizes: "64x64", type: "image/png" },
+      { url: "/logos/icon-32.png",  sizes: "32x32",   type: "image/png" },
+      { url: "/logos/icon-64.png",  sizes: "64x64",   type: "image/png" },
+      { url: "/logos/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/logos/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/logos/icon-64.png", sizes: "64x64", type: "image/png" },
+      { url: "/logos/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/logos/icon-32.png",
+    shortcut: "/logos/icon-192.png",
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "keskireste.",
+  },
 };
 
 export default function RootLayout({
@@ -79,6 +87,7 @@ export default function RootLayout({
         <Suspense>
           <ChatBotWrapper />
         </Suspense>
+        <PWARegister />
       </body>
     </html>
   );
