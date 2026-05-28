@@ -63,6 +63,7 @@ export default function MobileNav() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={true}
               className="flex flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-center transition"
               style={{ color: isActive ? "var(--ink-900)" : "var(--ink-300)" }}
             >

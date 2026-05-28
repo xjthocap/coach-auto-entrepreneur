@@ -105,6 +105,11 @@ body {
 }
 
 /* ── Animations ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
 @keyframes wave {
   0%, 60%, 100% { transform: rotate(0deg); }
   10%, 30%      { transform: rotate(-10deg); }
