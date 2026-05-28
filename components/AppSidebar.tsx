@@ -106,7 +106,8 @@ export default function AppSidebar({ activePage, profile, userEmail }: AppSideba
         borderRight: "1px solid var(--cream-200)",
         height: "100vh",
         position: "sticky",
-        top: "env(safe-area-inset-top)",
+        top: 0,
+        paddingTop: "env(safe-area-inset-top)",
         overflowY: "auto",
       }}
     >

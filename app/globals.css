@@ -102,13 +102,15 @@ body {
   color: var(--ink-900);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
-  /* Compense la barre de statut iOS (heure, batterie) en mode PWA */
-  padding-top: env(safe-area-inset-top);
 }
 
 /* ── Safe area : headers sticky en mode PWA iOS ── */
-/* Remplace top-0 sur les éléments sticky pour coller sous la barre de statut */
-.sticky-safe { position: sticky; top: env(safe-area-inset-top); }
+/* top: 0 pour couvrir le gap status bar, padding-top pour descendre le contenu */
+.sticky-safe {
+  position: sticky;
+  top: 0;
+  padding-top: env(safe-area-inset-top);
+}
 
 /* ── Animations ── */
 @keyframes pulse {

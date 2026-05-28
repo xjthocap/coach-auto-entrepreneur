@@ -212,6 +212,8 @@ export default function ChatBot() {
           inset: 0,
           width: "100vw",
           height: "100dvh",
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
           background: "white",
           borderRadius: 0,
           boxShadow: "none",
