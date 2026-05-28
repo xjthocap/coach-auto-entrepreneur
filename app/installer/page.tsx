@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "Installer l'app — keskireste.",
@@ -171,15 +172,7 @@ export default function InstallerPage() {
       {/* Nav */}
       <nav className="install-nav">
         <Link href="/" className="install-logo">
-          <div className="install-logo-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="3" width="7" height="9" rx="1.5" fill="white" fillOpacity="0.9"/>
-              <rect x="14" y="3" width="7" height="5" rx="1.5" fill="white" fillOpacity="0.6"/>
-              <rect x="14" y="12" width="7" height="9" rx="1.5" fill="white" fillOpacity="0.9"/>
-              <rect x="3" y="16" width="7" height="5" rx="1.5" fill="white" fillOpacity="0.6"/>
-            </svg>
-          </div>
-          keskireste.
+          <Image src="/logos/logo-dark.png" alt="keskireste." width={140} height={36} style={{ height: 32, width: "auto" }} priority />
         </Link>
         <Link href="/dashboard" style={{ fontSize: 14, fontWeight: 600, color: "#6D28D9", textDecoration: "none" }}>
           Ouvrir l&apos;app →
