@@ -102,6 +102,8 @@ body {
   color: var(--ink-900);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  /* Support safe area iOS (PWA + notch) */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ── Animations ── */

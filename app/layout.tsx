@@ -67,6 +67,10 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "keskireste.",
   },
+  // viewport-fit=cover pour que env(safe-area-inset-*) fonctionne sur iOS
+  other: {
+    "viewport": "width=device-width, initial-scale=1, viewport-fit=cover",
+  },
 };
 
 export default function RootLayout({

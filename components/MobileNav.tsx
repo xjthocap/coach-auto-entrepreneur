@@ -52,6 +52,7 @@ export default function MobileNav() {
       style={{
         background: "rgba(251, 250, 245, 0.95)",
         borderTop: "1px solid var(--cream-200)",
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
       <div className="flex items-center justify-around px-2 py-2">
