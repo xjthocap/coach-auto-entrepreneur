@@ -134,7 +134,7 @@ export default async function HistoryPage({
         expenses: monthExpenses,
         totalRevenue,
         totalExpenses,
-        charges: result.charges,
+        charges: result.charges + result.cfp,
         tax: result.tax,
         net: result.net - totalExpenses,
       }

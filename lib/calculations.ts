@@ -70,6 +70,14 @@ export function buildAnnualProjection(
   }
 }
 
+// ── Taux CFP (Contribution à la Formation Professionnelle) ───────────────────
+// Source : URSSAF 2026 — calculée sur le CA, arrondie à l'euro supérieur
+const CFP_RATE: Record<ActivityType, number> = {
+  vente:   0.001, // 0,1 % — BIC vente de marchandises
+  service: 0.003, // 0,3 % — BIC prestations de services
+  liberal: 0.002, // 0,2 % — BNC professions libérales
+}
+
 type CalculationInput = {
   revenue: number
   activityType: ActivityType
@@ -114,14 +122,22 @@ export function calculateMicro({
     taxRate = 0
   }
 
-  const charges = revenue * socialRate
-  const tax = revenue * taxRate
-  const net = revenue - charges - tax
+  // URSSAF arrondit à l'euro supérieur
+  const charges = Math.ceil(revenue * socialRate)
+  const tax     = taxRate > 0 ? Math.ceil(revenue * taxRate) : 0
+
+  // CFP — arrondie à l'euro supérieur (idem URSSAF)
+  const cfpRate = CFP_RATE[activityType]
+  const cfp     = Math.ceil(revenue * cfpRate)
+
+  const net = revenue - charges - cfp - tax
 
   return {
     socialRate,
     taxRate,
+    cfpRate,
     charges,
+    cfp,
     tax,
     net,
   }

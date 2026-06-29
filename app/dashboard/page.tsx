@@ -284,7 +284,7 @@ export default async function DashboardPage({
     : 0
 
   const realNet       = result.net - totalExpenses - irEstimate
-  const reserveAmount = result.charges + result.tax + irEstimate
+  const reserveAmount = result.charges + result.cfp + result.tax + irEstimate
 
   // ===== PÉRIODE PRÉCÉDENTE (pour comparatifs) =====
   const prevPeriod = getPeriodRange(frequency, prevDate)
@@ -322,7 +322,7 @@ export default async function DashboardPage({
   const prevIrEstimate    = useIREstimate
     ? estimateIRProvision(prevTotalRevenue, profile.activity_type, periodsPerYear)
     : 0
-  const prevReserveAmount = prevResult.charges + prevResult.tax + prevIrEstimate
+  const prevReserveAmount = prevResult.charges + prevResult.cfp + prevResult.tax + prevIrEstimate
   const prevRealNet       = prevResult.net - prevTotalExpenses - prevIrEstimate
 
   // ===== PÉRIODE AVANT-PRÉCÉDENTE (pour historique projection) =====
@@ -586,6 +586,14 @@ export default async function DashboardPage({
                     value={`−${result.charges.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
                     valueColor="var(--rose-500)"
                   />
+                  {/* CFP */}
+                  <WaterfallRow
+                    label="Formation pro (CFP)"
+                    tag={`${(result.cfpRate * 100).toFixed(1)}%`}
+                    tagStyle={{ background: "rgba(255,255,255,0.07)", color: "var(--ink-300)" }}
+                    value={`−${result.cfp.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €`}
+                    valueColor="var(--rose-500)"
+                  />
                   {/* Impôt — avec bouton détail si estimation barème */}
                   {useIREstimate ? (
                     <WaterfallRow
@@ -831,7 +839,7 @@ export default async function DashboardPage({
                   isPremium ? (
                     <AIInsightsCard
                       totalRevenue={totalRevenue}
-                      charges={result.charges}
+                      charges={result.charges + result.cfp}
                       tax={useIREstimate ? irEstimate : result.tax}
                       expenses={totalExpenses}
                       realNet={realNet}
@@ -850,7 +858,7 @@ export default async function DashboardPage({
                     <ProjectionCard
                       periodLabel={period.label}
                       projectedRevenue={projection.projectedRevenue}
-                      projectedCharges={projectedResult.charges}
+                      projectedCharges={projectedResult.charges + projectedResult.cfp}
                       projectedTax={projectedResult.tax}
                       projectedExpenses={projection.projectedExpenses}
                       projectedRealNet={projectedRealNet}
@@ -919,6 +927,7 @@ export default async function DashboardPage({
                 {[
                   { label: "Chiffre d'affaires", value: totalRevenue },
                   { label: "Charges sociales",  value: result.charges, sub: `${(result.socialRate * 100).toFixed(2)}%` },
+                  { label: "Formation pro (CFP)", value: result.cfp, sub: `${(result.cfpRate * 100).toFixed(1)}%` },
                   useIREstimate
                     ? { label: "Provision IR (estimée)", value: irEstimate, sub: "Barème progressif · 1 part" }
                     : { label: "Impôt libératoire",      value: result.tax, sub: `${(result.taxRate * 100).toFixed(2)}%` },

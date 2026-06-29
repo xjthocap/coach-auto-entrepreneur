@@ -91,7 +91,7 @@ export async function POST(req: Request) {
       acre: profile.acre ?? false,
       versementLiberatoire: profile.versement_liberatoire ?? false,
     })
-    const urssaf = micro.charges
+    const urssaf = micro.charges + micro.cfp
     const irProvision = estimateIRProvision(totalRevenue, activityType, periodsPerYear, yearRevenue)
     const totalSet = urssaf + irProvision
     const realNet = totalRevenue - totalSet - totalExpenses
